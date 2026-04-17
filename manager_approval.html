@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offers — Back Office Prototype</title>
+  <script src="https://cdn.tailwindcss.com?plugins="></script>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    html, body { font-family: "Figtree", sans-serif; -webkit-font-smoothing: antialiased; }
+    .animate-in { opacity: 0; animation: fadeInUp 400ms ease-out forwards; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); filter: blur(4px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    /* ── Queue styles ── */
+    .offer-row { transition: background 120ms ease; cursor: pointer; }
+    .offer-row:hover { background: #fafaf8; }
+    .offer-row:active { background: #f4f3ef; }
+    .tr-bar-track { width: 64px; height: 6px; border-radius: 3px; background: #eae8e4; position: relative; overflow: visible; }
+    .tr-bar-fill { height: 100%; border-radius: 3px; transition: width 200ms, background 200ms; }
+    .tr-bar-floor { position: absolute; top: -2px; bottom: -2px; width: 2px; border-radius: 1px; background: #fb2c36; opacity: 0.5; }
+    .filter-chip { transition: all 150ms; }
+    .filter-chip:hover { background: #eae8e4; }
+    .nav-item { transition: background 120ms; }
+    .nav-item:hover { background: #5f4f300d; }
+    .nav-item.active { background: #090806ec; color: white; }
+    .dropdown-menu { opacity: 0; transform: scale(0.95) translateY(-4px); pointer-events: none; transition: opacity 150ms, transform 150ms; transform-origin: top left; }
+    .dropdown-menu.open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+    .dropdown-item:hover { background: #5f4f300d; }
+    .active-filter { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: #5f4f300d; color: #090806ec; cursor: pointer; transition: background 120ms; }
+    .active-filter:hover { background: #756b571a; }
+    .active-filter svg { opacity: 0.5; }
+    .checkbox { width: 18px; height: 18px; border-radius: 5px; border: 2px solid #8f867633; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 150ms; flex-shrink: 0; }
+    .checkbox.checked { background: #090806ec; border-color: #090806ec; }
+    .sortable { cursor: pointer; user-select: none; }
+    .sortable:hover { color: #090806ec; }
+    .sortable svg { opacity: 0.4; transition: transform 150ms, opacity 150ms; }
+    .sortable.sort-active { color: #090806ec; }
+    .sortable.sort-active svg { opacity: 1; }
+    .sortable.sort-asc svg { transform: rotate(180deg); }
+
+    /* ── Detail styles ── */
+    .si { transition: background 120ms; cursor: pointer; }
+    .si:hover { background: #5f4f300d; }
+    .si.on { background: #e1e51a33; color: #090806ec; }
+    .tb { position: relative; padding: 0 2px 10px; font-size: 14px; line-height: 20px; font-weight: 500; color: #807e79; cursor: pointer; background: none; border: none; font-family: "Figtree", sans-serif; transition: color 150ms; }
+    .tb.on { color: #090806ec; font-weight: 600; }
+    .tb.on::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #c7ca16; border-radius: 1px 1px 0 0; }
+    .tb:hover:not(.on) { color: #090806ec; }
+    .tc { display: none; }
+    .tc.on { display: block; }
+    .mo { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 60; opacity: 0; pointer-events: none; transition: opacity 200ms; }
+    .mo.open { opacity: 1; pointer-events: auto; }
+    .mp { background: white; border-radius: 12px; width: 480px; padding: 24px; box-shadow: 0 16px 40px rgba(0,0,0,0.12); transform: scale(0.97); transition: transform 200ms cubic-bezier(0.2,0,0,1); }
+    .mo.open .mp { transform: scale(1); }
+    .sg { flex: 1; height: 36px; border-radius: 8px; border: 1px solid #e0ddd8; background: white; font-size: 13px; font-weight: 500; color: #090806ec; cursor: pointer; transition: all 150ms; font-family: "Figtree", sans-serif; }
+    .sg.sel { border-color: #090806ec; background: #f6f5f3; }
+    .sg:hover:not(.sel) { border-color: #aaa; }
+    .stab { padding: 8px 16px; font-size: 13px; font-weight: 500; color: #807e79; cursor: pointer; border-bottom: 2px solid transparent; transition: all 150ms; background: none; border-top: none; border-left: none; border-right: none; font-family: "Figtree", sans-serif; }
+    .stab.on { color: #090806ec; font-weight: 600; border-bottom-color: #c7ca16; }
+    .stab:hover:not(.on) { color: #090806ec; }
+    .sc { display: none; }
+    .sc.on { display: block; }
+
+    /* ── View switching ── */
+    .view { display: none; }
+    .view.active { display: flex; }
+  </style>
+</head>
+<body class="bg-[#f6f5f3] min-h-screen">
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- ═══ VIEW 1: OFFERS QUEUE                                      ═══ -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <div id="view-queue" class="view active min-h-screen">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="w-[240px] bg-white border-r border-[#756b571a] flex flex-col flex-shrink-0 animate-in" style="animation-delay: 0ms">
+      <div class="px-5 pt-5 pb-4 flex items-center gap-3">
+        <div class="size-9 rounded-[12px] bg-[#090806ec] flex items-center justify-center flex-shrink-0">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M5 17C5 17 7 10 11 8C15 6 18 8 18 8C18 8 14 9 12 12C10 15 11 17 11 17H5Z" fill="#e1e51a"/><path d="M9 17C9 17 10 14 12 12" stroke="#e1e51a" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <p class="text-[14px] font-semibold text-[#090806ec]">Teya</p>
+          <p class="text-[11px] text-[#16140e8c]">Back office</p>
+        </div>
+      </div>
+
+      <div class="px-3 flex-1">
+        <div class="mb-1">
+          <p class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] px-3 py-2">Sales</p>
+        </div>
+        <div class="nav-item rounded-xl px-3 py-2.5 flex items-center gap-3 mb-0.5">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h4v6H3V9zm8-4h4v10h-4V5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="text-[14px] font-medium">Dashboard</span>
+        </div>
+        <div class="nav-item active rounded-xl px-3 py-2.5 flex items-center gap-3 mb-0.5">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5h14M2 9h14M2 13h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span class="text-[14px] font-medium">Offers</span>
+          <span class="ml-auto text-[11px] font-semibold bg-[#fe9a001a] text-[#bb4d00] px-2 py-0.5 rounded-full">3</span>
+        </div>
+        <div class="nav-item rounded-xl px-3 py-2.5 flex items-center gap-3 mb-0.5 text-[#16140e8c]">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span class="text-[14px] font-medium">Partner management</span>
+        </div>
+        <div class="nav-item rounded-xl px-3 py-2.5 flex items-center gap-3 mb-0.5 text-[#16140e8c]">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 14l4-4 3 3 5-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="text-[14px] font-medium">Commissions</span>
+        </div>
+        <div class="nav-item rounded-xl px-3 py-2.5 flex items-center gap-3 text-[#16140e8c]">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5l7-3 7 3v8l-7 3-7-3V5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="text-[14px] font-medium">Weekly payments</span>
+        </div>
+      </div>
+
+      <div class="px-3 pb-4 border-t border-[#756b571a] pt-3">
+        <div class="flex items-center gap-3 px-3">
+          <div class="size-8 rounded-full bg-[#e1e51a33] flex items-center justify-center text-[12px] font-semibold text-[#46520f]">SM</div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[13px] font-medium text-[#090806ec] truncate">Sarah Mitchell</p>
+            <p class="text-[11px] text-[#16140e8c]">Sales manager</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main class="flex-1 flex flex-col min-w-0">
+
+      <header class="bg-white border-b border-[#756b571a] px-8 py-5 flex items-center justify-between animate-in" style="animation-delay: 60ms">
+        <h1 class="text-[28px] leading-[36px] font-semibold text-[#090806ec]">Offers</h1>
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[#16140e8c]" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <input type="text" placeholder="Search by merchant or agent..." class="bg-[#f6f5f3] rounded-full h-10 pl-9 pr-4 text-[14px] w-[280px] border-2 border-transparent focus:border-[#090806ec] focus:bg-white outline-none transition-all placeholder:text-[#211c1266]" id="searchInput">
+          </div>
+          <button onclick="toggleFilterPanel()" class="h-10 px-4 rounded-full border border-[#8f867633] bg-white text-[14px] font-medium text-[#090806ec] flex items-center gap-2 hover:bg-[#f6f5f3] transition-colors" id="filterBtn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Filters
+            <span class="hidden bg-[#090806ec] text-white text-[11px] font-semibold size-5 rounded-full items-center justify-center" id="filterCount">0</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="px-8 py-3 border-b border-[#756b571a] bg-white flex items-center gap-2 flex-wrap animate-in relative z-30" style="animation-delay: 100ms" id="filterBar">
+        <div class="flex gap-2 items-center">
+          <span class="text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[1px] mr-1">Status</span>
+          <button class="filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-transparent bg-[#46520f] text-[#e1e51a]" onclick="toggleStatusFilter(this, 'all')" data-status="all" id="filter-all">All</button>
+          <button class="filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-[#8f867633] bg-white text-[#090806ec]" onclick="toggleStatusFilter(this, 'pending')" data-status="pending" id="filter-pending">
+            Pending
+            <span class="ml-1 text-[11px] opacity-60">3</span>
+          </button>
+          <button class="filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-[#8f867633] bg-white text-[#090806ec]" onclick="toggleStatusFilter(this, 'countered')" data-status="countered" id="filter-countered">
+            Countered
+            <span class="ml-1 text-[11px] opacity-60">6</span>
+          </button>
+          <button class="filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-[#8f867633] bg-white text-[#090806ec]" onclick="toggleStatusFilter(this, 'approved')" data-status="approved" id="filter-approved">Approved</button>
+          <button class="filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-[#8f867633] bg-white text-[#090806ec]" onclick="toggleStatusFilter(this, 'rejected')" data-status="rejected" id="filter-rejected">Rejected</button>
+          <button class="filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-[#8f867633] bg-white text-[#090806ec]" onclick="toggleStatusFilter(this, 'onboarded')" data-status="onboarded" id="filter-onboarded">Onboarded</button>
+        </div>
+
+        <div class="w-px h-6 bg-[#756b571a] mx-2"></div>
+
+        <div class="relative">
+          <button class="filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-[#8f867633] bg-white text-[#090806ec] flex items-center gap-1.5" onclick="toggleDropdown('channel-dd')">
+            Channel
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </button>
+          <div class="dropdown-menu absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_4px_16px_rgba(0,0,0,0.12)] z-50 min-w-[160px] py-1.5 overflow-hidden" id="channel-dd">
+            <button class="dropdown-item w-full text-left px-4 py-2.5 text-[13px] text-[#090806ec] flex items-center gap-2" onclick="applyFilter('channel','Inside')">Inside</button>
+            <button class="dropdown-item w-full text-left px-4 py-2.5 text-[13px] text-[#090806ec] flex items-center gap-2" onclick="applyFilter('channel','Field')">Field</button>
+            <button class="dropdown-item w-full text-left px-4 py-2.5 text-[13px] text-[#090806ec] flex items-center gap-2" onclick="applyFilter('channel','ISC')">ISC</button>
+            <button class="dropdown-item w-full text-left px-4 py-2.5 text-[13px] text-[#090806ec] flex items-center gap-2" onclick="applyFilter('channel','Partnerships')">Partnerships</button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <button class="filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-[#8f867633] bg-white text-[#090806ec] flex items-center gap-1.5" onclick="toggleDropdown('agent-dd')">
+            Agent
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </button>
+          <div class="dropdown-menu absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_4px_16px_rgba(0,0,0,0.12)] z-50 min-w-[180px] py-1.5 overflow-hidden" id="agent-dd">
+            <button class="dropdown-item w-full text-left px-4 py-2.5 text-[13px] text-[#090806ec]" onclick="applyFilter('agent','Shreyas Parekh')">Shreyas Parekh</button>
+            <button class="dropdown-item w-full text-left px-4 py-2.5 text-[13px] text-[#090806ec]" onclick="applyFilter('agent','Marcus Chen')">Marcus Chen</button>
+            <button class="dropdown-item w-full text-left px-4 py-2.5 text-[13px] text-[#090806ec]" onclick="applyFilter('agent','Ana Silva')">Ana Silva</button>
+            <button class="dropdown-item w-full text-left px-4 py-2.5 text-[13px] text-[#090806ec]" onclick="applyFilter('agent','Jon Sigurdsson')">Jon Sigurdsson</button>
+          </div>
+        </div>
+
+        <div id="activeFilters" class="flex gap-2 flex-wrap"></div>
+      </div>
+
+      <div class="flex-1 overflow-auto">
+        <table class="w-full" id="offersTable">
+          <thead>
+            <tr class="border-b border-[#756b571a] bg-white sticky top-0 z-10">
+              <th class="text-left px-4 py-3 text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[0.5px] w-[22%]">
+                <span class="sortable flex items-center gap-1" onclick="sortTable('merchant')">Deals <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 3L4 5.5L6.5 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+              </th>
+              <th class="text-left px-3 py-3 text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[0.5px] w-[10%]">Agent</th>
+              <th class="text-left px-3 py-3 text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[0.5px] w-[6%]">Channel</th>
+              <th class="text-center px-3 py-3 text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[0.5px] w-[5%]">Stores</th>
+              <th class="text-left px-3 py-3 text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[0.5px] w-[14%]">
+                <span class="sortable flex items-center gap-1" onclick="sortTable('takeRate')">Take rate
+                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 3L4 5.5L6.5 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </span>
+              </th>
+              <th class="text-right px-3 py-3 text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[0.5px] w-[8%]">
+                <span class="sortable flex items-center gap-1 justify-end" onclick="sortTable('tpv')">TPV <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 3L4 5.5L6.5 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+              </th>
+              <th class="text-right px-3 py-3 text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[0.5px] w-[8%]">
+                <span class="sortable flex items-center gap-1 justify-end" onclick="sortTable('revenue')">Revenue <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 3L4 5.5L6.5 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+              </th>
+              <th class="text-center px-3 py-3 text-[12px] font-semibold text-[#16140e8c] uppercase tracking-[0.5px] w-[9%]">Status</th>
+            </tr>
+          </thead>
+          <tbody id="offersBody"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- ═══ VIEW 2: OFFER DETAIL                                       ═══ -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <div id="view-detail" class="view bg-white h-screen overflow-hidden">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="w-[220px] border-r border-[#e8e6e1] flex flex-col shrink-0">
+      <div class="px-5 pt-5 pb-6 flex items-center gap-2.5">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="#090806ec"/><path d="M7 21C7 21 9.5 13 14 11C18.5 9 22 11 22 11C22 11 17.5 12.5 15 16C12.5 19.5 14 21 14 21H7Z" fill="#e1e51a"/></svg>
+        <span class="text-[16px] font-semibold text-[#090806ec] tracking-[-0.2px]">teya</span>
+      </div>
+      <div class="px-3 flex-1">
+        <div class="si rounded-lg px-3 py-2 flex items-center gap-3 mb-0.5 text-[#555450]"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="text-[14px]">Partner management</span></div>
+        <div class="si rounded-lg px-3 py-2 flex items-center gap-3 mb-0.5 text-[#555450]"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h4v6H3V9zm8-4h4v10h-4V5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[14px]">Manual commissions</span></div>
+        <div class="si on rounded-lg px-3 py-2 flex items-center gap-3 mb-0.5 font-medium"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5h14M2 9h14M2 13h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="text-[14px]">Offers</span></div>
+        <div class="si rounded-lg px-3 py-2 flex items-center gap-3 mb-0.5 text-[#555450]"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5l7-3 7 3v8l-7 3-7-3V5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[14px]">Weekly payments</span></div>
+      </div>
+      <div class="px-3 pb-4 border-t border-[#e8e6e1] pt-3 space-y-1">
+        <div class="flex items-center gap-2 px-3 text-[#555450]"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M8 5.5v3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="10.5" r=".6" fill="currentColor"/></svg><span class="text-[13px]">Help centre</span></div>
+        <div class="flex items-center gap-2 px-3 text-[#555450]"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span class="text-[13px]">Legal</span></div>
+        <div class="flex items-center gap-2 px-3 text-[#555450]"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2h8v12H4V2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M6 5h4M6 7.5h4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg><span class="text-[13px]">Docs and guides</span></div>
+      </div>
+    </aside>
+
+    <!-- ═══ MAIN ═══ -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+
+      <div class="bg-white border-b border-[#e8e6e1] px-10 pt-5 pb-5 sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+          <button onclick="showQueue()" class="text-[#807e79] hover:text-[#090806ec] transition-colors"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 4L6 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <svg width="20" height="14" viewBox="0 0 20 14" fill="none"><rect width="20" height="14" rx="2" fill="#012169"/><path d="M0 0l20 14M20 0L0 14" stroke="white" stroke-width="2.5"/><path d="M0 0l20 14M20 0L0 14" stroke="#C8102E" stroke-width="1.2"/><path d="M10 0v14M0 7h20" stroke="white" stroke-width="4"/><path d="M10 0v14M0 7h20" stroke="#C8102E" stroke-width="2"/></svg>
+          <h1 class="text-[22px] font-semibold text-[#090806ec]">SMOKE AND BBQ</h1>
+          <span class="text-[13px] text-[#807e79]">· 2 stores</span>
+          <span id="detailStatusPill" class="inline-flex items-center h-[22px] px-2 rounded text-[11px] font-semibold bg-[#fef3c6] text-[#97660c] ml-1">Pending</span>
+        </div>
+      </div>
+
+      <div class="flex-1 px-10 pb-10 pt-6 bg-[#f6f5f3]">
+        <div class="max-w-[1600px]">
+
+          <div class="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-5">
+            <h3 class="text-[13px] font-semibold text-[#090806ec] mb-4">Take rate</h3>
+            <div class="flex items-end gap-8 pb-3">
+              <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-0.5">Submitted</p>
+                <p class="text-[20px] font-semibold text-[#e7000b] tabular-nums leading-none">0.98%</p>
+              </div>
+              <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-0.5">Floor</p>
+                <p class="text-[20px] font-semibold text-[#090806ec] tabular-nums leading-none">1.20%</p>
+              </div>
+              <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-0.5">Recommended</p>
+                <p class="text-[20px] font-semibold text-[#46520f] tabular-nums leading-none">1.60%</p>
+              </div>
+              <div class="ml-auto text-right">
+                <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-0.5">Revenue gap</p>
+                <p class="text-[18px] font-semibold text-[#e7000b] tabular-nums leading-none">−£248.00<span class="text-[13px] text-[#807e79]">/mo</span></p>
+              </div>
+            </div>
+
+            <div class="relative h-[6px] rounded-[3px] bg-[#eae8e4] mb-1">
+              <div class="h-full rounded-[3px] bg-[#fb2c36]" style="width:30.6%"></div>
+              <div class="absolute top-[-4px] bottom-[-4px] w-[2px] rounded bg-[#090806ec] opacity-20" style="left:37.5%"></div>
+              <div class="absolute top-[-4px] bottom-[-4px] w-[2px] rounded bg-[#46520f] opacity-30" style="left:50%"></div>
+              <div class="absolute top-1/2 -translate-y-1/2 size-[12px] rounded-full bg-[#fb2c36] border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.1)] -translate-x-1/2" style="left:30.6%"></div>
+              <div class="absolute top-1/2 -translate-y-1/2 size-[12px] rounded-full bg-[#46520f] border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.1)] -translate-x-1/2" style="left:50%"></div>
+            </div>
+            <p class="text-[12px] text-[#e7000b] pt-1.5">22 bps below floor</p>
+          </div>
+
+          <div class="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-5">
+            <h3 class="text-[13px] font-semibold text-[#090806ec] mb-3">Revenue projection</h3>
+            <div class="grid grid-cols-4 gap-3">
+              <div class="bg-[#f6f5f3] rounded-lg px-4 py-3">
+                <p class="text-[11px] text-[#807e79] mb-1">Monthly revenue</p>
+                <p class="text-[18px] font-semibold text-[#090806ec] tabular-nums leading-none">£392.00</p>
+              </div>
+              <div class="bg-[#f6f5f3] rounded-lg px-4 py-3">
+                <p class="text-[11px] text-[#807e79] mb-1">Annual revenue</p>
+                <p class="text-[18px] font-semibold text-[#090806ec] tabular-nums leading-none">£4,704.00</p>
+              </div>
+              <div class="bg-[#f6f5f3] rounded-lg px-4 py-3">
+                <p class="text-[11px] text-[#807e79] mb-1">At recommended rate</p>
+                <p class="text-[18px] font-semibold text-[#46520f] tabular-nums leading-none">£640.00<span class="text-[13px] text-[#807e79] font-normal">/mo</span></p>
+              </div>
+              <div class="bg-[#fef5f5] rounded-lg px-4 py-3">
+                <p class="text-[11px] text-[#e7000b] mb-1">Revenue gap</p>
+                <p class="text-[18px] font-semibold text-[#e7000b] tabular-nums leading-none">−£248.00<span class="text-[13px] text-[#807e79] font-normal">/mo</span></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-5">
+            <h3 class="text-[13px] font-semibold text-[#090806ec] mb-3">Reason</h3>
+            <p class="text-[12px] text-[#807e79] mb-1">Brief explanation for the custom amount</p>
+            <p class="text-[14px] text-[#090806ec] leading-[22px]">Large pub chain with high TPV potential. Already has 3 locations confirmed and plans to open 2 more this year. Competitor offer from SumUp at 0.99%. Matching their rate to secure the deal — expected to generate £4,700+ annually in net revenue across all locations.</p>
+          </div>
+
+          <!-- ══ AI SUGGESTION ══ -->
+          <div id="aiSuggestion" class="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-5 relative overflow-hidden">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="size-6 rounded-md bg-[#090806ec] flex items-center justify-center">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 2v2M7 10v2M2 7h2M10 7h2M3.5 3.5l1.4 1.4M9.1 9.1l1.4 1.4M3.5 10.5l1.4-1.4M9.1 4.9l1.4-1.4" stroke="#e1e51a" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7" r="1.5" fill="#e1e51a"/></svg>
+                </div>
+                <h3 class="text-[13px] font-semibold text-[#090806ec]">AI analysis</h3>
+                <span class="inline-flex items-center h-[20px] px-2 rounded text-[11px] font-semibold bg-[#fef3c6] text-[#97660c]">Counter-offer recommended</span>
+              </div>
+            </div>
+
+            <p class="text-[14px] text-[#090806ec] leading-[22px] mb-4">
+              Submitted take rate is <span class="font-semibold">0.98%</span> — 22 bps below the 1.20% floor. The competitor claim checks out, so simply raising the payment rate to match the floor would break the deal. Instead, the full relationship value can be unlocked across <span class="font-semibold">payments, banking, and credit</span> to restore take rate to target while keeping the headline rate close to SumUp's.
+            </p>
+
+            <div id="aiSuggestionBox" class="bg-gradient-to-br from-[#fafaf8] to-[#f6f5f3] border border-[#e8e6e1] rounded-lg p-4">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-1">Suggested counter-offer</p>
+                  <div class="flex items-baseline gap-2.5">
+                    <p class="text-[24px] font-semibold text-[#090806ec] tabular-nums leading-none">1.22%</p>
+                    <span class="text-[12px] text-[#46520f] font-medium">Take rate at floor</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-[11px] text-[#807e79] mb-1">Revenue impact</p>
+                  <p class="text-[15px] font-semibold text-[#46520f] tabular-nums leading-none">+£96.00/mo</p>
+                </div>
+              </div>
+
+              <!-- Levers -->
+              <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2">Levers applied</p>
+              <div class="divide-y divide-[#e8e6e1] border-y border-[#e8e6e1] mb-4">
+                <div class="flex items-center py-2 text-[13px]">
+                  <span class="text-[#090806ec] font-medium w-[140px]">Single rate</span>
+                  <span class="text-[#555450] tabular-nums">0.98% <span class="text-[#a6a4a0] px-1">→</span> 1.05%</span>
+                  <span class="ml-auto text-[#46520f] tabular-nums font-semibold">+7 bps</span>
+                </div>
+                <div class="flex items-center py-2 text-[13px]">
+                  <span class="text-[#090806ec] font-medium w-[140px]">Banking bundle</span>
+                  <span class="text-[#555450]">Light <span class="text-[#a6a4a0] px-1">→</span> Gold</span>
+                  <span class="ml-auto text-[#46520f] tabular-nums font-semibold">+14 bps</span>
+                </div>
+                <div class="flex items-center py-2 text-[13px]">
+                  <span class="text-[#090806ec] font-medium w-[140px]">Contract type</span>
+                  <span class="text-[#555450]">Flexible <span class="text-[#a6a4a0] px-1">→</span> 12 months</span>
+                  <span class="ml-auto text-[#46520f] tabular-nums font-semibold">+3 bps</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="openCounterOffer()" class="h-9 px-4 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-[#252422] transition-colors">
+                  Review & send counter-offer
+                </button>
+                <button onclick="dismissSuggestion()" class="h-9 px-4 rounded-lg border border-[#e0ddd8] text-[13px] font-medium text-[#090806ec] hover:bg-white transition-colors">Dismiss</button>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-1.5 mt-4 text-[11px] text-[#807e79]">
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none" class="mt-[2px] shrink-0"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="9.5" r=".6" fill="currentColor"/></svg>
+              <p>AI analysis based on the submitted offer, the uploaded statement, and the agent's reason.</p>
+            </div>
+          </div>
+
+          <!-- ══ COUNTER-OFFER SENT STATE ══ -->
+          <div id="aiSent" class="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-5 relative overflow-hidden" style="display:none;">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="size-6 rounded-md bg-[#090806ec] flex items-center justify-center">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 2v2M7 10v2M2 7h2M10 7h2M3.5 3.5l1.4 1.4M9.1 9.1l1.4 1.4M3.5 10.5l1.4-1.4M9.1 4.9l1.4-1.4" stroke="#e1e51a" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7" r="1.5" fill="#e1e51a"/></svg>
+                </div>
+                <h3 class="text-[13px] font-semibold text-[#090806ec]">AI analysis</h3>
+                <span class="inline-flex items-center h-[20px] px-2 rounded text-[11px] font-semibold bg-[#f0ede8] text-[#090806ec] gap-1">
+                  <svg width="10" height="10" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Counter-offer sent
+                </span>
+              </div>
+              <p class="text-[11px] text-[#807e79]" id="aiSentTime">Just now</p>
+            </div>
+
+            <p class="text-[14px] text-[#090806ec] leading-[22px] mb-4">
+              Submitted take rate is <span class="font-semibold">0.98%</span> — 22 bps below the 1.20% floor. The competitor claim checks out, so simply raising the payment rate to match the floor would break the deal. Instead, the full relationship value can be unlocked across <span class="font-semibold">payments, banking, and credit</span> to restore take rate to target while keeping the headline rate close to SumUp's.
+            </p>
+
+            <div class="bg-[#fafaf8] border border-[#e8e6e1] rounded-lg p-4 mb-3">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-1">Counter-offer sent</p>
+                  <div class="flex items-baseline gap-2.5">
+                    <p class="text-[24px] font-semibold text-[#090806ec] tabular-nums leading-none" id="aiSentTR">1.22%</p>
+                    <span class="text-[12px] text-[#46520f] font-medium" id="aiSentStatus">Take rate at floor</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-[11px] text-[#807e79] mb-1">Revenue impact</p>
+                  <p class="text-[15px] font-semibold text-[#46520f] tabular-nums leading-none" id="aiSentRev">+£96.00/mo</p>
+                </div>
+              </div>
+
+              <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2">Terms sent</p>
+              <div class="divide-y divide-[#e8e6e1] border-y border-[#e8e6e1] mb-4" id="aiSentLevers">
+                <!-- filled by JS -->
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="cancelCounter()" class="h-9 px-4 rounded-lg border border-[#e0ddd8] bg-white text-[13px] font-medium text-[#090806ec] hover:bg-[#f6f5f3] transition-colors flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  Cancel counter
+                </button>
+                <button onclick="openCounterOffer()" class="h-9 px-4 rounded-lg border border-[#e0ddd8] bg-white text-[13px] font-medium text-[#090806ec] hover:bg-[#f6f5f3] transition-colors">Edit & resend</button>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-1.5 mt-4 text-[11px] text-[#807e79]">
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none" class="mt-[2px] shrink-0"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="9.5" r=".6" fill="currentColor"/></svg>
+              <p>AI analysis based on the submitted offer, the uploaded statement, and the agent's reason.</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-5">
+            <h3 class="text-[13px] font-semibold text-[#090806ec] mb-3">Submitted by</h3>
+            <div class="flex items-center gap-8">
+              <div class="flex items-center gap-3">
+                <div class="size-8 rounded-full bg-[#f0ede8] flex items-center justify-center text-[11px] font-semibold text-[#555450]">SP</div>
+                <div>
+                  <p class="text-[13px] font-semibold text-[#090806ec]">Shreyas Parekh</p>
+                  <p class="text-[11px] text-[#807e79]">ISC · 14 Apr, 22:14</p>
+                </div>
+              </div>
+              <div class="w-px h-8 bg-[#e8e6e1]"></div>
+              <div class="flex items-center gap-6 text-[12px]">
+                <div><span class="text-[#807e79]">Offers this month </span><span class="font-semibold text-[#090806ec] tabular-nums">8</span></div>
+                <div><span class="text-[#807e79]">Avg take rate </span><span class="font-semibold text-[#090806ec] tabular-nums">1.34%</span></div>
+                <div><span class="text-[#807e79]">Needed approval </span><span class="font-semibold text-[#e7000b] tabular-nums">3</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-b border-[#e8e6e1] flex gap-6 mb-5">
+            <button class="tb on" onclick="tab('offer',this)">Offer</button>
+            <button class="tb" onclick="tab('stores',this)">Store fees</button>
+            <button class="tb" onclick="tab('docs',this)">Documents</button>
+            <button class="tb" onclick="tab('hist',this)">History</button>
+          </div>
+
+          <div id="t-offer" class="tc on">
+            <div class="bg-white border border-[#e8e6e1] rounded-xl mb-5 overflow-hidden">
+              <h3 class="text-[15px] font-semibold text-[#090806ec] px-5 pt-5 pb-3">Effective rate</h3>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Base rate (recommended)</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">1.60%</span></div>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Agent negotiation</span><span class="text-[13px] font-medium text-[#e7000b] tabular-nums">−111 bps</span></div>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Contract (Flexible)</span><span class="text-[13px] font-medium text-[#090806ec]">Included</span></div>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Banking bundle (Teya BA)</span><span class="text-[13px] font-medium text-[#090806ec]">Included</span></div>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1] bg-[#fafaf8]"><span class="text-[13px] font-semibold text-[#090806ec]">Company base fee</span><span class="text-[13px] font-semibold text-[#090806ec] tabular-nums">0.49%</span></div>
+            </div>
+
+            <div class="bg-white border border-[#e8e6e1] rounded-xl mb-5 overflow-hidden">
+              <div class="px-5 pt-5 pb-3">
+                <h3 class="text-[15px] font-semibold text-[#090806ec] mb-1">Card machines</h3>
+                <p class="text-[13px] text-[#807e79]"><span class="font-medium text-[#090806ec]">Pricing</span> Monthly</p>
+              </div>
+              <div class="flex items-center gap-3 px-5 py-3 border-t border-[#e8e6e1]">
+                <div class="size-14 rounded-lg bg-[#f6f5f3] flex items-center justify-center shrink-0 overflow-hidden"><img src="45fbb70c016df9b1f72cab2dd588ab3362eef2a7.png" alt="Sunmi P2 Pro" class="h-12 w-auto object-contain"></div>
+                <div class="flex-1"><p class="text-[13px] font-medium text-[#090806ec]">Sunmi P2 Pro</p><p class="text-[12px] text-[#807e79]">Regent Street</p></div>
+                <span class="text-[13px] font-medium text-[#090806ec] tabular-nums">£30.00/mo</span>
+              </div>
+              <div class="flex items-center gap-3 px-5 py-3 border-t border-[#e8e6e1]">
+                <div class="size-14 rounded-lg bg-[#f6f5f3] flex items-center justify-center shrink-0 overflow-hidden"><img src="8f037fe4196f463033734e1d9229431b61d18195.png" alt="Teya Go" class="h-12 w-auto object-contain"></div>
+                <div class="flex-1"><p class="text-[13px] font-medium text-[#090806ec]">Go</p><p class="text-[12px] text-[#807e79]">Camden Market</p></div>
+                <span class="text-[13px] font-medium text-[#090806ec] tabular-nums">£19.00/mo</span>
+              </div>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1] bg-[#fafaf8]"><span class="text-[13px] font-medium text-[#090806ec]">Total</span><span class="text-[13px] font-semibold text-[#090806ec] tabular-nums">£49.00/mo</span></div>
+            </div>
+
+            <div class="bg-white border border-[#e8e6e1] rounded-xl mb-5 overflow-hidden">
+              <h3 class="text-[15px] font-semibold text-[#090806ec] px-5 pt-5 pb-3">Eligibility surcharges</h3>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">AMEX and other cards</span><span class="text-[13px] font-medium text-[#090806ec]">Not enabled</span></div>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">MOTO</span><span class="text-[13px] font-medium text-[#090806ec]">Not enabled</span></div>
+              <div class="flex justify-between px-5 py-3 border-t border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Pay by Link</span><span class="text-[13px] font-medium text-[#090806ec]">Not enabled</span></div>
+            </div>
+          </div>
+
+          <div id="t-stores" class="tc">
+            <p class="text-[13px] text-[#807e79] mb-4">Each store can have different settlement terms, resulting in different effective fees.</p>
+
+            <div class="border-b border-[#e8e6e1] flex gap-0 mb-5">
+              <button class="stab on" onclick="stab('s1',this)">Regent Street</button>
+              <button class="stab" onclick="stab('s2',this)">Camden Market</button>
+            </div>
+
+            <div id="t-s1" class="sc on">
+              <div class="flex items-start gap-3 mb-4">
+                <div class="size-9 rounded-lg bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5V14h12V6.5" stroke="#807e79" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 3h14v3.5H1V3z" stroke="#807e79" stroke-width="1.2" stroke-linejoin="round"/><path d="M6.5 10h3v4h-3v-4z" stroke="#807e79" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <p class="text-[14px] font-semibold text-[#090806ec]">Regent Street</p>
+                  <p class="text-[12px] text-[#807e79]">42 Regent Street, London W1B 5RA</p>
+                </div>
+              </div>
+
+              <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2 px-1">Store profile</p>
+              <div class="border border-[#e8e6e1] rounded-lg mb-4">
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Business activity</span><span class="text-[13px] font-medium text-[#090806ec]">Bar/Pub/Club</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Seasonality</span><span class="text-[13px] font-medium text-[#090806ec]">All year</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Estimated ATV</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">£25.00</span></div>
+                <div class="grid grid-cols-2 border-b border-[#e8e6e1]">
+                  <div class="px-5 py-3 border-r border-[#e8e6e1]"><p class="text-[12px] text-[#807e79] mb-0.5">Peak TPV/month</p><p class="text-[13px] font-medium text-[#090806ec] tabular-nums">£65,000</p></div>
+                  <div class="px-5 py-3"><p class="text-[12px] text-[#807e79] mb-0.5">Off-peak TPV/month</p><p class="text-[13px] font-medium text-[#090806ec] tabular-nums">£45,000</p></div>
+                </div>
+                <div class="flex justify-between px-5 py-3"><span class="text-[13px] text-[#807e79]">Blended TPV/month</span><span class="text-[13px] font-semibold text-[#090806ec] tabular-nums">£55,000</span></div>
+              </div>
+
+              <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2 px-1">Transaction profile</p>
+              <div class="border border-[#e8e6e1] rounded-lg mb-4">
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Card present (CP)</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">95%</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Contactless share</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">72%</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Debit / credit split</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">68% / 32%</span></div>
+                <div class="flex justify-between px-5 py-3"><span class="text-[13px] text-[#807e79]">Consumer / commercial split</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">92% / 8%</span></div>
+              </div>
+
+              <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2 px-1">Fees and settlement</p>
+              <div class="border border-[#e8e6e1] rounded-lg mb-4">
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Settlement</span><span class="text-[13px] font-medium text-[#090806ec]">Weekday · 0 bps</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Settlement account</span><span class="text-[13px] font-medium text-[#090806ec]">Teya BA · 0 bps</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Card machine</span><span class="text-[13px] font-medium text-[#090806ec]">Sunmi P2 Pro · £30.00/mo</span></div>
+                <div class="flex justify-between px-5 py-3 bg-[#fafaf8]"><span class="text-[13px] font-semibold text-[#090806ec]">Effective fee</span><span class="text-[13px] font-semibold text-[#090806ec] tabular-nums">0.49%</span></div>
+              </div>
+            </div>
+
+            <div id="t-s2" class="sc">
+              <div class="flex items-start gap-3 mb-4">
+                <div class="size-9 rounded-lg bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5V14h12V6.5" stroke="#807e79" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 3h14v3.5H1V3z" stroke="#807e79" stroke-width="1.2" stroke-linejoin="round"/><path d="M6.5 10h3v4h-3v-4z" stroke="#807e79" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <p class="text-[14px] font-semibold text-[#090806ec]">Camden Market</p>
+                  <p class="text-[12px] text-[#807e79]">Unit 15, Camden Lock Place, London NW1 8AF</p>
+                </div>
+              </div>
+
+              <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2 px-1">Store profile</p>
+              <div class="border border-[#e8e6e1] rounded-lg mb-4">
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Business activity</span><span class="text-[13px] font-medium text-[#090806ec]">Bar/Pub/Club</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Seasonality</span><span class="text-[13px] font-medium text-[#090806ec]">Seasonal — peak Apr–Sep</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Estimated ATV</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">£18.00</span></div>
+                <div class="grid grid-cols-2 border-b border-[#e8e6e1]">
+                  <div class="px-5 py-3 border-r border-[#e8e6e1]"><p class="text-[12px] text-[#807e79] mb-0.5">Peak TPV/month</p><p class="text-[13px] font-medium text-[#090806ec] tabular-nums">£35,000</p></div>
+                  <div class="px-5 py-3"><p class="text-[12px] text-[#807e79] mb-0.5">Off-peak TPV/month</p><p class="text-[13px] font-medium text-[#090806ec] tabular-nums">£15,000</p></div>
+                </div>
+                <div class="flex justify-between px-5 py-3"><span class="text-[13px] text-[#807e79]">Blended TPV/month</span><span class="text-[13px] font-semibold text-[#090806ec] tabular-nums">£25,000</span></div>
+              </div>
+
+              <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2 px-1">Transaction profile</p>
+              <div class="border border-[#e8e6e1] rounded-lg mb-4">
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Card present (CP)</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">98%</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Contactless share</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">85%</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Debit / credit split</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">75% / 25%</span></div>
+                <div class="flex justify-between px-5 py-3"><span class="text-[13px] text-[#807e79]">Consumer / commercial split</span><span class="text-[13px] font-medium text-[#090806ec] tabular-nums">96% / 4%</span></div>
+              </div>
+
+              <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2 px-1">Fees and settlement</p>
+              <div class="border border-[#e8e6e1] rounded-lg mb-4">
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Settlement</span><span class="text-[13px] font-medium text-[#090806ec]">Everyday · 0 bps</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Settlement account</span><span class="text-[13px] font-medium text-[#090806ec]">Teya BA · 0 bps</span></div>
+                <div class="flex justify-between px-5 py-3 border-b border-[#e8e6e1]"><span class="text-[13px] text-[#807e79]">Card machine</span><span class="text-[13px] font-medium text-[#090806ec]">Go · £19.00/mo</span></div>
+                <div class="flex justify-between px-5 py-3 bg-[#fafaf8]"><span class="text-[13px] font-semibold text-[#090806ec]">Effective fee</span><span class="text-[13px] font-semibold text-[#090806ec] tabular-nums">0.49%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="t-docs" class="tc">
+            <div class="border border-[#e8e6e1] rounded-lg">
+              <div class="flex items-center gap-3 px-5 py-3">
+                <svg width="20" height="22" viewBox="0 0 20 22" fill="none"><path d="M4 1h8l5 5v15H4V1z" stroke="#807e79" stroke-width="1.2" stroke-linejoin="round"/><path d="M12 1v5h5" stroke="#807e79" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                <div class="flex-1"><p class="text-[13px] font-medium text-[#090806ec]">competitor_quote_sumup.pdf</p><p class="text-[12px] text-[#807e79]">PDF · 245 KB</p></div>
+                <button class="h-8 px-3 rounded-lg border border-[#e0ddd8] text-[13px] font-medium text-[#090806ec] hover:bg-[#fafaf8] transition-colors">Download</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="t-hist" class="tc">
+            <div class="border border-[#e8e6e1] rounded-lg overflow-hidden">
+              <table class="w-full">
+                <thead><tr class="bg-[#fafaf8] border-b border-[#e8e6e1]">
+                  <th class="text-left px-5 py-2.5 text-[12px] font-medium text-[#807e79]">Date</th>
+                  <th class="text-left px-4 py-2.5 text-[12px] font-medium text-[#807e79]">Description</th>
+                  <th class="text-left px-5 py-2.5 text-[12px] font-medium text-[#807e79]">User</th>
+                </tr></thead>
+                <tbody>
+                  <tr class="border-b border-[#e8e6e1]"><td class="px-5 py-3 text-[13px] text-[#090806ec]">14 Apr 26 - 22:14</td><td class="px-4 py-3 text-[13px] text-[#090806ec]">Offer created</td><td class="px-5 py-3 text-[13px] text-[#090806ec]">shreyas parekh</td></tr>
+                  <tr class="border-b border-[#e8e6e1]"><td class="px-5 py-3 text-[13px] text-[#090806ec]">14 Apr 26 - 22:14</td><td class="px-4 py-3 text-[13px] text-[#e7000b]">Flagged — take rate below floor</td><td class="px-5 py-3 text-[13px] text-[#807e79]">System</td></tr>
+                  <tr><td class="px-5 py-3 text-[13px] text-[#090806ec]">14 Apr 26 - 22:14</td><td class="px-4 py-3 text-[13px] text-[#090806ec]">Awaiting manager review</td><td class="px-5 py-3 text-[13px] text-[#807e79]">System</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="sticky bottom-0 z-20 bg-white border-t border-[#e8e6e1] px-10 py-3 flex items-center justify-between" style="box-shadow: 0 -4px 12px rgba(0,0,0,0.04);">
+        <!-- Default state: review & take action -->
+        <div id="actionBarDefault" class="flex items-center justify-between w-full">
+          <p class="text-[13px] text-[#807e79]">Review this offer and take action</p>
+          <div class="flex items-center gap-3">
+            <button onclick="openModal()" class="h-10 px-5 rounded-lg border border-[#e0ddd8] text-[14px] font-medium text-[#e7000b] flex items-center gap-2 hover:bg-[#fef5f5] transition-colors active:scale-[0.97]">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Reject
+            </button>
+            <button onclick="doApprove()" id="appBtn" class="h-10 px-6 rounded-lg bg-[#090806] text-white text-[14px] font-medium flex items-center gap-2 hover:bg-[#252422] transition-colors active:scale-[0.97]">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3.5 3.5 5.5-5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Approve
+            </button>
+          </div>
+        </div>
+        <!-- Counter-offer sent state -->
+        <div id="actionBarCounterSent" class="hidden items-center justify-between w-full">
+          <div class="flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#807e79" stroke-width="1.3"/><path d="M7 4.5V7l1.5 1" stroke="#807e79" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <p class="text-[13px] text-[#555450]"><span class="font-medium text-[#090806ec]">Counter-offer sent</span> · Awaiting partner response</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="cancelCounter()" class="h-10 px-5 rounded-lg border border-[#e0ddd8] text-[14px] font-medium text-[#090806ec] flex items-center gap-2 hover:bg-[#f6f5f3] transition-colors active:scale-[0.97]">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Cancel counter
+            </button>
+            <button onclick="openCO()" class="h-10 px-5 rounded-lg bg-[#090806] text-white text-[14px] font-medium flex items-center gap-2 hover:bg-[#252422] transition-colors active:scale-[0.97]">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 3L4 9l-1.5-1.5M8 7l2 2 2-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Edit & resend
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ COUNTER-OFFER MODAL (create-offer style) ═══ -->
+  <div id="coModal" class="mo">
+    <div class="mp" style="width: 640px; max-height: 92vh; display: flex; flex-direction: column; padding: 0;">
+
+      <!-- Header -->
+      <div class="px-6 pt-5 pb-4 border-b border-[#e8e6e1]">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h2 class="text-[17px] font-semibold text-[#090806ec] mb-0.5">Build counter-offer</h2>
+            <p class="text-[13px] text-[#807e79]">Adjust levers across payments, banking and credit to hit the take rate target</p>
+          </div>
+          <button onclick="closeCO()" class="size-8 rounded-lg hover:bg-[#f6f5f3] flex items-center justify-center text-[#807e79]"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        </div>
+
+        <!-- Take rate summary -->
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-baseline gap-2">
+            <span class="text-[12px] text-[#807e79]">Take rate</span>
+            <span class="text-[18px] font-semibold text-[#090806ec] tabular-nums" id="coTR">1.22%</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-[12px] text-[#807e79]">Est. revenue</span>
+            <span class="text-[18px] font-semibold text-[#090806ec] tabular-nums" id="coRev">£488/mo</span>
+          </div>
+        </div>
+        <div class="relative h-[5px] rounded-[3px] bg-[#eae8e4] mb-1.5">
+          <div class="absolute top-0 left-0 h-full rounded-[3px]" id="coTRbar" style="width:76%;background:#C0C42D"></div>
+          <div class="absolute top-[-3px] bottom-[-3px] w-[2px] rounded bg-[#090806ec] opacity-30" style="left:60%"></div>
+          <div class="absolute top-[-3px] bottom-[-3px] w-[2px] rounded bg-[#46520f] opacity-50" style="left:80%"></div>
+        </div>
+        <div class="flex justify-between text-[11px] text-[#807e79]">
+          <span>Floor: 1.20%</span>
+          <span>Target: 1.60%</span>
+        </div>
+      </div>
+
+      <!-- Scrollable body -->
+      <div class="px-6 py-5 overflow-y-auto" style="flex: 1;">
+
+        <!-- Single rate -->
+        <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2">Single rate</p>
+        <div class="border border-[#e8e6e1] rounded-xl p-4 mb-5">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <p class="text-[13px] font-semibold text-[#090806ec]">Single blended rate</p>
+              <p class="text-[12px] text-[#807e79]">Applied across all card types</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="adjRate(-1)" class="size-9 rounded-full border border-[#e0ddd8] text-[18px] font-medium text-[#090806ec] hover:bg-[#f6f5f3] transition-colors flex items-center justify-center">−</button>
+              <p class="text-[22px] font-semibold text-[#090806ec] tabular-nums leading-none w-[76px] text-center" id="coRate">1.05%</p>
+              <button onclick="adjRate(1)" class="size-9 rounded-full border border-[#e0ddd8] text-[18px] font-medium text-[#090806ec] hover:bg-[#f6f5f3] transition-colors flex items-center justify-center">+</button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[12px]">
+            <span class="text-[#46520f] font-medium">Still competitive with SumUp (0.97%)</span>
+            <span class="text-[#807e79]">Agent submitted: 0.98%</span>
+          </div>
+        </div>
+
+        <!-- Configure -->
+        <p class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-2">Configure</p>
+        <div class="border border-[#e8e6e1] rounded-xl overflow-hidden mb-5">
+
+          <!-- Banking bundle -->
+          <div class="flex items-center justify-between px-4 py-3 border-b border-[#e8e6e1]">
+            <div class="flex items-center gap-3">
+              <div class="size-9 rounded-lg bg-[#f6f5f3] flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6l6-3 6 3M3 6v6h10V6M6 8v3M10 8v3" stroke="#555450" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div>
+                <p class="text-[13px] font-medium text-[#090806ec]">Banking bundle</p>
+                <p class="text-[11px] text-[#807e79]" id="coBALabel">Silver — £14/mo · +8 bps to TR</p>
+              </div>
+            </div>
+            <select id="coBA" onchange="updateCO()" class="h-8 px-3 pr-8 rounded-lg border border-[#e0ddd8] text-[13px] font-medium text-[#090806ec] bg-white appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 viewBox=%220 0 10 10%22 fill=%22none%22><path d=%22M2.5 3.75L5 6.25L7.5 3.75%22 stroke=%22%23090806%22 stroke-width=%221.2%22 stroke-linecap=%22round%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;">
+              <option value="light">Teya BA Light (0 bps)</option>
+              <option value="silver" selected>Teya BA Silver (+8 bps)</option>
+              <option value="gold">Teya BA Gold (+14 bps)</option>
+            </select>
+          </div>
+
+          <!-- Contract -->
+          <div class="flex items-center justify-between px-4 py-3 border-b border-[#e8e6e1]">
+            <div class="flex items-center gap-3">
+              <div class="size-9 rounded-lg bg-[#f6f5f3] flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="#555450" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 2v3h3M5.5 8h5M5.5 10.5h5" stroke="#555450" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+              <div>
+                <p class="text-[13px] font-medium text-[#090806ec]">Contract type</p>
+                <p class="text-[11px] text-[#807e79]" id="coContractLabel">Flexible — no commitment</p>
+              </div>
+            </div>
+            <select id="coContract" onchange="updateCO()" class="h-8 px-3 pr-8 rounded-lg border border-[#e0ddd8] text-[13px] font-medium text-[#090806ec] bg-white appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 viewBox=%220 0 10 10%22 fill=%22none%22><path d=%22M2.5 3.75L5 6.25L7.5 3.75%22 stroke=%22%23090806%22 stroke-width=%221.2%22 stroke-linecap=%22round%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;">
+              <option value="flexible" selected>Flexible (0 bps)</option>
+              <option value="12m">12 months (+3 bps)</option>
+              <option value="24m">24 months (+5 bps)</option>
+            </select>
+          </div>
+
+          <!-- Settlement -->
+          <div class="flex items-center justify-between px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="size-9 rounded-lg bg-[#f6f5f3] flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M10 5l3 3-3 3M6 5L3 8l3 3" stroke="#555450" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div>
+                <p class="text-[13px] font-medium text-[#090806ec]">Settlement</p>
+                <p class="text-[11px] text-[#807e79]" id="coSettleLabel">Weekday — 0 bps</p>
+              </div>
+            </div>
+            <select id="coSettle" onchange="updateCO()" class="h-8 px-3 pr-8 rounded-lg border border-[#e0ddd8] text-[13px] font-medium text-[#090806ec] bg-white appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 viewBox=%220 0 10 10%22 fill=%22none%22><path d=%22M2.5 3.75L5 6.25L7.5 3.75%22 stroke=%22%23090806%22 stroke-width=%221.2%22 stroke-linecap=%22round%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center;">
+              <option value="weekday" selected>Weekday (0 bps)</option>
+              <option value="everyday">Everyday (+5 bps)</option>
+              <option value="instant">Instant (+10 bps)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Message -->
+        <label class="text-[11px] font-semibold uppercase tracking-[1px] text-[#807e79] mb-1.5 block">Message to agent</label>
+        <textarea class="w-full h-[80px] p-3 bg-[#f6f5f3] rounded-lg text-[13px] border border-[#e0ddd8] focus:border-[#090806ec] focus:bg-white outline-none transition-all resize-none placeholder:text-[#a6a4a0]">Your submitted rate is below floor. Rather than raising the headline rate all the way, I've built a counter that pulls the Teya BA Gold bundle and a 12-month contract into the offer — this brings take rate above floor while keeping the payment rate close to SumUp. Merchant is already interested in the banking bundle.</textarea>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-[#e8e6e1] flex items-center justify-between bg-[#fafaf8]">
+        <div>
+          <p class="text-[11px] text-[#807e79]">Counter take rate</p>
+          <div class="flex items-baseline gap-2">
+            <span class="text-[18px] font-semibold text-[#090806ec] tabular-nums" id="coTRFoot">1.22%</span>
+            <span class="text-[12px] text-[#46520f] font-medium" id="coStatus">At floor</span>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="closeCO()" class="h-10 px-4 rounded-lg border border-[#e0ddd8] text-[13px] font-medium text-[#090806ec] hover:bg-white transition-colors">Cancel</button>
+          <button onclick="sendCounter()" class="h-10 px-5 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-[#252422] transition-colors">
+            Send counter-offer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ REJECT MODAL ═══ -->
+  <div id="rModal" class="mo">
+    <div class="mp">
+      <h2 class="text-[16px] font-semibold text-[#090806ec] mb-1">Reject this offer?</h2>
+      <p class="text-[13px] text-[#807e79] mb-4">The agent will be notified and can revise the offer.</p>
+      <div class="mb-4"><label class="text-[13px] font-medium text-[#090806ec] mb-1.5 block">Reason</label><textarea class="w-full h-20 p-3 bg-[#f6f5f3] rounded-lg text-[14px] border border-[#e0ddd8] focus:border-[#090806ec] focus:bg-white outline-none transition-all resize-none placeholder:text-[#a6a4a0]" placeholder="Explain why this offer is being rejected..."></textarea></div>
+      <div class="mb-5"><label class="text-[13px] font-medium text-[#090806ec] mb-1.5 block">Suggested action</label><div class="flex gap-2"><button class="sg sel" onclick="pickSg(this)">Increase rate</button><button class="sg" onclick="pickSg(this)">Add justification</button><button class="sg" onclick="pickSg(this)">Other</button></div></div>
+      <div class="flex gap-2 justify-end">
+        <button onclick="closeModal()" class="h-9 px-4 rounded-lg border border-[#e0ddd8] text-[13px] font-medium text-[#090806ec] hover:bg-[#f6f5f3] transition-colors">Cancel</button>
+        <button onclick="closeModal()" class="h-9 px-4 rounded-lg bg-[#e7000b] text-white text-[13px] font-medium hover:bg-[#c10007] transition-colors flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Reject offer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══ VIEW SWITCHING ═══
+    function showQueue() {
+      document.getElementById('view-detail').classList.remove('active');
+      document.getElementById('view-queue').classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    function showDetail(id) {
+      document.getElementById('view-queue').classList.remove('active');
+      document.getElementById('view-detail').classList.add('active');
+      window.scrollTo(0, 0);
+
+      const offer = offers.find(o => o.id === id);
+      if (!offer) return;
+
+      const pill = document.getElementById('detailStatusPill');
+      const aiSuggestion = document.getElementById('aiSuggestion');
+      const aiSent = document.getElementById('aiSent');
+      const barDefault = document.getElementById('actionBarDefault');
+      const barCountered = document.getElementById('actionBarCounterSent');
+
+      if (offer.status === 'countered') {
+        // Status pill
+        pill.textContent = 'Countered';
+        pill.className = 'inline-flex items-center h-[22px] px-2 rounded text-[11px] font-semibold bg-[#f0ede8] text-[#555450] ml-1';
+
+        // Switch AI analysis card to "counter-offer sent" state
+        aiSuggestion.style.display = 'none';
+        aiSent.style.display = 'block';
+
+        // Pre-populate sent summary with demo defaults
+        document.getElementById('aiSentTR').textContent = '1.22%';
+        const statusEl = document.getElementById('aiSentStatus');
+        statusEl.textContent = 'Take rate at floor';
+        statusEl.className = 'text-[12px] text-[#46520f] font-medium';
+        document.getElementById('aiSentRev').textContent = '+£96.00/mo';
+        document.getElementById('aiSentTime').textContent = 'Sent to ' + offer.agent + ' on ' + offer.submitted;
+        document.getElementById('aiSentLevers').innerHTML = `
+          <div class="flex items-center py-2 text-[13px]">
+            <span class="text-[#090806ec] font-medium w-[140px]">Single rate</span>
+            <span class="text-[#555450] tabular-nums">0.98% <span class="text-[#a6a4a0] px-1">→</span> 1.05%</span>
+            <span class="ml-auto text-[#46520f] tabular-nums font-semibold">+7 bps</span>
+          </div>
+          <div class="flex items-center py-2 text-[13px]">
+            <span class="text-[#090806ec] font-medium w-[140px]">Banking bundle</span>
+            <span class="text-[#555450]">Light <span class="text-[#a6a4a0] px-1">→</span> Gold</span>
+            <span class="ml-auto text-[#46520f] tabular-nums font-semibold">+14 bps</span>
+          </div>
+          <div class="flex items-center py-2 text-[13px]">
+            <span class="text-[#090806ec] font-medium w-[140px]">Contract type</span>
+            <span class="text-[#555450]">Flexible <span class="text-[#a6a4a0] px-1">→</span> 12 months</span>
+            <span class="ml-auto text-[#46520f] tabular-nums font-semibold">+3 bps</span>
+          </div>
+        `;
+
+        // Swap sticky action bar to counter-sent
+        barDefault.classList.add('hidden');
+        barDefault.classList.remove('flex');
+        barCountered.classList.remove('hidden');
+        barCountered.classList.add('flex');
+      } else {
+        // Default: pending
+        pill.textContent = 'Pending';
+        pill.className = 'inline-flex items-center h-[22px] px-2 rounded text-[11px] font-semibold bg-[#fef3c6] text-[#97660c] ml-1';
+
+        aiSuggestion.style.display = '';
+        aiSent.style.display = 'none';
+
+        // Default action bar
+        barCountered.classList.add('hidden');
+        barCountered.classList.remove('flex');
+        barDefault.classList.remove('hidden');
+        barDefault.classList.add('flex');
+      }
+    }
+
+    // ═══ QUEUE DATA & LOGIC ═══
+    const FLAGS = {
+      GB: '<svg width="20" height="14" viewBox="0 0 20 14" fill="none"><rect width="20" height="14" rx="2" fill="#012169"/><path d="M0 0l20 14M20 0L0 14" stroke="white" stroke-width="2.5"/><path d="M0 0l20 14M20 0L0 14" stroke="#C8102E" stroke-width="1.2"/><path d="M10 0v14M0 7h20" stroke="white" stroke-width="4"/><path d="M10 0v14M0 7h20" stroke="#C8102E" stroke-width="2"/></svg>',
+      CZ: '<svg width="20" height="14" viewBox="0 0 20 14" fill="none"><rect width="20" height="14" rx="2" fill="#D7141A"/><rect width="20" height="7" rx="1" fill="white"/><path d="M0 0l10 7L0 14V0Z" fill="#11457E"/></svg>',
+      IS: '<svg width="20" height="14" viewBox="0 0 20 14" fill="none"><rect width="20" height="14" rx="2" fill="#02529C"/><path d="M0 5.5h6V0h3v5.5h11v3H9V14H6V8.5H0v-3z" fill="white"/><path d="M0 6h6.5V0h2v6h11.5v2H8.5v6h-2V8H0V6z" fill="#DC1E35"/></svg>',
+      PT: '<svg width="20" height="14" viewBox="0 0 20 14" fill="none"><rect width="20" height="14" rx="2" fill="#FF0000"/><rect width="8" height="14" rx="1" fill="#006600"/><circle cx="8" cy="7" r="2.5" fill="#FFCC00" stroke="#006600" stroke-width="0.5"/></svg>',
+      NO: '<svg width="20" height="14" viewBox="0 0 20 14" fill="none"><rect width="20" height="14" rx="2" fill="#EF2B2D"/><path d="M0 5.5h6V0h3v5.5h11v3H9V14H6V8.5H0v-3z" fill="white"/><path d="M0 6h6.5V0h2v6h11.5v2H8.5v6h-2V8H0V6z" fill="#002868"/></svg>',
+    };
+
+    const offers = [
+      { id:1, merchant:'SMOKE AND BBQ', country:'GB', agent:'Shreyas Parekh', channel:'ISC', stores:2, takeRate:98, recTakeRate:160, floor:120, target:160, tpv:'£80K', tpvNum:80000, revenue:'£392', status:'pending', submitted:'14 Apr 2026' },
+      { id:20, merchant:'Oakwood Bistro', country:'GB', agent:'Ana Silva', channel:'ISC', stores:1, takeRate:162, recTakeRate:158, floor:120, target:160, tpv:'£22K', tpvNum:22000, revenue:'£356', status:'approved', submitted:'14 Apr 2026' },
+      { id:2, merchant:'Butchers of Bermondsey', country:'GB', agent:'Marcus Chen', channel:'ISC', stores:1, takeRate:110, recTakeRate:155, floor:120, target:160, tpv:'£65K', tpvNum:65000, revenue:'£715', status:'pending', submitted:'14 Apr 2026' },
+      { id:3, merchant:'Grocery Store Ltd', country:'GB', agent:'Shreyas Parekh', channel:'ISC', stores:1, takeRate:125, recTakeRate:148, floor:120, target:160, tpv:'£25K', tpvNum:25000, revenue:'£313', status:'countered', submitted:'13 Apr 2026' },
+      { id:21, merchant:'Harbour Fish Co', country:'GB', agent:'Marcus Chen', channel:'Field', stores:2, takeRate:170, recTakeRate:162, floor:120, target:160, tpv:'£38K', tpvNum:38000, revenue:'£646', status:'approved', submitted:'13 Apr 2026' },
+      { id:4, merchant:'Trends2024 Limited', country:'GB', agent:'Ana Silva', channel:'ISC', stores:3, takeRate:138, recTakeRate:152, floor:120, target:160, tpv:'£40K', tpvNum:40000, revenue:'£552', status:'countered', submitted:'13 Apr 2026' },
+      { id:5, merchant:'Spice of India NW', country:'GB', agent:'Marcus Chen', channel:'ISC', stores:1, takeRate:175, recTakeRate:162, floor:120, target:160, tpv:'£5,100', tpvNum:5100, revenue:'£89', status:'countered', submitted:'13 Apr 2026' },
+      { id:6, merchant:'purepath ventures', country:'GB', agent:'Shreyas Parekh', channel:'ISC', stores:2, takeRate:105, recTakeRate:158, floor:120, target:160, tpv:'£65K', tpvNum:65000, revenue:'£683', status:'pending', submitted:'12 Apr 2026' },
+      { id:22, merchant:'The Vault Coffee', country:'GB', agent:'Shreyas Parekh', channel:'Partnerships', stores:1, takeRate:158, recTakeRate:160, floor:120, target:160, tpv:'£16K', tpvNum:16000, revenue:'£253', status:'approved', submitted:'12 Apr 2026' },
+      { id:7, merchant:'DAY 1 Cafe', country:'GB', agent:'Ana Silva', channel:'ISC', stores:1, takeRate:155, recTakeRate:160, floor:120, target:160, tpv:'£18K', tpvNum:18000, revenue:'£279', status:'approved', submitted:'12 Apr 2026' },
+      { id:8, merchant:'Easy Shop & Go', country:'GB', agent:'Marcus Chen', channel:'ISC', stores:1, takeRate:142, recTakeRate:156, floor:120, target:160, tpv:'£45K', tpvNum:45000, revenue:'£639', status:'approved', submitted:'11 Apr 2026' },
+      { id:23, merchant:'Northside Hardware', country:'GB', agent:'Marcus Chen', channel:'Inside', stores:1, takeRate:164, recTakeRate:160, floor:120, target:160, tpv:'£28K', tpvNum:28000, revenue:'£459', status:'approved', submitted:'11 Apr 2026' },
+      { id:11, merchant:'Tuto\'s Pizzeria', country:'GB', agent:'Shreyas Parekh', channel:'Partnerships', stores:1, takeRate:168, recTakeRate:160, floor:120, target:160, tpv:'£13K', tpvNum:13000, revenue:'£218', status:'countered', submitted:'10 Apr 2026' },
+      { id:13, merchant:'ridge&Sons.co', country:'GB', agent:'Marcus Chen', channel:'Field', stores:1, takeRate:148, recTakeRate:155, floor:120, target:160, tpv:'£35K', tpvNum:35000, revenue:'£518', status:'countered', submitted:'9 Apr 2026' },
+      { id:14, merchant:'Royal Dry Fruits', country:'GB', agent:'Shreyas Parekh', channel:'ISC', stores:1, takeRate:220, recTakeRate:160, floor:120, target:160, tpv:'£11K', tpvNum:11000, revenue:'£242', status:'countered', submitted:'8 Apr 2026' },
+      { id:15, merchant:'AMB Elite Catering', country:'GB', agent:'Ana Silva', channel:'ISC', stores:1, takeRate:165, recTakeRate:160, floor:120, target:160, tpv:'£8,000', tpvNum:8000, revenue:'£132', status:'approved', submitted:'7 Apr 2026' },
+      { id:17, merchant:'construction LTD', country:'GB', agent:'Marcus Chen', channel:'Inside', stores:1, takeRate:135, recTakeRate:160, floor:120, target:160, tpv:'£50K', tpvNum:50000, revenue:'£675', status:'onboarded', submitted:'3 Apr 2026' },
+      { id:18, merchant:'Elite Catering', country:'GB', agent:'Shreyas Parekh', channel:'ISC', stores:1, takeRate:172, recTakeRate:160, floor:120, target:160, tpv:'£8,000', tpvNum:8000, revenue:'£138', status:'approved', submitted:'2 Apr 2026' },
+      { id:30, merchant:'Bloom Flowers', country:'GB', agent:'Ana Silva', channel:'Field', stores:1, takeRate:166, recTakeRate:160, floor:120, target:160, tpv:'£20K', tpvNum:20000, revenue:'£332', status:'approved', submitted:'10 Apr 2026' },
+      { id:31, merchant:'Greenway Grocers', country:'GB', agent:'Marcus Chen', channel:'ISC', stores:2, takeRate:160, recTakeRate:160, floor:120, target:160, tpv:'£52K', tpvNum:52000, revenue:'£832', status:'approved', submitted:'9 Apr 2026' },
+      { id:32, merchant:'Stratford Supplies', country:'GB', agent:'Shreyas Parekh', channel:'Inside', stores:1, takeRate:174, recTakeRate:162, floor:120, target:160, tpv:'£14K', tpvNum:14000, revenue:'£244', status:'approved', submitted:'8 Apr 2026' },
+    ];
+
+    let activeStatus = 'all';
+    let activeFilters = {};
+    let bulkMode = false;
+    let sortKey = null;
+    let sortDir = 'desc';
+    const STATUS_PRIORITY = { pending: 0, countered: 1, approved: 2, rejected: 3, onboarded: 4 };
+
+    function sortValue(o, key) {
+      if (key === 'takeRate') return o.takeRate;
+      if (key === 'tpv') return o.tpvNum;
+      if (key === 'revenue') return parseFloat(String(o.revenue).replace(/[^\d.]/g, '')) || 0;
+      if (key === 'merchant') return o.merchant.toLowerCase();
+      return 0;
+    }
+
+    function renderRows() {
+      const tbody = document.getElementById('offersBody');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      let filtered = offers.filter(o => {
+        if (activeStatus !== 'all' && o.status !== activeStatus) return false;
+        if (activeFilters.channel && o.channel !== activeFilters.channel) return false;
+        if (activeFilters.country && o.country !== activeFilters.country) return false;
+        if (activeFilters.agent && o.agent !== activeFilters.agent) return false;
+        if (search && !o.merchant.toLowerCase().includes(search) && !o.agent.toLowerCase().includes(search)) return false;
+        return true;
+      });
+
+      if (sortKey) {
+        const dir = sortDir === 'asc' ? 1 : -1;
+        filtered.sort((a, b) => {
+          const va = sortValue(a, sortKey);
+          const vb = sortValue(b, sortKey);
+          if (va < vb) return -1 * dir;
+          if (va > vb) return  1 * dir;
+          return 0;
+        });
+      } else {
+        // Default order: prioritize status (pending → countered → approved → rejected → onboarded)
+        filtered.sort((a, b) => (STATUS_PRIORITY[a.status] ?? 99) - (STATUS_PRIORITY[b.status] ?? 99));
+      }
+
+      // Update sort indicators on headers
+      document.querySelectorAll('.sortable').forEach(s => s.classList.remove('sort-active', 'sort-asc', 'sort-desc'));
+      if (sortKey) {
+        const activeEl = document.querySelector(`.sortable[onclick*="'${sortKey}'"]`);
+        if (activeEl) activeEl.classList.add('sort-active', sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+      }
+
+      tbody.innerHTML = filtered.map((o, i) => {
+        const aboveFloor = o.takeRate >= o.floor;
+        const aboveTarget = o.takeRate >= o.target;
+        const maxTR = o.target * 2;
+        const pct = Math.max(0, Math.min(100, (o.takeRate / maxTR) * 100));
+        const floorPct = Math.max(0, Math.min(100, (o.floor / maxTR) * 100));
+        const barColor = aboveTarget ? '#C0C42D' : aboveFloor ? '#D4D72C' : '#fb2c36';
+
+        const statusMap = {
+          pending: '<span class="inline-flex items-center h-5 px-2 rounded-[6px] text-[12px] font-semibold bg-[#fe9a001a] text-[#bb4d00]">Pending</span>',
+          countered: '<span class="inline-flex items-center h-5 px-2 rounded-[6px] text-[12px] font-semibold bg-[#f0ede8] text-[#555450]">Countered</span>',
+          approved: '<span class="inline-flex items-center h-5 px-2 rounded-[6px] text-[12px] font-semibold bg-[#F1F3B6] text-[#46520f]">Approved</span>',
+          rejected: '<span class="inline-flex items-center h-5 px-2 rounded-[6px] text-[12px] font-semibold bg-[#fb2c361a] text-[#e7000b]">Rejected</span>',
+          onboarded: '<span class="inline-flex items-center h-5 px-2 rounded-[6px] text-[12px] font-semibold bg-[#5f4f300d] text-[#090806ec]">Onboarded</span>',
+        };
+
+        const trPct = (o.takeRate / 100).toFixed(2) + '%';
+        const recTrPct = (o.recTakeRate / 100).toFixed(2) + '%';
+        const needsApproval = !aboveFloor;
+
+        // Delta subtext: bps vs floor (below floor), vs rec. (above floor)
+        const floorBps = Math.round(o.floor);
+        const recBps = Math.round(o.recTakeRate);
+        const trBps = Math.round(o.takeRate);
+        let deltaText, deltaCls;
+        if (!aboveFloor) {
+          deltaText = (trBps - floorBps) + ' bps vs floor';
+          deltaCls = 'text-[#e7000b]';
+        } else if (aboveTarget) {
+          const d = trBps - recBps;
+          deltaText = (d >= 0 ? '+' : '') + d + ' bps vs rec.';
+          deltaCls = 'text-[#46520f]';
+        } else {
+          const d = trBps - floorBps;
+          deltaText = '+' + d + ' bps vs floor';
+          deltaCls = 'text-[#807e79]';
+        }
+
+        return `
+          <tr class="offer-row border-b border-[#756b571a] animate-in" style="animation-delay: ${160 + i * 40}ms" onclick="showDetail(${o.id})">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-3">
+                <span class="flex-shrink-0">${FLAGS[o.country]}</span>
+                <div class="min-w-0">
+                  <p class="text-[14px] font-medium text-[#090806ec] truncate">${o.merchant}</p>
+                  <p class="text-[12px] text-[#16140e8c]">${o.submitted}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-3 py-3 text-[13px] text-[#16140e8c]">${o.agent.split(' ')[0]}</td>
+            <td class="px-3 py-3 text-[13px] text-[#16140e8c]">${o.channel}</td>
+            <td class="px-3 py-3 text-center text-[13px] tabular-nums text-[#090806ec]">${o.stores}</td>
+            <td class="px-3 py-3">
+              <div class="flex flex-col">
+                <span class="text-[14px] tabular-nums font-semibold ${needsApproval ? 'text-[#e7000b]' : 'text-[#090806ec]'}">${trPct}</span>
+                <span class="text-[11px] tabular-nums ${deltaCls}">${deltaText}</span>
+              </div>
+            </td>
+            <td class="px-3 py-3 text-right text-[13px] tabular-nums text-[#090806ec]">${o.tpv}</td>
+            <td class="px-3 py-3 text-right text-[13px] tabular-nums text-[#46520f] font-medium">${o.revenue}</td>
+            <td class="px-3 py-3 text-center">${statusMap[o.status]}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function toggleStatusFilter(btn, status) {
+      activeStatus = status;
+      document.querySelectorAll('[data-status]').forEach(chip => {
+        if (chip.dataset.status === status) {
+          chip.className = 'filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-transparent bg-[#46520f] text-[#e1e51a]';
+        } else {
+          chip.className = 'filter-chip h-8 px-3 rounded-full text-[13px] font-medium border border-[#8f867633] bg-white text-[#090806ec]';
+        }
+      });
+      renderRows();
+    }
+
+    function toggleDropdown(id) {
+      document.querySelectorAll('.dropdown-menu').forEach(dd => {
+        if (dd.id !== id) dd.classList.remove('open');
+      });
+      document.getElementById(id).classList.toggle('open');
+    }
+
+    function applyFilter(type, value) {
+      activeFilters[type] = value;
+      document.querySelectorAll('.dropdown-menu').forEach(dd => dd.classList.remove('open'));
+      renderActiveFilters();
+      renderRows();
+    }
+
+    function removeFilter(type) {
+      delete activeFilters[type];
+      renderActiveFilters();
+      renderRows();
+    }
+
+    function renderActiveFilters() {
+      const container = document.getElementById('activeFilters');
+      container.innerHTML = Object.entries(activeFilters).map(([key, val]) =>
+        `<span class="active-filter" onclick="removeFilter('${key}')">
+          <span class="text-[11px] font-semibold uppercase tracking-[0.5px] text-[#16140e8c]">${key}</span>
+          ${val}
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 2.5l5 5M7.5 2.5l-5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </span>`
+      ).join('');
+
+      const count = Object.keys(activeFilters).length + (activeStatus !== 'all' && activeStatus !== 'pending' ? 1 : 0);
+      const badge = document.getElementById('filterCount');
+      if (count > 0) {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+        badge.textContent = count;
+      } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+      }
+    }
+
+    function toggleBulkSelect() {
+      bulkMode = !bulkMode;
+      const btn = document.getElementById('bulkSelectBtn');
+      btn.style.color = bulkMode ? '#090806ec' : '';
+    }
+
+    function toggleFilterPanel() {
+      const bar = document.getElementById('filterBar');
+      bar.style.display = bar.style.display === 'none' ? 'flex' : '';
+    }
+
+    function sortTable(column) {
+      if (sortKey === column) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortKey = column;
+        sortDir = 'desc';
+      }
+      renderRows();
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.relative')) {
+        document.querySelectorAll('.dropdown-menu').forEach(dd => dd.classList.remove('open'));
+      }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', renderRows);
+
+    renderRows();
+
+    // ═══ DETAIL VIEW LOGIC ═══
+    function tab(id, el) {
+      document.querySelectorAll('.tb').forEach(b => b.classList.remove('on'));
+      document.querySelectorAll('.tc').forEach(c => c.classList.remove('on'));
+      el.classList.add('on');
+      document.getElementById('t-' + id).classList.add('on');
+    }
+    function stab(id, el) {
+      document.querySelectorAll('.stab').forEach(b => b.classList.remove('on'));
+      document.querySelectorAll('.sc').forEach(c => c.classList.remove('on'));
+      el.classList.add('on');
+      document.getElementById('t-' + id).classList.add('on');
+    }
+    function openModal() { document.getElementById('rModal').classList.add('open'); }
+    function closeModal() { document.getElementById('rModal').classList.remove('open'); }
+    document.getElementById('rModal').addEventListener('click', e => { if (e.target.id === 'rModal') closeModal(); });
+    function doApprove() {
+      const b = document.getElementById('appBtn');
+      b.textContent = 'Approved!';
+      b.style.background = '#46520f';
+      setTimeout(() => {
+        b.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Approve';
+        b.style.background = '#090806';
+      }, 1500);
+    }
+    // ═══ COUNTER-OFFER MODAL ═══
+    // All levers contribute bps to the overall take rate. Revenue = TPV × take rate.
+    const BA_OPTIONS = {
+      light:  { label: 'Light — 0 bps',    bps: 0  },
+      silver: { label: 'Silver — +8 bps',  bps: 8  },
+      gold:   { label: 'Gold — +14 bps',   bps: 14 },
+    };
+    const CONTRACT_OPTIONS = {
+      flexible: { label: 'Flexible — 0 bps',    bps: 0 },
+      '12m':    { label: '12 months — +3 bps',  bps: 3 },
+      '24m':    { label: '24 months — +5 bps',  bps: 5 },
+    };
+    const SETTLE_OPTIONS = {
+      weekday:  { label: 'Weekday — 0 bps',   bps: 0  },
+      everyday: { label: 'Everyday — +5 bps', bps: 5  },
+      instant:  { label: 'Instant — +10 bps', bps: 10 },
+    };
+    const MCA_BPS = 7;
+    const TPV_MO = 80000; // £/mo
+
+    let coRate = 105; // bps payment rate
+    function openCounterOffer() {
+      coRate = 105;
+      document.getElementById('coBA').value = 'gold';
+      document.getElementById('coContract').value = '12m';
+      document.getElementById('coSettle').value = 'weekday';
+      updateCO();
+      document.getElementById('coModal').classList.add('open');
+    }
+    function closeCO() { document.getElementById('coModal').classList.remove('open'); }
+    function adjRate(delta) {
+      coRate = Math.max(80, Math.min(200, coRate + delta));
+      updateCO();
+    }
+    function updateCO() {
+      // Payment rate display
+      document.getElementById('coRate').textContent = (coRate / 100).toFixed(2) + '%';
+
+      // Add-on contributions
+      const ba = BA_OPTIONS[document.getElementById('coBA').value];
+      const contract = CONTRACT_OPTIONS[document.getElementById('coContract').value];
+      const settle = SETTLE_OPTIONS[document.getElementById('coSettle').value];
+
+      document.getElementById('coBALabel').textContent = ba.label;
+      document.getElementById('coContractLabel').textContent = contract.label;
+      document.getElementById('coSettleLabel').textContent = settle.label;
+
+      // Total take rate in bps
+      const trBps = coRate + ba.bps + contract.bps + settle.bps;
+      const tr = (trBps / 100).toFixed(2) + '%';
+      document.getElementById('coTR').textContent = tr;
+      document.getElementById('coTRFoot').textContent = tr;
+
+      // Revenue estimate: TPV × take rate
+      const totalRev = TPV_MO * (trBps / 10000);
+      document.getElementById('coRev').textContent = '£' + Math.round(totalRev) + '/mo';
+
+      // Bar: 0% → 2%, floor at 60%, target at 80%
+      const barPct = Math.min(100, trBps / 200 * 100);
+      const bar = document.getElementById('coTRbar');
+      bar.style.width = barPct + '%';
+      bar.style.background = trBps >= 160 ? '#C0C42D' : trBps >= 120 ? '#D4D72C' : '#fb2c36';
+
+      // Status
+      const status = document.getElementById('coStatus');
+      if (trBps >= 160) { status.textContent = 'At target'; status.className = 'text-[12px] text-[#46520f] font-medium'; }
+      else if (trBps >= 120) { status.textContent = 'At floor'; status.className = 'text-[12px] text-[#46520f] font-medium'; }
+      else { status.textContent = (120 - trBps) + ' bps below floor'; status.className = 'text-[12px] text-[#e7000b] font-medium'; }
+    }
+    document.getElementById('coModal').addEventListener('click', e => { if (e.target.id === 'coModal') closeCO(); });
+
+    // ═══ Send / cancel counter-offer state ═══
+    function sendCounter() {
+      // Snapshot current counter values into the "sent" card
+      const ba = BA_OPTIONS[document.getElementById('coBA').value];
+      const contract = CONTRACT_OPTIONS[document.getElementById('coContract').value];
+      const settle = SETTLE_OPTIONS[document.getElementById('coSettle').value];
+      const trBps = coRate + ba.bps + contract.bps + settle.bps;
+
+      // Fill the sent card
+      document.getElementById('aiSentTR').textContent = (trBps / 100).toFixed(2) + '%';
+      const statusEl = document.getElementById('aiSentStatus');
+      if (trBps >= 160) { statusEl.textContent = 'Take rate at target'; }
+      else if (trBps >= 120) { statusEl.textContent = 'Take rate at floor'; }
+      else { statusEl.textContent = (120 - trBps) + ' bps below floor'; statusEl.className = 'text-[12px] text-[#e7000b] font-medium'; }
+
+      const totalRev = TPV_MO * (trBps / 10000);
+      const revDelta = totalRev - 392; // vs submitted £392/mo
+      document.getElementById('aiSentRev').textContent = (revDelta >= 0 ? '+' : '−') + '£' + Math.abs(revDelta).toFixed(2) + '/mo';
+
+      // Sent time
+      const now = new Date();
+      const d = String(now.getDate());
+      const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][now.getMonth()];
+      const h = String(now.getHours()).padStart(2,'0');
+      const mm = String(now.getMinutes()).padStart(2,'0');
+      document.getElementById('aiSentTime').textContent = 'Sent to Shreyas Parekh on ' + d + ' ' + m + ', ' + h + ':' + mm;
+
+      // Levers list
+      const baName = (document.getElementById('coBA').value === 'light') ? 'Light' : (document.getElementById('coBA').value === 'silver') ? 'Silver' : 'Gold';
+      const contractName = (document.getElementById('coContract').value === 'flexible') ? 'Flexible' : (document.getElementById('coContract').value === '12m') ? '12 months' : '24 months';
+      const settleName = (document.getElementById('coSettle').value === 'weekday') ? 'Weekday' : (document.getElementById('coSettle').value === 'everyday') ? 'Everyday' : 'Instant';
+      const levers = [
+        { label: 'Single rate',     from: '0.98%',    to: (coRate/100).toFixed(2) + '%', bps: coRate - 98 },
+        { label: 'Banking bundle',  from: 'Light',    to: baName,       bps: ba.bps },
+        { label: 'Contract type',   from: 'Flexible', to: contractName, bps: contract.bps },
+        { label: 'Settlement',      from: 'Weekday',  to: settleName,   bps: settle.bps },
+      ];
+      document.getElementById('aiSentLevers').innerHTML = levers.filter(l => l.bps !== 0).map(l => `
+        <div class="flex items-center py-2 text-[13px]">
+          <span class="text-[#090806ec] font-medium w-[140px]">${l.label}</span>
+          <span class="text-[#555450]">${l.from} <span class="text-[#a6a4a0] px-1">→</span> ${l.to}</span>
+          <span class="ml-auto text-[#46520f] tabular-nums font-semibold">+${l.bps} bps</span>
+        </div>
+      `).join('');
+
+      // Toggle states
+      document.getElementById('aiSuggestion').style.display = 'none';
+      document.getElementById('aiSent').style.display = 'block';
+
+      // Header status pill
+      const pill = document.getElementById('detailStatusPill');
+      pill.textContent = 'Counter sent';
+      pill.className = 'inline-flex items-center h-[22px] px-2 rounded text-[11px] font-semibold bg-[#f0ede8] text-[#090806ec] ml-1';
+
+      // Swap sticky action bar to "awaiting response" state
+      document.getElementById('actionBarDefault').classList.add('hidden');
+      document.getElementById('actionBarDefault').classList.remove('flex');
+      document.getElementById('actionBarCounterSent').classList.remove('hidden');
+      document.getElementById('actionBarCounterSent').classList.add('flex');
+
+      closeCO();
+    }
+
+    function cancelCounter() {
+      document.getElementById('aiSuggestion').style.display = '';
+      document.getElementById('aiSent').style.display = 'none';
+
+      const pill = document.getElementById('detailStatusPill');
+      pill.textContent = 'Pending';
+      pill.className = 'inline-flex items-center h-[22px] px-2 rounded text-[11px] font-semibold bg-[#fef3c6] text-[#97660c] ml-1';
+
+      // Restore default action bar
+      document.getElementById('actionBarCounterSent').classList.add('hidden');
+      document.getElementById('actionBarCounterSent').classList.remove('flex');
+      document.getElementById('actionBarDefault').classList.remove('hidden');
+      document.getElementById('actionBarDefault').classList.add('flex');
+    }
+
+    function dismissSuggestion() {
+      const box = document.getElementById('aiSuggestionBox');
+      if (box) box.remove();
+    }
+
+    function pickSg(el) {
+      el.parentElement.querySelectorAll('.sg').forEach(b => b.classList.remove('sel'));
+      el.classList.add('sel');
+    }
+  </script>
+
+</body>
+</html>
