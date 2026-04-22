@@ -103,7 +103,7 @@
     .section-header-text h3 { font-size:14px; font-weight:600; color:#090806ec; margin:0; white-space:nowrap; }
     .section-header-text p { font-size:11px; color:#16140e8c; margin:2px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .section-body { overflow:hidden; max-height:0; opacity:0; transition:max-height 350ms cubic-bezier(0.2,0,0,1),opacity 220ms ease; }
-    .section-body.open { max-height:1200px; opacity:1; }
+    .section-body.open { max-height:2600px; opacity:1; }
     .section-inner { padding:0 16px 16px; }
     .chev { transition:transform 220ms cubic-bezier(0.2,0,0,1); flex-shrink:0; }
     .chev.open { transform:rotate(180deg); }
@@ -176,9 +176,20 @@
 </head>
 <body class="bg-[#e8e6e1] min-h-screen flex flex-col items-center justify-center p-8 gap-4">
 <p class="text-[13px] font-semibold text-[#090806ec]/40 tracking-wide uppercase select-none">PES v2 · New Merchant Onboarding</p>
-<div class="relative" style="width:433px">
-<div class="bg-[#1a1a1a] rounded-[52px] p-[20px] shadow-2xl">
-<div class="bg-[#f6f5f3] rounded-[36px] overflow-hidden relative" style="width:393px;height:852px">
+<div class="relative" style="width:415px">
+<!-- ═══ iPhone 17 device frame ═══ -->
+<div style="position:relative;width:415px;padding:8px;border-radius:58px;background:linear-gradient(135deg,#3a3a3c 0%,#1d1d1f 22%,#0a0a0b 50%,#1a1a1c 78%,#2d2d2f 100%);box-shadow:0 30px 60px -12px rgba(0,0,0,0.45),0 12px 24px -8px rgba(0,0,0,0.25),inset 0 1px 1.5px rgba(255,255,255,0.1),inset 0 -1px 1.5px rgba(0,0,0,0.4),inset 0 0 0 1px rgba(255,255,255,0.04)">
+  <!-- Inner glass bezel -->
+  <div style="padding:3px;border-radius:50px;background:linear-gradient(to bottom,#030304 0%,#000 50%,#050506 100%);box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.03)">
+    <!-- Screen -->
+    <div class="bg-[#f6f5f3] overflow-hidden relative" style="width:393px;height:852px;border-radius:47px">
+      <!-- Dynamic Island -->
+      <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:126px;height:37px;background:#000;border-radius:20px;z-index:9999;box-shadow:0 0 0 0.5px rgba(255,255,255,0.06),0 1px 3px rgba(0,0,0,0.4);pointer-events:none">
+        <!-- Front camera lens -->
+        <div style="position:absolute;top:50%;right:14px;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#2a3040 0%,#0a0a10 55%,#000 100%);box-shadow:inset 0 0 1px rgba(90,100,130,0.3)">
+          <div style="position:absolute;top:1.5px;left:2px;width:2.5px;height:2px;border-radius:50%;background:rgba(255,255,255,0.35);filter:blur(0.3px)"></div>
+        </div>
+      </div>
 
 
 <!-- ═══ SIDE MENU ═══ -->
@@ -1021,7 +1032,8 @@
   #s-05 .ba-details { max-height:0; overflow:hidden; opacity:0; transition:max-height 300ms cubic-bezier(0.2,0,0,1),opacity 200ms ease; }
   #s-05 .ba-details.open { max-height:400px; opacity:1; }
   #s-05 .carousel-wrap { }
-  #s-05 .carousel-track { display:flex; align-items:flex-start; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:4px 0 8px 16px; gap:10px; scrollbar-width:none; }
+  #s-05 .carousel-track { display:flex; align-items:stretch; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:4px 0 8px 16px; gap:10px; scrollbar-width:none; }
+  #s-05 .offer-slide { display:flex; flex-direction:column; }
   #s-05 .carousel-track::-webkit-scrollbar { display:none; }
   #s-05 .offer-slide { flex:0 0 90%; scroll-snap-align:center; background:white; border-radius:24px; box-shadow:0 0 0 1px rgba(0,0,0,0.06),0 2px 8px rgba(0,0,0,0.05); padding:20px 18px; position:relative; transition:box-shadow 200ms ease; }
   #s-05 .offer-slide.selected { box-shadow:0 0 0 1.5px #090806a0,0 2px 8px rgba(0,0,0,0.05); }
@@ -1163,13 +1175,42 @@
                 </div>
               </div>
             </div>
+            <!-- Amex rate (agent view: tap-to-edit with chevron) -->
+            <div onclick="openAmexSheet()" class="agent-only" style="display:flex;align-items:center;gap:10px;padding:4px 4px 14px;margin-bottom:4px;cursor:pointer">
+              <img src="amex.svg" alt="Amex" style="width:20px;height:20px;object-fit:contain;flex-shrink:0">
+              <span style="font-size:12px;color:#16140e8c">Amex &amp; other</span>
+              <span id="bl-amex-rate" style="margin-left:auto;font-size:13px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">1.90%</span>
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1l4 4-4 4" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <!-- Amex rate (client view: view-only, no chevron) -->
+            <div class="client-only">
+              <div style="display:flex;align-items:center;gap:10px;padding:4px 4px 14px;margin-bottom:4px">
+                <img src="amex.svg" alt="Amex" style="width:20px;height:20px;object-fit:contain;flex-shrink:0">
+                <span style="font-size:12px;color:#16140e8c">Amex &amp; other</span>
+                <span id="bl-amex-rate-client" style="margin-left:auto;font-size:13px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">1.90%</span>
+              </div>
+            </div>
             <!-- Savings narrative (tappable → opens bottom sheet) -->
             <div id="bl-savings" onclick="openSavingsSheet()" style="background:#7ccf001a;border-radius:12px;padding:10px 12px;margin-bottom:14px;display:flex;align-items:center;gap:6px;cursor:pointer">
               <span id="bl-savings-text" style="font-size:12px;color:#497d00;font-weight:500;flex:1">Saving merchant &pound;108/mo vs statement</span>
               <svg width="7" height="12" viewBox="0 0 7 12" fill="none" style="flex-shrink:0"><path d="M1 1l5 5-5 5" stroke="#497d00" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
+            <!-- Terminals section -->
+            <div style="border-top:1px solid #756b571a;padding-top:12px;margin-bottom:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;min-height:20px">
+                <p style="font-size:11px;color:#16140e8c;margin:0">Terminals</p>
+                <span style="font-size:10px;font-weight:600;background:#e1e51a33;color:#46520f;padding:2px 8px;border-radius:20px">3 months free</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px">
+                <img src="45fbb70c016df9b1f72cab2dd588ab3362eef2a7.png" alt="Teya Pro" style="width:28px;height:36px;object-fit:contain;flex-shrink:0">
+                <div>
+                  <p style="font-size:13px;color:#090806ec;font-weight:500;margin:0;line-height:1.2">1&times; Teya Pro</p>
+                  <p style="font-size:11px;line-height:1.4;color:#16140e8c;margin:4px 0 0">Free for 3 months, then &pound;15/mo</p>
+                </div>
+              </div>
+            </div>
             <!-- Included features -->
-            <div>
+            <div style="border-top:1px solid #756b571a;padding-top:12px">
               <p style="font-size:11px;color:#16140e8c;margin:0 0 6px">Included features</p>
               <div id="included-features-bl" style="display:flex;flex-direction:column;gap:4px"></div>
             </div>
@@ -1209,13 +1250,33 @@
                 </div>
               </div>
             </div>
+            <!-- Amex rate (view-only — multi-rate edits all 7 rates via the "Change all rates" sheet) -->
+            <div style="display:flex;align-items:center;gap:10px;padding:4px 4px 14px;margin-bottom:4px">
+              <img src="amex.svg" alt="Amex" style="width:20px;height:20px;object-fit:contain;flex-shrink:0">
+              <span style="font-size:12px;color:#16140e8c">Amex &amp; other</span>
+              <span id="mr-amex-rate" style="margin-left:auto;font-size:13px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">1.90%</span>
+            </div>
             <!-- Savings narrative (multi-rate) -->
             <div id="mr-savings" onclick="openSavingsSheet()" style="background:#7ccf001a;border-radius:12px;padding:10px 12px;margin-bottom:14px;display:flex;align-items:center;gap:6px;cursor:pointer">
               <span id="mr-savings-text" style="font-size:12px;color:#497d00;font-weight:500;flex:1">Saving merchant &pound;86/mo vs statement</span>
               <svg width="7" height="12" viewBox="0 0 7 12" fill="none" style="flex-shrink:0"><path d="M1 1l5 5-5 5" stroke="#497d00" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
+            <!-- Terminals section -->
+            <div style="border-top:1px solid #756b571a;padding-top:12px;margin-bottom:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;min-height:20px">
+                <p style="font-size:11px;color:#16140e8c;margin:0">Terminals</p>
+                <span style="font-size:10px;font-weight:600;background:#7ccf001a;color:#497d00;padding:2px 8px;border-radius:20px">Free terminal</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px">
+                <img src="2e4b880c56532cb4192b69370bc6805885111ec4.png" alt="Teya Go" style="width:28px;height:36px;object-fit:contain;flex-shrink:0">
+                <div>
+                  <p style="font-size:13px;color:#090806ec;font-weight:500;margin:0;line-height:1.2">1&times; Teya Go</p>
+                  <p style="font-size:11px;line-height:1.4;color:#16140e8c;margin:4px 0 0">Included for the life of the contract</p>
+                </div>
+              </div>
+            </div>
             <!-- Included features -->
-            <div>
+            <div style="border-top:1px solid #756b571a;padding-top:12px">
               <p style="font-size:11px;color:#16140e8c;margin:0 0 6px">Included features</p>
               <div id="included-features-mr" style="display:flex;flex-direction:column;gap:4px"></div>
             </div>
@@ -1252,13 +1313,41 @@
               <button id="ic-reset-btn" onclick="resetIcRate()" style="font-size:10px;color:#497d00;font-weight:500;font-family:inherit;background:none;border:none;padding:0;cursor:default;transition:opacity 120ms">Suggested 0.30%</button>
               <span style="font-size:10px;color:#16140e8c;font-weight:500;margin-left:auto">Competition blended rate: <b style="color:#090806ec">1.69%</b></span>
             </div>
+            <!-- Amex rate (agent view: tap-to-edit with chevron) -->
+            <div onclick="openAmexSheet()" class="agent-only" style="display:flex;align-items:center;gap:10px;padding:4px 4px 14px;margin-bottom:4px;cursor:pointer">
+              <img src="amex.svg" alt="Amex" style="width:20px;height:20px;object-fit:contain;flex-shrink:0">
+              <span style="font-size:12px;color:#16140e8c">Amex &amp; other</span>
+              <span id="ic-amex-rate" style="margin-left:auto;font-size:13px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">1.90%</span>
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1l4 4-4 4" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <!-- Amex rate (client view: view-only, no chevron) -->
+            <div class="client-only">
+              <div style="display:flex;align-items:center;gap:10px;padding:4px 4px 14px;margin-bottom:4px">
+                <img src="amex.svg" alt="Amex" style="width:20px;height:20px;object-fit:contain;flex-shrink:0">
+                <span style="font-size:12px;color:#16140e8c">Amex &amp; other</span>
+                <span id="ic-amex-rate-client" style="margin-left:auto;font-size:13px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">1.90%</span>
+              </div>
+            </div>
             <!-- Savings narrative (dynamic rate) -->
             <div id="ic-savings" onclick="openSavingsSheet()" style="background:#7ccf001a;border-radius:12px;padding:10px 12px;margin-bottom:14px;display:flex;align-items:center;gap:6px;cursor:pointer">
               <span id="ic-savings-text" style="font-size:12px;color:#497d00;font-weight:500;flex:1">Saving merchant vs their 1.69%</span>
               <svg width="7" height="12" viewBox="0 0 7 12" fill="none" style="flex-shrink:0"><path d="M1 1l5 5-5 5" stroke="#497d00" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
+            <!-- Terminals section -->
+            <div style="border-top:1px solid #756b571a;padding-top:12px;margin-bottom:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;min-height:20px">
+                <p style="font-size:11px;color:#16140e8c;margin:0">Terminals</p>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px">
+                <img src="2e4b880c56532cb4192b69370bc6805885111ec4.png" alt="Teya Go" style="width:28px;height:36px;object-fit:contain;flex-shrink:0">
+                <div>
+                  <p style="font-size:13px;color:#090806ec;font-weight:500;margin:0;line-height:1.2">Monthly from &pound;15/mo</p>
+                  <p style="font-size:11px;line-height:1.4;color:#16140e8c;margin:4px 0 0">Pay-once terminals from &pound;49</p>
+                </div>
+              </div>
+            </div>
             <!-- Included features -->
-            <div>
+            <div style="border-top:1px solid #756b571a;padding-top:12px">
               <p style="font-size:11px;color:#16140e8c;margin:0 0 6px">Included features</p>
               <div id="included-features-ic" style="display:flex;flex-direction:column;gap:4px"></div>
             </div>
@@ -1302,22 +1391,22 @@
             </div>
           </div>
 
-          <!-- ── Business account (simple header like the other accordions, rich inner-tier card in body) ── -->
+          <!-- ── Settlement account accordion (rate lever — separate from BA plan) ── -->
           <div class="addon-card" data-open="false">
             <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
-              <p class="addon-label">Business account</p>
+              <p class="addon-label">Settlement account</p>
               <span class="accordion-preview">
-                <span class="accordion-preview-value" id="ba-preview-val">Silver BA</span>
+                <span class="accordion-preview-value" id="sa-preview-val">Teya BA</span>
+                <span class="accordion-preview-mod" id="sa-preview-mod"></span>
               </span>
               <svg class="accordion-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <div class="accordion-body">
               <div class="accordion-body-inner">
-                <p style="font-size:12px;color:#16140e8c;margin:0 0 10px;line-height:1.5">Business account included with every offer. Upgrade for more features.</p>
-                <!-- Current-tier card (rendered dynamically by renderBaCard) -->
-                <div id="ba-current-card" style="background:#7ccf000d;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:1px solid #7ccf0026"></div>
-                <!-- Opens the existing bottom sheet with full tier comparison + features -->
-                <button onclick="openBaSheet()" style="font-size:12px;color:#16140e8c;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline">Change</button>
+                <div class="chip-row" id="sa-chips">
+                  <button class="chip active" data-idx="0" onclick="chipSelect('sa',0)">Teya BA</button>
+                  <button class="chip" data-idx="1" onclick="chipSelect('sa',1)">External bank <span class="chip-mod amber">+20</span></button>
+                </div>
               </div>
             </div>
           </div>
@@ -1341,78 +1430,6 @@
                   <button class="chip active" data-idx="1" onclick="chipSelect('sf',1)">Everyday</button>
                   <button class="chip" data-idx="2" onclick="chipSelect('sf',2)">Instant <span class="chip-mod amber">+20</span></button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── Teya MCA accordion (tier cards + custom input) ── -->
-          <div class="addon-card" data-open="false">
-            <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
-              <p class="addon-label">Teya MCA</p>
-              <span class="accordion-preview">
-                <span class="accordion-preview-value muted" id="mca-preview-val">Not added</span>
-                <span class="accordion-preview-mod" id="mca-preview-mod"></span>
-              </span>
-              <svg class="accordion-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <div class="accordion-body">
-              <div class="accordion-body-inner">
-
-                <!-- ── STATE 1: Selection (visible when mcaConfirmed = false) ── -->
-                <div id="mca-selection">
-                  <p style="font-size:12px;color:#16140e8c;margin:0 0 2px">Eligible up to <b style="color:#090806ec">&pound;16,500</b></p>
-                  <p style="font-size:11px;color:#16140e8c;margin:0 0 10px">Discount applied after loan approval</p>
-                  <!-- Suggested tiers -->
-                  <div style="display:flex;gap:8px;margin-bottom:10px">
-                    <div id="mca-t1" class="mca-tier" onclick="selMcaTier(1)" style="flex:1;text-align:center;padding:10px 4px;border-radius:12px;background:white;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
-                      <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0 0 2px">&pound;5k</p>
-                      <p style="font-size:11px;font-weight:600;color:#497d00;margin:0">&minus;15 bps</p>
-                    </div>
-                    <div id="mca-t2" class="mca-tier" onclick="selMcaTier(2)" style="flex:1;text-align:center;padding:10px 4px;border-radius:12px;background:white;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
-                      <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0 0 2px">&pound;10k</p>
-                      <p style="font-size:11px;font-weight:600;color:#497d00;margin:0">&minus;25 bps</p>
-                    </div>
-                    <div id="mca-t3" class="mca-tier" onclick="selMcaTier(3)" style="flex:1;text-align:center;padding:10px 4px;border-radius:12px;background:white;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
-                      <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0 0 2px">&pound;16.5k</p>
-                      <p style="font-size:11px;font-weight:600;color:#497d00;margin:0">&minus;35 bps</p>
-                    </div>
-                  </div>
-                  <!-- Custom amount input -->
-                  <div style="margin-bottom:12px">
-                    <label style="font-size:11px;color:#16140e8c;display:block;margin-bottom:4px">Or enter a custom amount</label>
-                    <div style="background:#f6f5f3;border-radius:10px;height:38px;display:flex;align-items:center;padding:0 10px">
-                      <span style="font-size:13px;color:#16140e8c;margin-right:4px">&pound;</span>
-                      <input id="mca-custom" type="text" placeholder="e.g. 8,000" oninput="mcaCustomAmount(this.value)" style="flex:1;background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;color:#090806ec;font-variant-numeric:tabular-nums"/>
-                    </div>
-                  </div>
-                  <!-- Interested button — disabled until an amount is selected -->
-                  <button id="mca-interested-btn" onclick="confirmMcaInterest()" disabled style="width:100%;padding:13px;border-radius:999px;font-family:inherit;font-size:14px;font-weight:600;border:none;cursor:default;transition:all 200ms;background:#e8e5df;color:#16140e8c">Interested</button>
-                </div>
-
-                <!-- ── STATE 2: Confirmed (visible when mcaConfirmed = true) ── -->
-                <div id="mca-confirmed" style="display:none">
-                  <!-- Confirmation card — no intro copy, the card says everything -->
-                  <div style="background:#f6f5f3;border-radius:14px;padding:14px;margin-bottom:12px">
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 4" stroke="#497d00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      <span style="font-size:13px;font-weight:600;color:#497d00">MCA interest noted</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
-                      <span style="font-size:12px;color:#16140e8c">Requested amount</span>
-                      <span id="mca-conf-amount" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;10,000</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
-                      <span style="font-size:12px;color:#16140e8c">Discount if MCA activates</span>
-                      <span id="mca-conf-delta" style="font-size:14px;font-weight:600;color:#497d00;font-variant-numeric:tabular-nums">&minus;25 bps</span>
-                    </div>
-                    <div style="border-top:1px solid #756b571a;padding-top:10px">
-                      <p style="font-size:11px;color:#16140e8c;line-height:1.5;margin:0">This is a simulation only. The <b id="mca-conf-bps2" style="color:#090806ec">&minus;35 bps</b> discount is <b style="color:#090806ec">not reflected in the effective rate</b> &mdash; it will apply once the cash advance is approved and activated.</p>
-                    </div>
-                  </div>
-                  <!-- Cancel interest -->
-                  <button onclick="cancelMcaInterest()" style="font-size:12px;color:#16140e8c;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline">Cancel interest</button>
-                </div>
-
               </div>
             </div>
           </div>
@@ -1513,8 +1530,8 @@
 
       <!-- Primary CTA -->
       <div style="padding:8px 16px 28px">
-        <button id="s05-primary-cta" onclick="go('05c')" style="width:100%;background:#e1e51a;color:#29320c;font-family:inherit;font-size:16px;font-weight:600;border:none;border-radius:32px;padding:16px;cursor:pointer;transition:transform 120ms,background 200ms,color 200ms" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''" onmouseleave="this.style.transform=''">
-          Card machines &rarr;
+        <button id="s05-primary-cta" onclick="s05Continue()" style="width:100%;background:#e1e51a;color:#29320c;font-family:inherit;font-size:16px;font-weight:600;border:none;border-radius:32px;padding:16px;cursor:pointer;transition:transform 120ms,background 200ms,color 200ms" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''" onmouseleave="this.style.transform=''">
+          Continue &rarr;
         </button>
       </div>
     </div>
@@ -1531,9 +1548,36 @@
           <button onclick="closeSavingsSheet()" style="width:28px;height:28px;border-radius:50%;background:#f6f5f3;border:1px solid #756b571a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button>
         </div>
         <!-- Dynamic comparison table -->
-        <div id="sav-table-wrap" style="background:white;border-radius:16px;padding:16px;border:1px solid #756b571a"></div>
+        <div id="sav-table-wrap" style="background:white;border-radius:16px;overflow:hidden;border:1px solid #756b571a"></div>
         <!-- Context note -->
         <p style="font-size:11px;color:#16140e8c;margin:12px 0 0;text-align:center">Previous pricing from uploaded statement</p>
+      </div>
+    </div>
+
+    <!-- ═══ Amex Rate Bottom Sheet ═══ -->
+    <div id="amex-sheet-overlay" style="display:none;position:absolute;inset:0;z-index:100">
+      <div onclick="closeAmexSheet()" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);transition:opacity 200ms"></div>
+      <div id="amex-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#f6f5f3;border-radius:20px 20px 0 0;padding:20px 16px 28px;transform:translateY(100%);transition:transform 300ms cubic-bezier(0.32,0.72,0,1)">
+        <div style="width:36px;height:4px;background:#756b5733;border-radius:2px;margin:0 auto 16px"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="amex.svg" alt="Amex" style="width:28px;height:28px;object-fit:contain;flex-shrink:0">
+            <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0">Amex &amp; other</p>
+          </div>
+          <button onclick="closeAmexSheet()" style="width:28px;height:28px;border-radius:50%;background:white;border:1px solid #756b571a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+        <p style="font-size:12px;color:#16140e8c;margin:0 0 16px">Separate rate for Amex &amp; other schemes (~10% of transactions).</p>
+        <div style="background:white;border-radius:16px;padding:18px 18px 14px;border:1px solid #756b571a">
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px">
+            <button onclick="nudgeAmex(-5)" style="width:36px;height:36px;border-radius:50%;background:#f6f5f3;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#090806ec;font-weight:500;transition:transform 120ms" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform=''">−</button>
+            <input type="text" id="amex-rate-input" value="1.90%" onchange="setAmexFromInput(this.value)" onfocus="this.select()" style="font-size:30px;font-weight:700;color:#090806ec;text-align:center;background:transparent;border:none;outline:none;width:120px;font-family:inherit;font-variant-numeric:tabular-nums;caret-color:#e1e51a">
+            <button onclick="nudgeAmex(5)" style="width:36px;height:36px;border-radius:50%;background:#f6f5f3;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#090806ec;font-weight:500;transition:transform 120ms" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform=''">+</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:0 4px">
+            <button id="amex-reset-btn" onclick="resetAmex()" style="color:#497d00;font-weight:500;font-size:10px;font-family:inherit;background:none;border:none;padding:0;cursor:default;transition:opacity 120ms">Suggested 1.90%</button>
+            <span style="color:#16140e8c;font-weight:500">Min: <b style="color:#090806ec">1.20%</b></span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1553,6 +1597,7 @@
               <tr><td>Cons. debit</td><td><input type="text" id="mr-cdCP-val" value="0.85%" onchange="updMrInput('cdCP',this);syncMrHero()" onfocus="this.select()"><div style="font-size:9px;color:#16140e4d;text-align:center;margin-top:1px">was 1.10%</div></td><td><input type="text" id="mr-cdCNP-val" value="0.95%" onchange="updMrInput('cdCNP',this)" onfocus="this.select()"><div style="font-size:9px;color:#16140e4d;text-align:center;margin-top:1px">was 1.20%</div></td></tr>
               <tr><td>Cons. credit</td><td><input type="text" id="mr-ccCP-val" value="1.20%" onchange="updMrInput('ccCP',this)" onfocus="this.select()"><div style="font-size:9px;color:#16140e4d;text-align:center;margin-top:1px">was 1.50%</div></td><td><input type="text" id="mr-ccCNP-val" value="1.30%" onchange="updMrInput('ccCNP',this)" onfocus="this.select()"><div style="font-size:9px;color:#16140e4d;text-align:center;margin-top:1px">was 1.60%</div></td></tr>
               <tr><td>Business/Intl</td><td><input type="text" id="mr-biCP-val" value="1.40%" onchange="updMrInput('biCP',this)" onfocus="this.select()"><div style="font-size:9px;color:#16140e4d;text-align:center;margin-top:1px">was 1.80%</div></td><td><input type="text" id="mr-biCNP-val" value="1.50%" onchange="updMrInput('biCNP',this)" onfocus="this.select()"><div style="font-size:9px;color:#16140e4d;text-align:center;margin-top:1px">was 1.90%</div></td></tr>
+              <tr><td style="border-top:1px solid #756b571a"><div style="display:flex;align-items:center;gap:6px"><img src="amex.svg" alt="Amex" style="width:16px;height:16px;object-fit:contain">Amex &amp; other</div></td><td colspan="2" style="border-top:1px solid #756b571a"><input type="text" id="mr-amex-val" value="1.90%" onchange="updMrAmex(this)" onfocus="this.select()"><div style="font-size:9px;color:#16140e4d;text-align:center;margin-top:1px">min 1.20%</div></td></tr>
             </tbody>
           </table>
           <button onclick="resetMrRates()" style="display:block;margin:10px 0 0 auto;font-size:11px;color:#16140e8c;font-family:inherit;background:none;border:none;padding:0;cursor:pointer" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'">Reset to suggested</button>
@@ -1663,6 +1708,96 @@
     </div>
 </div>
 
+<!-- ═══ SCREEN 05b: BUSINESS ACCOUNT PLAN (only shown when settlement = Teya BA) ═══ -->
+<div id="s-05b" class="sp sr" style="display:flex;flex-direction:column">
+<!-- Pinned header -->
+<div style="flex-shrink:0">
+  <div class="flex items-center justify-between px-6 pt-4 bg-[#f6f5f3]" style="height:50px"><span class="text-[15px] font-semibold text-[#090806ec]">9:41</span><div class="flex items-center gap-1.5"><svg width="17" height="12" viewBox="0 0 17 12" fill="#090806ec"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#090806ec" stroke-opacity="0.35"/><rect x="1.5" y="1.5" width="16" height="9" rx="2.5" fill="#090806ec"/><path d="M23 4v4a2 2 0 000-4z" fill="#090806ec" fill-opacity="0.4"/></svg></div></div>
+  <div class="bg-[#f6f5f3] border-b border-[#756b571a]">
+    <div class="relative flex items-center justify-center px-4" style="height:56px">
+      <button onclick="go('05')" class="absolute left-4 flex items-center gap-1 text-[#090806ec] active:opacity-60"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[16px] font-medium">Back</span></button>
+      <span class="text-[16px] font-semibold text-[#090806ec]">Business account</span>
+    </div>
+  </div>
+</div>
+
+<div class="ss">
+  <div class="px-4 pt-4 pb-6">
+    <div style="margin-bottom:16px">
+      <h2 style="font-size:20px;font-weight:600;color:#090806ec;margin:0 0 4px;line-height:1.2">Choose a business account plan</h2>
+      <p style="font-size:13px;color:#16140e8c;margin:0;line-height:1.45">All plans are included at no extra cost. Upgrade for more features.</p>
+    </div>
+
+    <div id="ba-tier-cards-05b" style="display:flex;flex-direction:column;gap:10px">
+      <!-- Light -->
+      <div class="ba-tier-card" data-tier="light" onclick="selectBaTierOn05b('light')" role="radio" aria-checked="false" tabindex="0" style="background:white;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.05);padding:16px;cursor:pointer;transition:box-shadow 200ms,opacity 200ms;opacity:0.7">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <img src="light.png" alt="Teya BA Light" style="width:44px;height:32px;object-fit:contain;flex-shrink:0">
+            <div>
+              <p style="font-size:15px;font-weight:600;color:#090806ec;margin:0">Teya BA Light</p>
+              <p style="font-size:11px;color:#16140e8c;margin:1px 0 0">Entry-level business account</p>
+            </div>
+          </div>
+          <span style="font-size:11px;font-weight:600;color:#497d00;background:#7ccf001a;padding:3px 9px;border-radius:20px">Free</span>
+        </div>
+        <div style="border-top:1px solid #756b571a;padding-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">1 physical card</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">1 virtual card</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">&pound;10k/mo EFT out</span></div>
+        </div>
+      </div>
+
+      <!-- Silver (default) -->
+      <div class="ba-tier-card selected" data-tier="silver" onclick="selectBaTierOn05b('silver')" role="radio" aria-checked="true" tabindex="0" style="background:white;border-radius:20px;box-shadow:0 0 0 1.5px #090806ec,0 4px 14px rgba(0,0,0,0.07);padding:16px;cursor:pointer;transition:box-shadow 200ms,opacity 200ms">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <img src="silver.png" alt="Teya BA Silver" style="width:44px;height:32px;object-fit:contain;flex-shrink:0">
+            <div>
+              <p style="font-size:15px;font-weight:600;color:#090806ec;margin:0">Teya BA Silver</p>
+              <p style="font-size:11px;color:#16140e8c;margin:1px 0 0">More cards + cashback</p>
+            </div>
+          </div>
+          <span style="font-size:11px;font-weight:600;color:#497d00;background:#7ccf001a;padding:3px 9px;border-radius:20px">Free</span>
+        </div>
+        <div style="border-top:1px solid #756b571a;padding-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">2 physical cards</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">2 virtual cards</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">&pound;25k/mo EFT out</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">0.5% cashback</span></div>
+        </div>
+      </div>
+
+      <!-- Gold -->
+      <div class="ba-tier-card" data-tier="gold" onclick="selectBaTierOn05b('gold')" role="radio" aria-checked="false" tabindex="0" style="background:white;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.05);padding:16px;cursor:pointer;transition:box-shadow 200ms,opacity 200ms;opacity:0.7">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <img src="gold.png" alt="Teya BA Gold" style="width:44px;height:32px;object-fit:contain;flex-shrink:0">
+            <div>
+              <p style="font-size:15px;font-weight:600;color:#090806ec;margin:0">Teya BA Gold</p>
+              <p style="font-size:11px;color:#16140e8c;margin:1px 0 0">Unlimited + premium features</p>
+            </div>
+          </div>
+          <span style="font-size:11px;font-weight:600;color:#497d00;background:#7ccf001a;padding:3px 9px;border-radius:20px">Free</span>
+        </div>
+        <div style="border-top:1px solid #756b571a;padding-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">5 physical cards</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">Unlimited virtual cards</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">Unlimited EFT out</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">1% cashback</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">PayPoint + Cash Deposit</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <button onclick="go('05c')" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Card machines &rarr;</button>
+</div>
+</div>
+
 <!-- ═══ SCREEN 05c: CARD MACHINES (redesigned — terminal-first, stores as assignment rows) ═══ -->
 <div id="s-05c" class="sp sr" style="display:flex;flex-direction:column">
 <!-- Pinned header: status bar + nav + health bar (outside scroll) -->
@@ -1670,7 +1805,7 @@
   <div class="flex items-center justify-between px-6 pt-4 bg-[#f6f5f3]" style="height:50px"><span class="text-[15px] font-semibold text-[#090806ec]">9:41</span><div class="flex items-center gap-1.5"><svg width="17" height="12" viewBox="0 0 17 12" fill="#090806ec"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#090806ec" stroke-opacity="0.35"/><rect x="1.5" y="1.5" width="16" height="9" rx="2.5" fill="#090806ec"/><path d="M23 4v4a2 2 0 000-4z" fill="#090806ec" fill-opacity="0.4"/></svg></div></div>
   <div class="bg-[#f6f5f3] border-b border-[#756b571a]">
     <div class="relative flex items-center justify-center px-4" style="height:56px">
-      <button onclick="go('05')" class="absolute left-4 flex items-center gap-1 text-[#090806ec] active:opacity-60"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[16px] font-medium">Back</span></button>
+      <button onclick="s05cBack()" class="absolute left-4 flex items-center gap-1 text-[#090806ec] active:opacity-60"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[16px] font-medium">Back</span></button>
       <span class="text-[16px] font-semibold text-[#090806ec]">Card machines</span>
       <div style="position:absolute;right:16px">
         <button id="mode-menu-btn-05c" onclick="toggleModeMenu(event,'05c')" style="padding:0;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity 150ms" onmousedown="this.style.opacity='0.55'" onmouseup="this.style.opacity=''" onmouseleave="this.style.opacity=''">
@@ -1719,7 +1854,10 @@
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
       <img src="2e4b880c56532cb4192b69370bc6805885111ec4.png" alt="Teya Go" style="width:40px;height:48px;object-fit:contain;flex-shrink:0">
       <div style="flex:1">
-        <span style="font-size:14px;font-weight:600;color:#090806ec">Teya Go</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:14px;font-weight:600;color:#090806ec">Teya Go</span>
+          <span id="cm-chip-go" style="display:none;font-size:10px;font-weight:500;color:#497d00;background:#7ccf001a;padding:2px 8px;border-radius:10px"></span>
+        </div>
         <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Portable · accepts all cards</p>
       </div>
     </div>
@@ -1839,7 +1977,7 @@
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-size:14px;font-weight:600;color:#090806ec">Teya Pro</span>
-          <span style="font-size:10px;font-weight:500;color:#497d00;background:#7ccf001a;padding:2px 8px;border-radius:10px">1 free terminal</span>
+          <span id="cm-chip-pro" style="display:none;font-size:10px;font-weight:500;color:#46520f;background:#e1e51a33;padding:2px 8px;border-radius:10px"></span>
         </div>
         <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Full POS · large screen</p>
       </div>
@@ -2069,31 +2207,6 @@
         </div>
       </div>
 
-      <!-- AMEX & Other cards -->
-      <div id="row-amex">
-        <div class="flex items-center gap-3 px-4 py-4">
-          <div style="width:40px;height:40px;border-radius:12px;background:#f6f5f3;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="1" y="5" width="15" height="11" rx="2" stroke="#090806ec" stroke-width="1.3"/><rect x="8" y="8" width="15" height="11" rx="2" stroke="#090806ec" stroke-width="1.3" fill="white"/><path d="M11 14h4" stroke="#090806ec" stroke-width="1.3" stroke-linecap="round"/><path d="M11 11.5h2" stroke="#090806ec" stroke-width="1" stroke-linecap="round"/></svg>
-          </div>
-          <div class="flex-1">
-            <p class="text-[14px] font-semibold text-[#090806ec]">AMEX &amp; Other cards</p>
-            <p class="text-[12px] text-[#16140e8c]">Accept American Express &amp; other card schemes</p>
-          </div>
-          <label style="position:relative;width:44px;height:26px;flex-shrink:0;cursor:pointer">
-            <input type="checkbox" id="tog-amex" style="display:none" onchange="togProduct(this)">
-            <span style="position:absolute;inset:0;border-radius:13px;background:#e5e2dc;transition:background 200ms"></span>
-            <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.15);transition:transform 200ms"></span>
-          </label>
-        </div>
-        <div id="expand-amex" style="max-height:0;overflow:hidden;transition:max-height 300ms ease,opacity 200ms;opacity:0">
-          <div style="padding:0 16px 14px 68px">
-            <div style="display:flex;align-items:baseline;justify-content:space-between;background:#f6f5f3;border-radius:12px;padding:10px 14px">
-              <span style="font-size:12px;color:#16140e8c">Surcharge per transaction</span>
-              <span style="font-size:14px;font-weight:600;color:#090806ec">+0.40%</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
   </div>
@@ -5470,7 +5583,19 @@
 </div>
 </div><!-- /phone screen -->
 </div><!-- /bezel -->
+</div><!-- /frame -->
 <div class="absolute bottom-[28px] left-1/2 -translate-x-1/2 w-[134px] h-[5px] bg-white/30 rounded-full"></div>
+<!-- ═══ Side buttons (absolute, overhang the frame edges) ═══ -->
+<!-- Action Button (left) -->
+<div style="position:absolute;left:-2px;top:140px;width:3px;height:32px;background:linear-gradient(to right,#0a0a0a 0%,#2c2c2e 50%,#1a1a1c 100%);border-radius:1.5px 0 0 1.5px;box-shadow:inset 1px 0 1px rgba(255,255,255,0.05),-1px 0 2px rgba(0,0,0,0.35)"></div>
+<!-- Volume Up (left) -->
+<div style="position:absolute;left:-2px;top:200px;width:3px;height:56px;background:linear-gradient(to right,#0a0a0a 0%,#2c2c2e 50%,#1a1a1c 100%);border-radius:1.5px 0 0 1.5px;box-shadow:inset 1px 0 1px rgba(255,255,255,0.05),-1px 0 2px rgba(0,0,0,0.35)"></div>
+<!-- Volume Down (left) -->
+<div style="position:absolute;left:-2px;top:272px;width:3px;height:56px;background:linear-gradient(to right,#0a0a0a 0%,#2c2c2e 50%,#1a1a1c 100%);border-radius:1.5px 0 0 1.5px;box-shadow:inset 1px 0 1px rgba(255,255,255,0.05),-1px 0 2px rgba(0,0,0,0.35)"></div>
+<!-- Side button / power (right) -->
+<div style="position:absolute;right:-2px;top:210px;width:3px;height:90px;background:linear-gradient(to left,#0a0a0a 0%,#2c2c2e 50%,#1a1a1c 100%);border-radius:0 1.5px 1.5px 0;box-shadow:inset -1px 0 1px rgba(255,255,255,0.05),1px 0 2px rgba(0,0,0,0.35)"></div>
+<!-- Camera Control (right) -->
+<div style="position:absolute;right:-2px;top:320px;width:3px;height:40px;background:linear-gradient(to left,#0a0a0a 0%,#2c2c2e 50%,#1a1a1c 100%);border-radius:0 1.5px 1.5px 0;box-shadow:inset -1px 0 1px rgba(255,255,255,0.05),1px 0 2px rgba(0,0,0,0.35)"></div>
 </div><!-- /relative -->
 
 <!-- jump nav -->
@@ -5499,7 +5624,7 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-const ORDER=['01','members','02','03','04','04i','05','05c','06','07','08','09'];
+const ORDER=['01','members','02','03','04','04i','05','05b','05c','06','07','08','09'];
 let cur='01', hist=['01'];
 function go(t){
   if(!t||t===cur)return;
@@ -5520,7 +5645,7 @@ function go(t){
 }
 function goBack(){if(hist.length>1){hist.pop();const p=hist[hist.length-1];hist.pop();go(p);}}
 // ─── Product usage toggles ──
-const prodExpandMap={pbl:'expand-pbl',ecom:'expand-ecom',vt:'expand-vt',amex:'expand-amex'};
+const prodExpandMap={pbl:'expand-pbl',ecom:'expand-ecom',vt:'expand-vt'};
 function togProduct(cb){
   const lbl=cb.parentElement;const track=lbl.querySelectorAll('span')[0];const thumb=lbl.querySelectorAll('span')[1];
   if(cb.checked){track.style.background='#090806ec';thumb.style.transform='translateX(18px)';}
@@ -5838,6 +5963,8 @@ function ndToggleStore(idx) {
   const isOpen = body.classList.contains('open');
   body.classList.toggle('open', !isOpen);
   if (chev) chev.classList.toggle('open', !isOpen);
+  // Persist so any re-render (e.g. after changing Online payments chips or inputs) respects it
+  if (ndStores[idx]) ndStores[idx]._cardOpen = !isOpen;
 }
 
 // ── Render stores from ndStores array ──
@@ -5854,7 +5981,7 @@ function ndRenderStores(allExpanded) {
     addRow.style.display = 'flex';
   }
   ndStores.forEach((store, i) => {
-    const shouldOpen = allExpanded === true || i === ndLastAddedIdx;
+    const shouldOpen = allExpanded === true || i === ndLastAddedIdx || store._cardOpen === true;
     const allActivities = ['Café/Restaurant','Bar/Pub','Retail — Fashion','Retail — Grocery','Retail — Electronics','Takeaway/Fast Food','Hotel/Accommodation','Health & Beauty','Professional Services','Entertainment/Leisure','Charity/Non-Profit','Other'];
     const googleSuggestions = store._googleActivities || [];
     const hasGoogleData = googleSuggestions.length > 0 && store._manual;
@@ -5955,13 +6082,17 @@ function ndRenderStores(allExpanded) {
             '</div>' +
             // ── Seasonality section ──
             '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
-              '<label class="text-[13px] text-[#16140e8c] block mb-2" style="font-size:13px !important;color:rgba(22,20,14,0.55) !important">Seasonality</label>' +
-              '<div class="flex bg-[#f6f5f3] rounded-xl p-0.5 mb-3">' +
-                '<button onclick="ndSetSeasonMode(' + i + ',\'calendar\')" class="flex-1 text-[13px] font-medium py-2 rounded-[10px] transition-all ' + (store._seasonMode !== 'onetime' ? 'bg-white text-[#090806ec] shadow-[0_1px_3px_rgba(0,0,0,0.08)]' : 'text-[#16140e8c]') + '">Recurring</button>' +
-                '<button onclick="ndSetSeasonMode(' + i + ',\'onetime\')" class="flex-1 text-[13px] font-medium py-2 rounded-[10px] transition-all ' + (store._seasonMode === 'onetime' ? 'bg-white text-[#090806ec] shadow-[0_1px_3px_rgba(0,0,0,0.08)]' : 'text-[#16140e8c]') + '">One-time event</button>' +
-              '</div>' +
+              '<label class="text-[13px] block mb-1" style="font-size:13px !important;color:rgba(22,20,14,0.55) !important">' +
+                (store._seasonMode === 'onetime' ? 'One-time event' : 'Seasonality') +
+              '</label>' +
+              (store._seasonMode === 'onetime'
+                ? '<p class="text-[11px] text-[#16140e8c] mb-3">Use for merchants operating on fixed dates shorter than a month (e.g. fireworks stand, Christmas market).</p>'
+                : ''
+              ) +
               ndSeasonContent(i, store) +
             '</div>' +
+            // ── Online payments section ──
+            ndOnlinePaymentsSection(i, store) +
             // ── Transaction profile section ──
             ndTxProfileSection(i, store) +
           '</div>' +
@@ -6280,7 +6411,12 @@ function ndConfirmStmtStores() {
     _stmtActivity: s.activity, _stmtAtv: s.atv, _stmtTpv: s.tpv,
     _stmtTxProfile: s._txProfile || null,
     _txProfile: s._txProfile ? {...s._txProfile} : null,
-    _txProfileOpen: !!s._txProfile
+    _txProfileOpen: !!s._txProfile,
+    // Online payments pre-fill (statement): simulate typical mix — most merchants take ~15% online
+    _acceptsOnline: true,
+    _ecomPct: 15,
+    _stmtAcceptsOnline: true,
+    _stmtEcomPct: 15
   }));
   const file = ndCurrentStmt.file;
   ndCloseStmtSheet();
@@ -6389,7 +6525,10 @@ function ndAddStore(name, address, googleActivities, googleAtv) {
       _googleAtv: googleAtv || '',
       _googleTxProfile: googleTxProfile,
       _txProfile: {...googleTxProfile},
-      _txProfileOpen: false
+      _txProfileOpen: false,
+      // Online payments — disabled by default for Google-added stores (no statement data to pre-fill)
+      _acceptsOnline: false,
+      _ecomPct: null
     });
     ndLastAddedIdx = ndStores.length - 1;
     ndRenderStores(false);
@@ -6450,7 +6589,7 @@ function ndSeasonContent(idx, store) {
         '<span class="flex items-center gap-1.5 text-[11px] text-[#16140e8c]"><span class="inline-block size-2.5 rounded-sm bg-[#C0C42D]"></span>Peak</span>' +
         '<span class="flex items-center gap-1.5 text-[11px] text-[#16140e8c]"><span class="inline-block size-2.5 rounded-sm shadow-[inset_0_0_0_1px_rgba(117,107,87,0.2)]"></span>Closed</span>' +
       '</div>' +
-      '<button onclick="ndSetAllPeak(' + idx + ')" class="text-[11px] text-[#16140e8c] underline underline-offset-2">' + (allPeak ? 'Reset' : 'All peak') + '</button>' +
+      '<button onclick="ndSetAllPeak(' + idx + ')" class="text-[11px] text-[#16140e8c] active:opacity-60">' + (allPeak ? 'Reset' : 'All peak') + '</button>' +
     '</div>';
 
     let tpvFields;
@@ -6469,9 +6608,32 @@ function ndSeasonContent(idx, store) {
       tpvFields = '';
     }
 
+    // Smart nudge: exactly 1 selected month (peak OR off-peak) + 11 closed = likely a short operating period
+    const closedCount = months.filter(m => m === -1).length;
+    const singleMonthEvent = (peakCount + offPeakCount) === 1 && closedCount === 11 && !store._dismissedOneTimeNudge;
+    const nudge = singleMonthEvent
+      ? '<div class="mt-3 flex items-start gap-2 bg-[#F1F3B6] rounded-xl px-3 py-2.5">' +
+          '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px">' +
+            '<path d="M7 1L8.2 5.3L12.5 6.5L8.2 7.7L7 12L5.8 7.7L1.5 6.5L5.8 5.3Z" fill="#6d770d"/>' +
+            '<path d="M11 1.5L11.5 2.8L12.8 3.3L11.5 3.8L11 5.1L10.5 3.8L9.2 3.3L10.5 2.8Z" fill="#6d770d" opacity="0.5"/>' +
+          '</svg>' +
+          '<div class="flex-1 cursor-pointer active:opacity-80" onclick="ndSetSeasonMode(' + idx + ',\'onetime\')">' +
+            '<p class="text-[12px] font-medium text-[#46520f] leading-tight">Operating for less than a month?</p>' +
+            '<p class="text-[11px] text-[#6d770d] mt-0.5 leading-tight">Set as one-time event &rarr;</p>' +
+          '</div>' +
+          '<button onclick="ndDismissOneTimeNudge(' + idx + ')" aria-label="Dismiss" class="flex-shrink-0 p-0.5 -m-0.5 active:opacity-60" style="background:none;border:none;cursor:pointer">' +
+            '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#6d770d" stroke-width="1.3" stroke-linecap="round"/></svg>' +
+          '</button>' +
+        '</div>'
+      : '';
+
+    const footer = '<div class="mt-1 text-center">' +
+      '<button onclick="ndSetSeasonMode(' + idx + ',\'onetime\')" class="text-[11px] text-[#16140e8c] active:opacity-60">One-time event instead</button>' +
+    '</div>';
+
     return '<div>' +
       '<p class="text-[12px] text-[#16140e8c] mb-2">Tap to cycle: off-peak → peak → closed</p>' +
-      grid + legend + tpvFields +
+      grid + legend + tpvFields + nudge + footer +
     '</div>';
   }
 
@@ -6491,10 +6653,101 @@ function ndSeasonContent(idx, store) {
       '<div class="bg-[#f6f5f3] rounded-xl px-3 h-10 flex items-center"><span class="text-[13px] text-[#16140e8c] mr-1">£</span><input type="text" value="' + (store._onetimeTpv || '') + '" placeholder="0" class="flex-1 bg-transparent text-[14px] text-[#090806ec] outline-none tabular-nums"/></div>' +
       stmtTpvNote +
     '</div>' +
+    '<div class="mt-1 text-center">' +
+      '<button onclick="ndSetSeasonMode(' + idx + ',\'calendar\')" class="text-[11px] text-[#16140e8c] active:opacity-60">&larr; Back to recurring</button>' +
+    '</div>' +
   '</div>';
 }
 
 // ── Transaction profile section ──
+// ── Online payments section ──
+// Asks if the store accepts online payments. If yes, collects an In-person / E-commerce split.
+// Statement-derived stores arrive pre-filled; Google-added stores start disabled (agent toggles on).
+function ndOnlinePaymentsSection(idx, store) {
+  const on = !!store._acceptsOnline;
+  const ecom = store._ecomPct;
+  const hasSplit = on && typeof ecom === 'number';
+  const inperson = hasSplit ? (100 - ecom) : null;
+  const stmtIcon = '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="1.5" stroke="#16140e8c" stroke-width="1.2"/><path d="M5 4.5h6M5 7h6M5 9.5h4" stroke="#16140e8c" stroke-width="1" stroke-linecap="round"/></svg>';
+  const showStmtNote = store._fromStatement && typeof store._stmtEcomPct === 'number';
+
+  // Header row: label + segmented No / Yes chips
+  const chipBase = 'px-3 py-1 rounded-full text-[12px] font-medium transition-all whitespace-nowrap';
+  const chipActive = 'bg-[#e1e51a33] text-[#6d770d] shadow-[0_0_0_1px_rgba(109,119,13,0.3)]';
+  const chipInactive = 'bg-transparent text-[#090806ec] shadow-[0_0_0_1px_rgba(117,107,87,0.2)] active:scale-[0.96]';
+  let html = '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
+    '<div class="flex items-center justify-between gap-3">' +
+      '<div class="min-w-0">' +
+        '<label class="text-[13px] block" style="color:rgba(22,20,14,0.55)">Accepts online payments</label>' +
+        '<p class="text-[11px] text-[#16140e8c] mt-0.5">e.g. Pay by Link, MOTO, e-commerce</p>' +
+      '</div>' +
+      '<div class="flex gap-1.5 flex-shrink-0">' +
+        '<button onclick="ndSetAcceptsOnline(' + idx + ',false)" class="' + chipBase + ' ' + (on ? chipInactive : chipActive) + '">No</button>' +
+        '<button onclick="ndSetAcceptsOnline(' + idx + ',true)" class="' + chipBase + ' ' + (on ? chipActive : chipInactive) + '">Yes</button>' +
+      '</div>' +
+    '</div>';
+
+  if (on) {
+    // Optional "Pre-filled from statement" note when source exists
+    if (showStmtNote && store._stmtEcomPct === store._ecomPct) {
+      html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">Pre-filled from statement</span></div>';
+    } else if (showStmtNote) {
+      html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">From statement: In-person ' + (100 - store._stmtEcomPct) + '% · Online ' + store._stmtEcomPct + '%</span></div>';
+    }
+
+    // Split bar (filled when values set, neutral gray when blank)
+    const inP = hasSplit ? inperson : 0;
+    const ecP = hasSplit ? ecom : 0;
+    html += '<div class="mt-3">' +
+      // Split-bar visualisation (stays gray when blank)
+      (hasSplit
+        ? '<div class="flex h-2 rounded-full overflow-hidden mb-2">' +
+            '<div style="width:' + inP + '%" class="bg-[#C0C42D] transition-all"></div>' +
+            '<div style="width:' + ecP + '%" class="bg-[#F1F3B6] transition-all"></div>' +
+          '</div>'
+        : '<div class="h-2 rounded-full mb-2 bg-[#e8e5df]"></div>'
+      ) +
+      // Paired inputs: In-person | E-commerce
+      '<div class="grid grid-cols-2 gap-2">' +
+        '<div>' +
+          '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#C0C42D]"></span>In-person</p>' +
+          '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
+            '<input inputmode="numeric" placeholder="—" value="' + (hasSplit ? inperson : '') + '" onfocus="this.select()" onchange="ndUpdateEcomSplit(' + idx + ',this.value,\'inperson\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
+            '<span class="text-[12px] text-[#16140e8c]">%</span>' +
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#F1F3B6]"></span>Online</p>' +
+          '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
+            '<input inputmode="numeric" placeholder="—" value="' + (hasSplit ? ecom : '') + '" onfocus="this.select()" onchange="ndUpdateEcomSplit(' + idx + ',this.value,\'ecom\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
+            '<span class="text-[12px] text-[#16140e8c]">%</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// Set online-payments acceptance explicitly (keeps _ecomPct if already set, so agent can flip No/Yes without losing data)
+function ndSetAcceptsOnline(idx, on) {
+  const s = ndStores[idx];
+  s._acceptsOnline = !!on;
+  ndLastAddedIdx = idx;   // keep this store expanded across the re-render
+  ndRenderStores(false);
+}
+
+// Editing one side auto-updates the other (always summing to 100)
+function ndUpdateEcomSplit(idx, value, which) {
+  const v = Math.max(0, Math.min(100, parseInt(value) || 0));
+  const s = ndStores[idx];
+  s._ecomPct = which === 'ecom' ? v : (100 - v);
+  ndLastAddedIdx = idx;   // keep this store expanded across the re-render
+  ndRenderStores(false);
+}
+
 function ndTxProfileSection(idx, store) {
   const hasStmtProfile = store._fromStatement && store._stmtTxProfile;
   const hasGoogleProfile = store._manual && store._googleTxProfile;
@@ -6682,6 +6935,13 @@ function ndSetSeasonMode(storeIdx, mode) {
   } else {
     ndStores[storeIdx]._seasonMode = mode;
   }
+  ndLastAddedIdx = storeIdx;
+  ndRenderStores(false);
+}
+
+// Per-store sticky dismissal of the "operates < 1 month?" smart nudge
+function ndDismissOneTimeNudge(storeIdx) {
+  ndStores[storeIdx]._dismissedOneTimeNudge = true;
   ndLastAddedIdx = storeIdx;
   ndRenderStores(false);
 }
@@ -7036,6 +7296,24 @@ function syncHealthBar05c() {
   const srcFloor = document.getElementById('tr-floor-label');
   const dstFloor = document.getElementById('tr-floor-label-05c');
   if (srcFloor && dstFloor) { dstFloor.style.color = srcFloor.style.color; dstFloor.style.fontWeight = srcFloor.style.fontWeight; }
+  updateCardMachinePromos();
+}
+
+// Reflect the selected offer's terminal promo on the Card Machines screen:
+// show a matching chip on the terminal included with the selected offer.
+// Reads the global curPS set by the offer carousel.
+function updateCardMachinePromos() {
+  const ps = (typeof curPS !== 'undefined') ? curPS : 'bl';
+  const chipPro = document.getElementById('cm-chip-pro');
+  const chipGo  = document.getElementById('cm-chip-go');
+  if (chipPro) { chipPro.style.display = 'none'; chipPro.textContent = ''; }
+  if (chipGo)  { chipGo.style.display  = 'none'; chipGo.textContent  = ''; }
+  if (ps === 'bl') {
+    if (chipPro) { chipPro.textContent = '3 months free'; chipPro.style.display = 'inline-block'; }
+  } else if (ps === 'mr') {
+    if (chipGo) { chipGo.textContent = 'Free terminal'; chipGo.style.display = 'inline-block'; }
+  }
+  // 'ic' (Dynamic rate): no included terminal — chips stay hidden.
 }
 
 // Legacy compat — old functions no longer used but may be referenced
@@ -7436,6 +7714,8 @@ function asnToggleStore(idx) {
   const isOpen = body.classList.contains('open');
   body.classList.toggle('open', !isOpen);
   if (chev) chev.classList.toggle('open', !isOpen);
+  // Persist so any re-render (e.g. after changing Online payments chips or inputs) respects it
+  if (asnStores[idx]) asnStores[idx]._cardOpen = !isOpen;
 }
 
 // ── Render stores from asnStores array ──
@@ -7452,7 +7732,7 @@ function asnRenderStores(allExpanded) {
     addRow.style.display = 'flex';
   }
   asnStores.forEach((store, i) => {
-    const shouldOpen = allExpanded === true || i === asnLastAddedIdx;
+    const shouldOpen = allExpanded === true || i === asnLastAddedIdx || store._cardOpen === true;
     const allActivities = ['Café/Restaurant','Bar/Pub','Retail — Fashion','Retail — Grocery','Retail — Electronics','Takeaway/Fast Food','Hotel/Accommodation','Health & Beauty','Professional Services','Entertainment/Leisure','Charity/Non-Profit','Other'];
     const googleSuggestions = store._googleActivities || [];
     const hasGoogleData = googleSuggestions.length > 0 && store._manual;
@@ -7553,13 +7833,17 @@ function asnRenderStores(allExpanded) {
             '</div>' +
             // ── Seasonality section ──
             '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
-              '<label class="text-[13px] text-[#16140e8c] block mb-2" style="font-size:13px !important;color:rgba(22,20,14,0.55) !important">Seasonality</label>' +
-              '<div class="flex bg-[#f6f5f3] rounded-xl p-0.5 mb-3">' +
-                '<button onclick="asnSetSeasonMode(' + i + ',\'calendar\')" class="flex-1 text-[13px] font-medium py-2 rounded-[10px] transition-all ' + (store._seasonMode !== 'onetime' ? 'bg-white text-[#090806ec] shadow-[0_1px_3px_rgba(0,0,0,0.08)]' : 'text-[#16140e8c]') + '">Recurring</button>' +
-                '<button onclick="asnSetSeasonMode(' + i + ',\'onetime\')" class="flex-1 text-[13px] font-medium py-2 rounded-[10px] transition-all ' + (store._seasonMode === 'onetime' ? 'bg-white text-[#090806ec] shadow-[0_1px_3px_rgba(0,0,0,0.08)]' : 'text-[#16140e8c]') + '">One-time event</button>' +
-              '</div>' +
+              '<label class="text-[13px] block mb-1" style="font-size:13px !important;color:rgba(22,20,14,0.55) !important">' +
+                (store._seasonMode === 'onetime' ? 'One-time event' : 'Seasonality') +
+              '</label>' +
+              (store._seasonMode === 'onetime'
+                ? '<p class="text-[11px] text-[#16140e8c] mb-3">Use for merchants operating on fixed dates shorter than a month (e.g. fireworks stand, Christmas market).</p>'
+                : ''
+              ) +
               asnSeasonContent(i, store) +
             '</div>' +
+            // ── Online payments section ──
+            asnOnlinePaymentsSection(i, store) +
             // ── Transaction profile section ──
             asnTxProfileSection(i, store) +
           '</div>' +
@@ -7905,7 +8189,12 @@ function asnConfirmStmtStores() {
     _stmtActivity: s.activity, _stmtAtv: s.atv, _stmtTpv: s.tpv,
     _stmtTxProfile: s._txProfile || null,
     _txProfile: s._txProfile ? {...s._txProfile} : null,
-    _txProfileOpen: !!s._txProfile
+    _txProfileOpen: !!s._txProfile,
+    // Online payments pre-fill (statement): simulate typical mix — most merchants take ~15% online
+    _acceptsOnline: true,
+    _ecomPct: 15,
+    _stmtAcceptsOnline: true,
+    _stmtEcomPct: 15
   }));
   const file = asnCurrentStmt.file;
   asnCloseStmtSheet();
@@ -8045,7 +8334,10 @@ function asnAddStore(name, address, googleActivities, googleAtv) {
       _googleAtv: googleAtv || '',
       _googleTxProfile: googleTxProfile,
       _txProfile: {...googleTxProfile},
-      _txProfileOpen: false
+      _txProfileOpen: false,
+      // Online payments — disabled by default for Google-added stores (no statement data to pre-fill)
+      _acceptsOnline: false,
+      _ecomPct: null
     });
     asnLastAddedIdx = asnStores.length - 1;
     asnRenderStores(false);
@@ -8103,7 +8395,7 @@ function asnSeasonContent(idx, store) {
         '<span class="flex items-center gap-1.5 text-[11px] text-[#16140e8c]"><span class="inline-block size-2.5 rounded-sm bg-[#C0C42D]"></span>Peak</span>' +
         '<span class="flex items-center gap-1.5 text-[11px] text-[#16140e8c]"><span class="inline-block size-2.5 rounded-sm shadow-[inset_0_0_0_1px_rgba(117,107,87,0.2)]"></span>Closed</span>' +
       '</div>' +
-      '<button onclick="asnSetAllPeak(' + idx + ')" class="text-[11px] text-[#16140e8c] underline underline-offset-2">' + (allPeak ? 'Reset' : 'All peak') + '</button>' +
+      '<button onclick="asnSetAllPeak(' + idx + ')" class="text-[11px] text-[#16140e8c] active:opacity-60">' + (allPeak ? 'Reset' : 'All peak') + '</button>' +
     '</div>';
 
     let tpvFields;
@@ -8122,9 +8414,32 @@ function asnSeasonContent(idx, store) {
       tpvFields = '';
     }
 
+    // Smart nudge: exactly 1 selected month (peak OR off-peak) + 11 closed = likely a short operating period
+    const closedCount = months.filter(m => m === -1).length;
+    const singleMonthEvent = (peakCount + offPeakCount) === 1 && closedCount === 11 && !store._dismissedOneTimeNudge;
+    const nudge = singleMonthEvent
+      ? '<div class="mt-3 flex items-start gap-2 bg-[#F1F3B6] rounded-xl px-3 py-2.5">' +
+          '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px">' +
+            '<path d="M7 1L8.2 5.3L12.5 6.5L8.2 7.7L7 12L5.8 7.7L1.5 6.5L5.8 5.3Z" fill="#6d770d"/>' +
+            '<path d="M11 1.5L11.5 2.8L12.8 3.3L11.5 3.8L11 5.1L10.5 3.8L9.2 3.3L10.5 2.8Z" fill="#6d770d" opacity="0.5"/>' +
+          '</svg>' +
+          '<div class="flex-1 cursor-pointer active:opacity-80" onclick="asnSetSeasonMode(' + idx + ',\'onetime\')">' +
+            '<p class="text-[12px] font-medium text-[#46520f] leading-tight">Operating for less than a month?</p>' +
+            '<p class="text-[11px] text-[#6d770d] mt-0.5 leading-tight">Set as one-time event &rarr;</p>' +
+          '</div>' +
+          '<button onclick="asnDismissOneTimeNudge(' + idx + ')" aria-label="Dismiss" class="flex-shrink-0 p-0.5 -m-0.5 active:opacity-60" style="background:none;border:none;cursor:pointer">' +
+            '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#6d770d" stroke-width="1.3" stroke-linecap="round"/></svg>' +
+          '</button>' +
+        '</div>'
+      : '';
+
+    const footer = '<div class="mt-1 text-center">' +
+      '<button onclick="asnSetSeasonMode(' + idx + ',\'onetime\')" class="text-[11px] text-[#16140e8c] active:opacity-60">One-time event instead</button>' +
+    '</div>';
+
     return '<div>' +
       '<p class="text-[12px] text-[#16140e8c] mb-2">Tap to cycle: off-peak → peak → closed</p>' +
-      grid + legend + tpvFields +
+      grid + legend + tpvFields + nudge + footer +
     '</div>';
   }
 
@@ -8144,10 +8459,92 @@ function asnSeasonContent(idx, store) {
       '<div class="bg-[#f6f5f3] rounded-xl px-3 h-10 flex items-center"><span class="text-[13px] text-[#16140e8c] mr-1">£</span><input type="text" value="' + (store._onetimeTpv || '') + '" placeholder="0" class="flex-1 bg-transparent text-[14px] text-[#090806ec] outline-none tabular-nums"/></div>' +
       stmtTpvNote +
     '</div>' +
+    '<div class="mt-1 text-center">' +
+      '<button onclick="asnSetSeasonMode(' + idx + ',\'calendar\')" class="text-[11px] text-[#16140e8c] active:opacity-60">&larr; Back to recurring</button>' +
+    '</div>' +
   '</div>';
 }
 
 // ── Transaction profile section ──
+// ── Online payments section (add-store / upsell flow) ──
+function asnOnlinePaymentsSection(idx, store) {
+  const on = !!store._acceptsOnline;
+  const ecom = store._ecomPct;
+  const hasSplit = on && typeof ecom === 'number';
+  const inperson = hasSplit ? (100 - ecom) : null;
+  const stmtIcon = '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="1.5" stroke="#16140e8c" stroke-width="1.2"/><path d="M5 4.5h6M5 7h6M5 9.5h4" stroke="#16140e8c" stroke-width="1" stroke-linecap="round"/></svg>';
+  const showStmtNote = store._fromStatement && typeof store._stmtEcomPct === 'number';
+
+  const chipBase = 'px-3 py-1 rounded-full text-[12px] font-medium transition-all whitespace-nowrap';
+  const chipActive = 'bg-[#e1e51a33] text-[#6d770d] shadow-[0_0_0_1px_rgba(109,119,13,0.3)]';
+  const chipInactive = 'bg-transparent text-[#090806ec] shadow-[0_0_0_1px_rgba(117,107,87,0.2)] active:scale-[0.96]';
+  let html = '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
+    '<div class="flex items-center justify-between gap-3">' +
+      '<div class="min-w-0">' +
+        '<label class="text-[13px] block" style="color:rgba(22,20,14,0.55)">Accepts online payments</label>' +
+        '<p class="text-[11px] text-[#16140e8c] mt-0.5">e.g. Pay by Link, MOTO, e-commerce</p>' +
+      '</div>' +
+      '<div class="flex gap-1.5 flex-shrink-0">' +
+        '<button onclick="asnSetAcceptsOnline(' + idx + ',false)" class="' + chipBase + ' ' + (on ? chipInactive : chipActive) + '">No</button>' +
+        '<button onclick="asnSetAcceptsOnline(' + idx + ',true)" class="' + chipBase + ' ' + (on ? chipActive : chipInactive) + '">Yes</button>' +
+      '</div>' +
+    '</div>';
+
+  if (on) {
+    if (showStmtNote && store._stmtEcomPct === store._ecomPct) {
+      html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">Pre-filled from statement</span></div>';
+    } else if (showStmtNote) {
+      html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">From statement: In-person ' + (100 - store._stmtEcomPct) + '% · Online ' + store._stmtEcomPct + '%</span></div>';
+    }
+
+    const inP = hasSplit ? inperson : 0;
+    const ecP = hasSplit ? ecom : 0;
+    html += '<div class="mt-3">' +
+      (hasSplit
+        ? '<div class="flex h-2 rounded-full overflow-hidden mb-2">' +
+            '<div style="width:' + inP + '%" class="bg-[#C0C42D] transition-all"></div>' +
+            '<div style="width:' + ecP + '%" class="bg-[#F1F3B6] transition-all"></div>' +
+          '</div>'
+        : '<div class="h-2 rounded-full mb-2 bg-[#e8e5df]"></div>'
+      ) +
+      '<div class="grid grid-cols-2 gap-2">' +
+        '<div>' +
+          '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#C0C42D]"></span>In-person</p>' +
+          '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
+            '<input inputmode="numeric" placeholder="—" value="' + (hasSplit ? inperson : '') + '" onfocus="this.select()" onchange="asnUpdateEcomSplit(' + idx + ',this.value,\'inperson\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
+            '<span class="text-[12px] text-[#16140e8c]">%</span>' +
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#F1F3B6]"></span>Online</p>' +
+          '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
+            '<input inputmode="numeric" placeholder="—" value="' + (hasSplit ? ecom : '') + '" onfocus="this.select()" onchange="asnUpdateEcomSplit(' + idx + ',this.value,\'ecom\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
+            '<span class="text-[12px] text-[#16140e8c]">%</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function asnSetAcceptsOnline(idx, on) {
+  const s = asnStores[idx];
+  s._acceptsOnline = !!on;
+  asnLastAddedIdx = idx;   // keep this store expanded across the re-render
+  asnRenderStores(false);
+}
+
+function asnUpdateEcomSplit(idx, value, which) {
+  const v = Math.max(0, Math.min(100, parseInt(value) || 0));
+  const s = asnStores[idx];
+  s._ecomPct = which === 'ecom' ? v : (100 - v);
+  asnLastAddedIdx = idx;   // keep this store expanded across the re-render
+  asnRenderStores(false);
+}
+
 function asnTxProfileSection(idx, store) {
   const hasStmtProfile = store._fromStatement && store._stmtTxProfile;
   const hasGoogleProfile = store._manual && store._googleTxProfile;
@@ -8339,6 +8736,13 @@ function asnSetSeasonMode(storeIdx, mode) {
   asnRenderStores(false);
 }
 
+// Per-store sticky dismissal of the "operates < 1 month?" smart nudge
+function asnDismissOneTimeNudge(storeIdx) {
+  asnStores[storeIdx]._dismissedOneTimeNudge = true;
+  asnLastAddedIdx = storeIdx;
+  asnRenderStores(false);
+}
+
 function asnSetAllPeak(storeIdx) {
   if (!asnStores[storeIdx]._months) asnStores[storeIdx]._months = [0,0,0,0,0,0,0,0,0,0,0,0];
   const allPeak = asnStores[storeIdx]._months.every(m => m === 1);
@@ -8382,6 +8786,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+  if (typeof updateCardMachinePromos === 'function') updateCardMachinePromos();
 });
 
 // When entering screen 09, reset inner nav to company overview
@@ -8409,6 +8814,66 @@ function resetInnerNav() {
   let mcaMod = 0;
   let mcaTier = 0;            // 0=none, 1=5k, 2=10k, 3=16.5k
   let baBundleMod = 0;
+
+  // ─── Amex as a separate negotiable rate (no longer a surcharge) ──
+  // Applies as a weighted contribution to the effective rate: effRate = (1 - AMEX_MIX) * visaMcRate + AMEX_MIX * amexRate.
+  // Mix is a prototype-level 10% constant; production should read from the deal's transaction profile.
+  let amexRate = 190;           // bps, 1.90% default
+  const AMEX_DEFAULT = 190;
+  const AMEX_MIN = 120;         // 1.20% floor (our cost)
+  const AMEX_MAX = 500;
+  const AMEX_MIX = 0.10;        // 10% of transactions are Amex/other
+
+  function openAmexSheet() {
+    const overlay = document.getElementById('amex-sheet-overlay');
+    const sheet = document.getElementById('amex-sheet');
+    if (overlay) { overlay.style.display = 'block'; setTimeout(() => { if (sheet) sheet.style.transform = 'translateY(0)'; }, 10); }
+    updateAmexSheetUI();
+  }
+  function closeAmexSheet() {
+    const overlay = document.getElementById('amex-sheet-overlay');
+    const sheet = document.getElementById('amex-sheet');
+    if (sheet) sheet.style.transform = 'translateY(100%)';
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 300);
+  }
+  function nudgeAmex(delta) {
+    amexRate = Math.max(AMEX_MIN, Math.min(AMEX_MAX, amexRate + delta));
+    updateAmexSheetUI();
+    updateAmexRowDisplay();
+    if (typeof recalcAll === 'function') recalcAll();
+  }
+  function setAmexFromInput(val) {
+    const num = parseFloat(String(val).replace('%',''));
+    if (!isNaN(num)) amexRate = Math.max(AMEX_MIN, Math.min(AMEX_MAX, Math.round(num * 100)));
+    updateAmexSheetUI();
+    updateAmexRowDisplay();
+    if (typeof recalcAll === 'function') recalcAll();
+  }
+  function resetAmex() {
+    amexRate = AMEX_DEFAULT;
+    updateAmexSheetUI();
+    updateAmexRowDisplay();
+    if (typeof recalcAll === 'function') recalcAll();
+  }
+  function updateAmexSheetUI() {
+    const input = document.getElementById('amex-rate-input');
+    if (input) input.value = (typeof bps2pct === 'function' ? bps2pct(amexRate) : (amexRate/100).toFixed(2) + '%');
+    const btn = document.getElementById('amex-reset-btn');
+    if (btn) btn.style.opacity = amexRate === AMEX_DEFAULT ? '0.5' : '1';
+  }
+  function updateAmexRowDisplay() {
+    const txt = (typeof bps2pct === 'function' ? bps2pct(amexRate) : (amexRate/100).toFixed(2) + '%');
+    ['bl-amex-rate','mr-amex-rate','ic-amex-rate','bl-amex-rate-client','ic-amex-rate-client'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = txt;
+    });
+  }
+  // Expose to window so inline onclick handlers in the DOM can reliably find these
+  // regardless of the script's enclosing scope.
+  window.openAmexSheet = openAmexSheet;
+  window.closeAmexSheet = closeAmexSheet;
+  window.nudgeAmex = nudgeAmex;
+  window.setAmexFromInput = setAmexFromInput;
+  window.resetAmex = resetAmex;
   let eposCost = 0;
   let merchantMode = false;
   let footerExpanded = false;
@@ -8486,9 +8951,42 @@ function resetInnerNav() {
     const annualSaving = monthlySaving * 12;
     const newMonthlyCost = Math.round(AGG_TPV * newRate / 10000);
     const prevMonthlyCost = Math.round(AGG_TPV * prevRate / 10000);
-    if ($('bl-savings-text')) $('bl-savings-text').textContent = monthlySaving > 0
-      ? 'Saving merchant £' + monthlySaving + '/mo vs statement'
-      : 'Rate higher than statement pricing';
+    if ($('bl-savings-text')) {
+      const cb = (typeof getMonthlyCashback === 'function') ? getMonthlyCashback() : 0;
+      let txt;
+      if (monthlySaving > 0) {
+        txt = 'Saving £' + monthlySaving + '/mo';
+        txt += cb > 0 ? ' + £' + cb + '/mo cashback' : ' vs statement';
+      } else if (cb > 0) {
+        txt = '£' + cb + '/mo cashback vs statement';
+      } else {
+        txt = 'Rate higher than statement pricing';
+      }
+      $('bl-savings-text').textContent = txt;
+    }
+    // ── Multi-rate chip ──
+    // Uses PREV_RATES per bucket, mrRates + totalMod for new values. Kept in sync with openSavingsSheet().
+    if ($('mr-savings-text')) {
+      const totalMod = contractMod + settleMod + accountMod + baBundleMod;
+      const perBucket = AGG_TPV / 6;
+      let prevTotal = 0, newTotal = 0;
+      ['cdCP','cdCNP','ccCP','ccCNP','biCP','biCNP'].forEach(k => {
+        prevTotal += perBucket * PREV_RATES[k] / 100;
+        newTotal += perBucket * ((mrRates[k] + totalMod) / 100) / 100;
+      });
+      const mrMonthlySav = Math.round(prevTotal - newTotal);
+      const cb = (typeof getMonthlyCashback === 'function') ? getMonthlyCashback() : 0;
+      let txt;
+      if (mrMonthlySav > 0) {
+        txt = 'Saving £' + mrMonthlySav + '/mo';
+        txt += cb > 0 ? ' + £' + cb + '/mo cashback' : ' vs statement';
+      } else if (cb > 0) {
+        txt = '£' + cb + '/mo cashback vs statement';
+      } else {
+        txt = 'Rate comparison vs statement';
+      }
+      $('mr-savings-text').textContent = txt;
+    }
     if ($('bl-comp-rate')) $('bl-comp-rate').textContent = bps2pct(newRate);
     if ($('bl-comp-monthly')) $('bl-comp-monthly').textContent = '£' + newMonthlyCost.toLocaleString();
     if ($('bl-comp-annual')) $('bl-comp-annual').textContent = annualSaving > 0 ? '£' + annualSaving.toLocaleString() : '—';
@@ -8514,37 +9012,26 @@ function resetInnerNav() {
     const wrap = $('sav-table-wrap');
     if (!wrap) return;
     const totalMod = contractMod + settleMod + accountMod + baBundleMod;
-
-    const cellStyle = 'font-size:12px;padding:6px 0;font-variant-numeric:tabular-nums';
-    const headStyle = 'font-size:11px;font-weight:500;padding:0 0 8px';
-    const rowBorder = 'border-top:1px solid #756b571a';
-    function color(newV, oldV) { return newV < oldV ? '#497d00' : (newV > oldV ? '#c0392b' : '#090806ec'); }
     function fmt(v) { return v.toFixed(2) + '%'; }
 
-    let html = '<table style="width:100%;border-collapse:collapse"><thead><tr>' +
-      '<th style="text-align:left;' + headStyle + ';color:#16140e8c"></th>' +
-      '<th style="text-align:right;' + headStyle + ';color:#16140e8c">Previous</th>' +
-      '<th style="text-align:right;' + headStyle + ';color:#090806ec">New offer</th>' +
-      '</tr></thead><tbody>';
+    // ── Compute monthly rate savings + build the rate-breakdown detail ──
+    let monthlyRateSaving = 0;
+    let rateSummaryLine = '';   // e.g. "1.69% → 1.25%"
+    let rateDetailHtml = '';    // compact table beneath
+    const rowStyle = 'display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;font-size:12px;font-variant-numeric:tabular-nums';
+    const rowBorder = 'border-top:1px solid #756b571a';
 
     if (curPS === 'bl') {
-      // Single-rate: one row for rate + monthly + annual
       const newRate = (baseRate + totalMod) / 100;
       const prevRate = PREV_RATES.blended;
       const newMonthly = Math.round(AGG_TPV * newRate / 100);
       const prevMonthly = Math.round(AGG_TPV * prevRate / 100);
-      const annualSav = (prevMonthly - newMonthly) * 12;
-      html += '<tr><td style="' + cellStyle + ';color:#090806ec">Blended rate</td>' +
-        '<td style="' + cellStyle + ';text-align:right;color:#16140e8c">' + fmt(prevRate) + '</td>' +
-        '<td style="' + cellStyle + ';text-align:right;font-weight:600;color:' + color(newRate, prevRate) + '">' + fmt(newRate) + '</td></tr>';
-      html += '<tr style="' + rowBorder + '"><td style="' + cellStyle + ';color:#090806ec">Monthly cost</td>' +
-        '<td style="' + cellStyle + ';text-align:right;color:#16140e8c">£' + prevMonthly.toLocaleString() + '</td>' +
-        '<td style="' + cellStyle + ';text-align:right;font-weight:600;color:' + color(newMonthly, prevMonthly) + '">£' + newMonthly.toLocaleString() + '</td></tr>';
-      html += '<tr style="' + rowBorder + '"><td style="' + cellStyle + ';color:#090806ec">Annual savings</td>' +
-        '<td style="' + cellStyle + ';text-align:right;color:#16140e8c"></td>' +
-        '<td style="font-size:15px;font-weight:700;text-align:right;padding:8px 0;font-variant-numeric:tabular-nums;color:' + (annualSav > 0 ? '#497d00' : '#c0392b') + '">' + (annualSav > 0 ? '£' + annualSav.toLocaleString() : '—') + '</td></tr>';
+      monthlyRateSaving = Math.max(0, prevMonthly - newMonthly);
+      rateSummaryLine = fmt(prevRate) + ' → ' + fmt(newRate);
+      rateDetailHtml =
+        '<div style="' + rowStyle + '"><span style="color:#16140e8c">Blended rate</span><span style="color:#16140e8c">' + fmt(prevRate) + ' &rarr; <span style="color:#090806ec;font-weight:600">' + fmt(newRate) + '</span></span></div>' +
+        '<div style="' + rowStyle + ';' + rowBorder + '"><span style="color:#16140e8c">Monthly cost</span><span style="color:#16140e8c">&pound;' + prevMonthly.toLocaleString() + ' &rarr; <span style="color:#090806ec;font-weight:600">&pound;' + newMonthly.toLocaleString() + '</span></span></div>';
     } else if (curPS === 'mr') {
-      // Multi-rate: 6 rate rows + summary
       const rateRows = [
         { label:'Consumer debit CP', key:'cdCP' },
         { label:'Consumer debit CNP', key:'cdCNP' },
@@ -8553,43 +9040,93 @@ function resetInnerNav() {
         { label:'Business/Intl CP', key:'biCP' },
         { label:'Business/Intl CNP', key:'biCNP' }
       ];
-      let totalPrevCost = 0, totalNewCost = 0;
-      // Approximate TPV split for estimation (equal split for prototype)
+      let prevTotal = 0, newTotal = 0;
       const perBucket = AGG_TPV / 6;
+      let detailRows = '';
       rateRows.forEach((r, ri) => {
         const newRate = (mrRates[r.key] + totalMod) / 100;
         const prevRate = PREV_RATES[r.key];
-        totalPrevCost += perBucket * prevRate / 100;
-        totalNewCost += perBucket * newRate / 100;
-        html += '<tr' + (ri > 0 ? ' style="' + rowBorder + '"' : '') + '>' +
-          '<td style="' + cellStyle + ';color:#090806ec">' + r.label + '</td>' +
-          '<td style="' + cellStyle + ';text-align:right;color:#16140e8c">' + fmt(prevRate) + '</td>' +
-          '<td style="' + cellStyle + ';text-align:right;font-weight:600;color:' + color(newRate, prevRate) + '">' + fmt(newRate) + '</td></tr>';
+        prevTotal += perBucket * prevRate / 100;
+        newTotal += perBucket * newRate / 100;
+        detailRows +=
+          '<div style="' + rowStyle + (ri > 0 ? ';' + rowBorder : '') + '">' +
+            '<span style="color:#16140e8c">' + r.label + '</span>' +
+            '<span style="color:#16140e8c">' + fmt(prevRate) + ' &rarr; <span style="color:#090806ec;font-weight:600">' + fmt(newRate) + '</span></span>' +
+          '</div>';
       });
-      // Summary rows
-      const prevMonthly = Math.round(totalPrevCost);
-      const newMonthly = Math.round(totalNewCost);
-      const annualSav = (prevMonthly - newMonthly) * 12;
-      html += '<tr style="border-top:2px solid #090806ec"><td style="' + cellStyle + ';color:#090806ec;font-weight:600">Est. monthly cost</td>' +
-        '<td style="' + cellStyle + ';text-align:right;color:#16140e8c;font-weight:600">£' + prevMonthly.toLocaleString() + '</td>' +
-        '<td style="' + cellStyle + ';text-align:right;font-weight:700;color:' + color(newMonthly, prevMonthly) + '">£' + newMonthly.toLocaleString() + '</td></tr>';
-      html += '<tr style="' + rowBorder + '"><td style="' + cellStyle + ';color:#090806ec;font-weight:600">Annual savings</td>' +
-        '<td style="' + cellStyle + ';text-align:right"></td>' +
-        '<td style="font-size:15px;font-weight:700;text-align:right;padding:8px 0;font-variant-numeric:tabular-nums;color:' + (annualSav > 0 ? '#497d00' : '#c0392b') + '">' + (annualSav > 0 ? '£' + annualSav.toLocaleString() : '—') + '</td></tr>';
+      const prevMonthly = Math.round(prevTotal);
+      const newMonthly = Math.round(newTotal);
+      monthlyRateSaving = Math.max(0, prevMonthly - newMonthly);
+      rateSummaryLine = 'Consumer debit CP · ' + fmt(PREV_RATES.cdCP) + ' → ' + fmt((mrRates.cdCP + totalMod) / 100);
+      rateDetailHtml = detailRows +
+        '<div style="' + rowStyle + ';border-top:1.5px solid #090806ec;margin-top:4px;font-weight:600"><span style="color:#090806ec">Est. monthly cost</span><span style="color:#16140e8c">&pound;' + prevMonthly.toLocaleString() + ' &rarr; <span style="color:#090806ec">&pound;' + newMonthly.toLocaleString() + '</span></span></div>';
     } else {
-      // IC++: show markup + estimated effective
+      // IC: can't compute exact savings — markup only
       const markup = icMarkup / 100;
+      const effRate = (65 + 20 + icMarkup + totalMod) / 100;
       const prevRate = PREV_RATES.blended;
-      html += '<tr><td style="' + cellStyle + ';color:#090806ec">Your markup</td>' +
-        '<td style="' + cellStyle + ';text-align:right;color:#16140e8c">—</td>' +
-        '<td style="' + cellStyle + ';text-align:right;font-weight:600;color:#090806ec">' + fmt(markup) + '</td></tr>';
-      html += '<tr style="' + rowBorder + '"><td style="' + cellStyle + ';color:#090806ec">Previous blended rate</td>' +
-        '<td style="' + cellStyle + ';text-align:right;color:#16140e8c">' + fmt(prevRate) + '</td>' +
-        '<td style="' + cellStyle + ';text-align:right;color:#16140e8c">—</td></tr>';
-      html += '<tr style="' + rowBorder + '"><td colspan="3" style="' + cellStyle + ';color:#16140e8c;font-style:italic">Dynamic rate savings depend on actual interchange rates per transaction</td></tr>';
+      monthlyRateSaving = Math.max(0, Math.round(AGG_TPV * (prevRate - effRate) / 100));
+      rateSummaryLine = 'Est. ~' + fmt(effRate) + ' vs ' + fmt(prevRate);
+      rateDetailHtml =
+        '<div style="' + rowStyle + '"><span style="color:#16140e8c">Your markup</span><span style="color:#090806ec;font-weight:600">' + fmt(markup) + '</span></div>' +
+        '<div style="' + rowStyle + ';' + rowBorder + '"><span style="color:#16140e8c">Est. effective rate</span><span style="color:#090806ec;font-weight:600">' + fmt(effRate) + '</span></div>' +
+        '<div style="' + rowStyle + ';' + rowBorder + '"><span style="color:#16140e8c">Previous blended rate</span><span style="color:#16140e8c">' + fmt(prevRate) + '</span></div>' +
+        '<p style="font-size:11px;color:#16140e8c;margin:8px 0 0;line-height:1.45;font-style:italic">Dynamic rate savings depend on actual interchange rates per transaction.</p>';
     }
 
-    html += '</tbody></table>';
+    // ── Cashback + totals ──
+    const cb = getMonthlyCashback();
+    const expenses = getEstimatedBusinessExpenses();
+    const cbPct = BA_CASHBACK[curBaTier] * 100;
+    const tierName = curBaTier.charAt(0).toUpperCase() + curBaTier.slice(1);
+    const totalMonthlyValue = monthlyRateSaving + cb;
+    const totalAnnualValue = totalMonthlyValue * 12;
+    const heroLabel = 'Saved per year vs statement';
+
+    // ── Assemble unified card (the outer #sav-table-wrap already provides the container) ──
+    let html = '';
+
+    // 1) Hero: annual savings vs statement (leads with the yearly figure)
+    html +=
+      '<div style="padding:18px 18px 14px">' +
+        '<p style="font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#16140e8c;margin:0 0 6px">' + heroLabel + '</p>' +
+        '<p style="font-size:30px;font-weight:700;color:#090806ec;margin:0;line-height:1;font-variant-numeric:tabular-nums">&pound;' + totalAnnualValue.toLocaleString() + '<span style="font-size:15px;color:#16140e8c;font-weight:500;margin-left:3px">/yr</span></p>' +
+        '<p style="font-size:12px;color:#16140e8c;margin:5px 0 0">~&pound;' + totalMonthlyValue.toLocaleString() + '/mo</p>' +
+      '</div>';
+
+    // 2) Breakdown: rate savings + cashback (when both present)
+    if (monthlyRateSaving > 0 || cb > 0) {
+      html += '<div style="padding:4px 18px 14px;display:flex;flex-direction:column;gap:10px">';
+      if (monthlyRateSaving > 0) {
+        html +=
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
+            '<div style="flex:1;min-width:0">' +
+              '<p style="font-size:13px;font-weight:500;color:#090806ec;margin:0">Rate savings</p>' +
+              '<p style="font-size:11px;color:#16140e8c;margin:2px 0 0;line-height:1.35">' + rateSummaryLine + '</p>' +
+            '</div>' +
+            '<p style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums;margin:0;white-space:nowrap">&pound;' + monthlyRateSaving + '/mo</p>' +
+          '</div>';
+      }
+      if (cb > 0) {
+        html +=
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
+            '<div style="flex:1;min-width:0">' +
+              '<p style="font-size:13px;font-weight:500;color:#090806ec;margin:0">BA cashback (' + tierName + ' ' + cbPct + '%)</p>' +
+              '<p style="font-size:11px;color:#16140e8c;margin:2px 0 0;line-height:1.35">On ~&pound;' + expenses.toLocaleString() + '/mo estimated business expenses</p>' +
+            '</div>' +
+            '<p style="font-size:14px;font-weight:600;color:#497d00;font-variant-numeric:tabular-nums;margin:0;white-space:nowrap">&pound;' + cb + '/mo</p>' +
+          '</div>';
+      }
+      html += '</div>';
+    }
+
+    // 3) Rate breakdown (secondary detail)
+    html +=
+      '<div style="padding:14px 18px 18px;border-top:1px solid #756b571a">' +
+        '<p style="font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#16140e8c;margin:0 0 6px">Rate breakdown</p>' +
+        rateDetailHtml +
+      '</div>';
+
     wrap.innerHTML = html;
 
     // Update the MR savings text
@@ -8601,8 +9138,20 @@ function resetInnerNav() {
         newTotal += perBucket * ((mrRates[k] + totalMod) / 100) / 100;
       });
       const monthlySav = Math.round(prevTotal - newTotal);
+      const cb = getMonthlyCashback();
       const mrSavEl = $('mr-savings-text');
-      if (mrSavEl) mrSavEl.textContent = monthlySav > 0 ? 'Saving merchant £' + monthlySav + '/mo vs statement' : 'Rate comparison vs statement';
+      if (mrSavEl) {
+        let txt;
+        if (monthlySav > 0) {
+          txt = 'Saving £' + monthlySav + '/mo';
+          txt += cb > 0 ? ' + £' + cb + '/mo cashback' : ' vs statement';
+        } else if (cb > 0) {
+          txt = '£' + cb + '/mo cashback vs statement';
+        } else {
+          txt = 'Rate comparison vs statement';
+        }
+        mrSavEl.textContent = txt;
+      }
     }
 
     const overlay = $('savings-sheet-overlay');
@@ -8645,12 +9194,14 @@ function resetInnerNav() {
     if (heroInput) heroInput.value = bps2pct(mrRates.cdCP);
   }
 
-  // Keep the sheet table inputs in sync with mrRates
+  // Keep the sheet table inputs in sync with mrRates (includes Amex row)
   function syncMrSheetInputs() {
     ['cdCP','cdCNP','ccCP','ccCNP','biCP','biCNP'].forEach(k => {
       const el = $('mr-' + k + '-val');
       if (el) el.value = bps2pct(mrRates[k]);
     });
+    const amexEl = $('mr-amex-val');
+    if (amexEl) amexEl.value = bps2pct(amexRate);
   }
 
   function openMrSheet() {
@@ -8716,10 +9267,25 @@ function resetInnerNav() {
 
   function resetMrRates() {
     Object.keys(SUGGESTED_MR).forEach(k => { mrRates[k] = SUGGESTED_MR[k]; });
+    amexRate = AMEX_DEFAULT;
     syncMrHero();
     syncMrSheetInputs();
+    updateAmexRowDisplay();
     recalcAll();
   }
+
+  // Amex input inside the "Customise all rates" sheet — keeps amexRate in sync
+  // and propagates to the card rows + main calc.
+  function updMrAmex(el) {
+    const raw = String(el.value).replace(/[^0-9.]/g,'');
+    const pctVal = parseFloat(raw);
+    if (isNaN(pctVal)) { el.value = bps2pct(amexRate); return; }
+    amexRate = Math.max(AMEX_MIN, Math.min(AMEX_MAX, Math.round(pctVal * 100)));
+    el.value = bps2pct(amexRate);
+    updateAmexRowDisplay();
+    recalcAll();
+  }
+  window.updMrAmex = updMrAmex;
 
   function checkMrModified() {
     const modified = Object.keys(SUGGESTED_MR).some(k => mrRates[k] !== SUGGESTED_MR[k]);
@@ -8730,8 +9296,10 @@ function resetInnerNav() {
   // Reset all add-ons to defaults: Flexible, Silver BA, Everyday settlement, no MCA
   function resetAddons() {
     chipSelect('ct', 0);  // Flexible
-    setBankAccount(1);    // Silver
+    chipSelect('sa', 0);  // Teya BA (−20 bps, recommended default)
     chipSelect('sf', 1);  // Everyday
+    // BA plan tier defaults to Silver (recommended default, no rate impact)
+    if (typeof selectBaTierOn05b === 'function') selectBaTierOn05b('silver');
     if (typeof clearMca === 'function') clearMca();
     if (typeof cancelMcaInterest === 'function') cancelMcaInterest();
     // Hide the reset link (nothing to reset now)
@@ -8740,7 +9308,7 @@ function resetInnerNav() {
 
   // Show "Reset" link when any add-on deviates from default
   function checkAddonsModified() {
-    const modified = ADDON_CONFIG.ct.idx !== 0 || baTierIdx !== 1 || ADDON_CONFIG.sf.idx !== 1 || (typeof mcaConfirmed !== 'undefined' && mcaConfirmed) || mcaTier > 0;
+    const modified = ADDON_CONFIG.ct.idx !== 0 || ADDON_CONFIG.sa.idx !== 0 || ADDON_CONFIG.sf.idx !== 1 || curBaTier !== 'silver' || (typeof mcaConfirmed !== 'undefined' && mcaConfirmed) || mcaTier > 0;
     const btn = $('addons-reset');
     if (btn) btn.style.display = modified ? '' : 'none';
   }
@@ -8757,15 +9325,15 @@ function resetInnerNav() {
       idx: 0,
       apply: function(opt) { contractMod = opt.mod; curContract = opt.key; }
     },
-    ba: {
+    sa: {
+      // Settlement account — rate lever. Teya BA is included in the baseline rate (0 bps);
+      // External bank is a +20 bps penalty for opting out of settling with Teya.
       options: [
-        { key:'light', label:'Light', shortLabel:'Light', mod:-10 },
-        { key:'silver', label:'Silver', shortLabel:'Silver', mod:0 },
-        { key:'gold', label:'Gold', shortLabel:'Gold', mod:5 },
-        { key:'ext', label:'External', shortLabel:'External', mod:20 }
+        { key:'teya', label:'Teya Business Account', shortLabel:'Teya BA', mod:0 },
+        { key:'ext',  label:'External bank',         shortLabel:'External bank', mod:20 }
       ],
-      idx: 1,
-      apply: function(opt) { accountMod = opt.mod; curBankAccount = opt.key; }
+      idx: 0,
+      apply: function(opt) { accountMod = opt.mod; curSettlement = opt.key; }
     },
     sf: {
       options: [
@@ -8782,6 +9350,10 @@ function resetInnerNav() {
 
   let curContract = 'flex';
   let curSettle = 'ed';
+  let curSettlement = 'teya';   // 'teya' | 'ext' — drives accountMod
+  let curBaTier = 'silver';     // 'light' | 'silver' | 'gold' — upsell only, no rate impact (Silver = default recommendation)
+  // Initialise accountMod from default settlement choice (Teya BA = included, 0 bps)
+  accountMod = 0;
 
   // ─── Accordion helpers ───────────────────────────────────────────────────────
   function toggleAccordion(headerBtn) {
@@ -8823,8 +9395,9 @@ function resetInnerNav() {
     // Previews show VALUE ONLY — no bps. Modifiers live in the footer checkout list.
     setAccordionPreview('ct', ctOpt.shortLabel || ctOpt.label, 0);
 
-    // Bank account — rich accordion; current-tier card rendered by renderBaCard()
-    if (typeof renderBaCard === 'function') renderBaCard();
+    // Settlement account (the new rate-impacting accordion)
+    const saOpt = ADDON_CONFIG.sa.options[ADDON_CONFIG.sa.idx];
+    setAccordionPreview('sa', saOpt.shortLabel || saOpt.label, 0);
 
     // Settlement frequency
     const sfOpt = ADDON_CONFIG.sf.options[ADDON_CONFIG.sf.idx];
@@ -8993,6 +9566,36 @@ function resetInnerNav() {
       }
     }
     recalcAll();
+  }
+
+  // ─── Navigation between offer / BA-plan / card-machines screens ───
+  // 05 → Continue: skip BA-plan screen if settlement is external.
+  function s05Continue() {
+    go(curSettlement === 'teya' ? '05b' : '05c');
+  }
+  // 05c → Back: return to BA-plan screen if Teya BA, else straight back to offer.
+  function s05cBack() {
+    go(curSettlement === 'teya' ? '05b' : '05');
+  }
+  // Tier selection on the BA-plan screen (no rate impact — upsell only).
+  // Selected state is communicated via: stronger border, higher opacity, and
+  // a slightly deeper shadow — no radio, per UX best practice for card-level
+  // selection patterns. aria-checked is kept in sync for screen readers.
+  function selectBaTierOn05b(tier) {
+    curBaTier = tier;
+    const cards = document.querySelectorAll('#ba-tier-cards-05b .ba-tier-card');
+    cards.forEach(c => {
+      const isSel = c.dataset.tier === tier;
+      c.classList.toggle('selected', isSel);
+      c.setAttribute('aria-checked', isSel ? 'true' : 'false');
+      c.style.boxShadow = isSel
+        ? '0 0 0 1.5px #090806ec,0 4px 14px rgba(0,0,0,0.07)'
+        : '0 0 0 1px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.05)';
+      c.style.opacity = isSel ? '1' : '0.7';
+    });
+    if (typeof checkAddonsModified === 'function') checkAddonsModified();
+    // Cashback value depends on the tier — refresh the savings chips.
+    if (typeof recalcAll === 'function') recalcAll();
   }
 
   // Legacy wrappers (used by included features)
@@ -9212,12 +9815,12 @@ function resetInnerNav() {
       } else { ckContract.style.display = 'none'; }
     }
 
-    // Bank account modifier
+    // Settlement account modifier — Teya BA vs External (rate lever, not BA tier)
     const ckBa = $('ck-ba');
     if (ckBa) {
       if (accountMod !== 0) {
         ckBa.style.display = 'flex';
-        const lbl = $('ck-ba-label'); if (lbl) lbl.textContent = (typeof BA_TIERS !== 'undefined' && BA_TIERS[baTierIdx]) ? BA_TIERS[baTierIdx].label : 'Bank account';
+        const lbl = $('ck-ba-label'); if (lbl) lbl.textContent = (SETTLEMENT_LABEL_MAP && SETTLEMENT_LABEL_MAP[curSettlement]) || 'Settlement account';
         const val = $('ck-ba-val');
         if (val) { val.textContent = (accountMod < 0 ? '\u2212' : '+') + Math.abs(accountMod) + ' bps'; val.style.color = accountMod < 0 ? '#497d00' : '#c0850a'; }
       } else { ckBa.style.display = 'none'; }
@@ -9293,17 +9896,36 @@ function resetInnerNav() {
 
   // ─── Dynamic included features ─────────────────────────────────────────────
   const BA_LABEL_MAP = { light:'Light bank account', silver:'Silver bank account', gold:'Gold bank account', ext:'External bank account' };
+  const SETTLEMENT_LABEL_MAP = { teya:'Teya BA settlement', ext:'External bank settlement' };
+
+  // ─── BA cashback value (for the "savings + value" narrative) ──────────────
+  // Cashback % per Teya BA tier. Only applies when settlement = Teya BA.
+  const BA_CASHBACK = { light: 0, silver: 0.005, gold: 0.01 };
+  // Estimated monthly business expenses as a % of TPV (prototype heuristic).
+  const BUSINESS_EXPENSE_RATIO = 0.70;
+  // Monthly cashback value earned through the BA debit card (0 if External settlement).
+  function getMonthlyCashback() {
+    if (curSettlement !== 'teya') return 0;
+    const rate = BA_CASHBACK[curBaTier] || 0;
+    if (!rate) return 0;
+    return Math.round(AGG_TPV * BUSINESS_EXPENSE_RATIO * rate);
+  }
+  // Estimated monthly business expenses — used as caveat copy in the savings sheet.
+  function getEstimatedBusinessExpenses() {
+    return Math.round(AGG_TPV * BUSINESS_EXPENSE_RATIO);
+  }
   const SETTLE_LABEL_MAP = { wd:'Weekday settlement', ed:'Everyday settlement', 'in':'Instant settlement' };
   const CONTRACT_LABEL_MAP = { flex:'Flexible contract', '12m':'12-month fixed contract', '24m':'24-month fixed contract' };
 
   function getIncludedFeatures() {
     const feats = [];
-    // Only show the 3 key add-ons: contract, bank account, settlement
+    // Rate-impacting add-ons only: contract, settlement account, settlement frequency.
+    // BA plan tier is an upsell on s-05b and is not shown here (no rate impact).
     const contractLabel = CONTRACT_LABEL_MAP[curContract] || 'Flexible contract';
-    const baLabel = BA_LABEL_MAP[curBankAccount] || 'Silver bank account';
+    const settlementLabel = SETTLEMENT_LABEL_MAP[curSettlement] || 'Teya BA settlement';
     const settleLabel = SETTLE_LABEL_MAP[curSettle] || 'Everyday settlement';
     feats.push(contractLabel);
-    feats.push(baLabel);
+    feats.push(settlementLabel);
     feats.push(settleLabel);
     return feats;
   }
@@ -9324,6 +9946,10 @@ function resetInnerNav() {
     let effRate, effLabel, footerLabel;
 
     if (curPS === 'bl') {
+      // Effective rate = the single Visa/MC rate on the card + total modifiers.
+      // The breakdown sums cleanly for the agent. Amex is a separate rate,
+      // surfaced on its own card row and factored into the blended take rate
+      // at the top of the screen — not into the effective-rate footer math.
       effRate = baseRate + totalMod;
       effLabel = bps2pct(effRate);
       footerLabel = merchantMode ? 'Your rate:' : 'Effective rate:';
@@ -9336,8 +9962,16 @@ function resetInnerNav() {
       const savingMo = Math.round((savingBps / 100 / 100) * AGG_TPV);
       const savEl = $('bl-savings-text');
       if (savEl) {
-        if (savingBps > 0) {
-          savEl.textContent = 'Saving merchant \u00a3' + savingMo + '/mo vs their ' + bps2pct(STANDARD);
+        const cb = getMonthlyCashback();
+        if (savingBps > 0 || cb > 0) {
+          let txt;
+          if (savingBps > 0) {
+            txt = 'Saving \u00a3' + savingMo + '/mo';
+            txt += cb > 0 ? ' + \u00a3' + cb + '/mo cashback' : ' vs their ' + bps2pct(STANDARD);
+          } else {
+            txt = '\u00a3' + cb + '/mo cashback';
+          }
+          savEl.textContent = txt;
           $('bl-savings').style.display = 'flex';
         } else {
           $('bl-savings').style.display = 'none';
@@ -9351,7 +9985,9 @@ function resetInnerNav() {
     } else if (curPS === 'mr') {
       const vals = Object.values(mrRates);
       const avg = Math.round(vals.reduce((a,b)=>a+b,0) / vals.length);
-      effRate = avg + totalMod;
+      // Weighted blend: the six Visa/MC rates averaged + Amex rate at its mix share
+      const mrBlended = Math.round((1 - AMEX_MIX) * avg + AMEX_MIX * amexRate);
+      effRate = mrBlended + totalMod;
       const cdCPEff = mrRates.cdCP + totalMod;
       effLabel = 'Cons. debit CP: ' + bps2pct(cdCPEff);
       footerLabel = merchantMode ? 'Your rates:' : 'Cons. debit (CP):';
@@ -9365,7 +10001,10 @@ function resetInnerNav() {
       });
 
     } else if (curPS === 'ic') {
-      effRate = 65 + 20 + icMarkup + totalMod;
+      // IC pass-through + markup for Visa/MC; Amex blended in at its mix share
+      const icBase = 65 + 20 + icMarkup;
+      const icBlended = Math.round((1 - AMEX_MIX) * icBase + AMEX_MIX * amexRate);
+      effRate = icBlended + totalMod;
       effLabel = 'IC + ' + bps2pct(icMarkup);
       footerLabel = merchantMode ? 'Your markup:' : 'Effective rate:';
       const db = $('footer-details-btn'); if (db) db.style.display = 'none';
@@ -9378,8 +10017,16 @@ function resetInnerNav() {
       const icSavEl = $('ic-savings-text');
       const icSavWrap = $('ic-savings');
       if (icSavEl && icSavWrap) {
-        if (icSavingBps > 0) {
-          icSavEl.textContent = 'Saving merchant \u00a3' + icSavingMo + '/mo vs their ' + bps2pct(STANDARD);
+        const cb = getMonthlyCashback();
+        if (icSavingBps > 0 || cb > 0) {
+          let txt;
+          if (icSavingBps > 0) {
+            txt = 'Saving \u00a3' + icSavingMo + '/mo';
+            txt += cb > 0 ? ' + \u00a3' + cb + '/mo cashback' : ' vs their ' + bps2pct(STANDARD);
+          } else {
+            txt = '\u00a3' + cb + '/mo cashback';
+          }
+          icSavEl.textContent = txt;
           icSavWrap.style.display = 'flex';
         } else {
           icSavWrap.style.display = 'none';
@@ -9446,11 +10093,15 @@ function resetInnerNav() {
       }
     }
 
-    // Footer CTA flips live on the floor gate: "Card machines →" when above, "Request approval →" when below
+    // Footer CTA flips live on the floor gate + reflects the next screen:
+    //   above floor + Teya BA    → "Business account →" (goes to 05b)
+    //   above floor + External   → "Card machines →"    (goes to 05c)
+    //   below floor              → "Request approval →"
     const footerCta = $('s05-primary-cta');
     if (footerCta) {
       if (aboveFloor) {
-        footerCta.textContent = 'Card machines \u2192';
+        const nextLabel = curSettlement === 'teya' ? 'Business account' : 'Card machines';
+        footerCta.textContent = nextLabel + ' \u2192';
         footerCta.style.background = '#e1e51a';
         footerCta.style.color = '#29320c';
       } else {
@@ -9519,8 +10170,10 @@ function resetInnerNav() {
   }
 
   // ─── Init ──────────────────────────────────────────────────────────────────
-  // Init BA tier (renders features list, syncs state, triggers first recalc)
-  setBankAccount(1);
+  // Settlement account + BA plan defaults are set at declaration time
+  // (curSettlement='teya', accountMod=-20, curBaTier='light'). Kick off a recalc
+  // so the initial effective rate reflects them.
+  if (typeof recalcAll === 'function') recalcAll();
   // Seed the company overview with the default (negative) variant so s-09 has content
   if (typeof hydrateCompanyOverview === 'function') hydrateCompanyOverview('mario');
 </script>
