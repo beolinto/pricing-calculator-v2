@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing Calculator — Prioritisation</title>
+<script src="https://cdn.tailwindcss.com?plugins="></script>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { font-family: "Figtree", sans-serif; -webkit-font-smoothing: antialiased; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .card.dragging { opacity: 0.4; transform: scale(0.98); }
+  .column.drag-over { background-color: #e1e51a1a; border-color: #6d770d; }
+  .card { transition: box-shadow 150ms ease, opacity 150ms ease, border-color 150ms ease; }
+  .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04); }
+  .chip { transition: all 150ms ease; }
+  .animate-in { opacity: 0; animation: fadeInUp 300ms ease-out forwards; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .scroll-soft::-webkit-scrollbar { width: 8px; }
+  .scroll-soft::-webkit-scrollbar-thumb { background: #756b574d; border-radius: 4px; }
+  .tier-btn { transition: all 150ms ease; }
+  .tier-btn-active-high   { background: #fb2c36; color: white; border-color: #fb2c36; }
+  .tier-btn-active-medium { background: #e17100; color: white; border-color: #e17100; }
+  .tier-btn-active-low    { background: #5ea500; color: white; border-color: #5ea500; }
+  .progress-bar { transition: width 400ms ease; }
+  .score-chip { user-select: none; cursor: pointer; transition: all 150ms ease; }
+  .score-chip:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  .score-chip:active { transform: translateY(0); }
+</style>
+</head>
+<body class="bg-[#f6f5f3] min-h-screen text-[#090806ec]">
+
+<!-- Header -->
+<header class="bg-white border-b border-[#756b571a] sticky top-0 z-30">
+  <div class="max-w-[1600px] mx-auto px-6 py-3 flex items-center gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-[#e1e51a] flex items-center justify-center">
+        <span class="text-[#29320c] font-semibold text-sm">T</span>
+      </div>
+      <div>
+        <h1 class="text-[16px] leading-[22px] font-semibold">Pricing Calculator — Prioritisation</h1>
+        <p class="text-[11px] leading-[14px] text-[#16140e8c]">44 features · country leaders meeting tool</p>
+      </div>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="ml-4 flex items-center gap-1 bg-[#f6f5f3] rounded-full p-1">
+      <button id="mode-classify" class="px-4 py-1.5 rounded-full text-[13px] font-medium transition">1 · Classify</button>
+      <button id="mode-rank" class="px-4 py-1.5 rounded-full text-[13px] font-medium transition">2 · Rank</button>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <div class="flex items-center gap-2">
+      <button id="reset-btn" class="px-3 py-1.5 text-[13px] font-medium text-[#16140e8c] hover:text-[#090806ec] transition">Reset</button>
+      <button id="export-btn" class="px-4 py-1.5 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-black transition">Export CSV</button>
+    </div>
+  </div>
+
+  <!-- Phase bar -->
+  <div class="max-w-[1600px] mx-auto px-6 pb-3">
+    <div class="bg-[#f6f5f3] rounded-xl p-3 flex items-center gap-4">
+      <div class="flex-1 min-w-0">
+        <div id="phase-title" class="text-[13px] font-semibold"></div>
+        <div id="phase-hint" class="text-[12px] text-[#16140e8c] mt-0.5"></div>
+      </div>
+      <div id="score-legend" class="hidden items-center gap-2 text-[11px] text-[#16140e8c]"></div>
+      <div class="flex items-center gap-2">
+        <div class="w-40 h-1.5 bg-[#756b571a] rounded-full overflow-hidden">
+          <div id="progress-bar" class="progress-bar h-full bg-[#090806ec]" style="width: 0%"></div>
+        </div>
+        <span id="progress-text" class="text-[12px] tabular-nums text-[#16140e8c] font-medium"></span>
+      </div>
+      <button id="phase-advance" class="hidden px-3 py-1.5 rounded-lg bg-[#e1e51a] text-[#29320c] text-[13px] font-semibold hover:bg-[#eaea48] transition">Move to ranking →</button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="max-w-[1600px] mx-auto px-6 pb-3 flex items-center gap-2 flex-wrap">
+    <span class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mr-1">Category</span>
+    <div id="category-filters" class="flex gap-1.5 flex-wrap"></div>
+    <div class="w-px h-5 bg-[#756b571a] mx-2"></div>
+    <span class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mr-1">Country</span>
+    <div id="country-filters" class="flex gap-1.5 flex-wrap"></div>
+  </div>
+</header>
+
+<!-- Content area -->
+<main class="max-w-[1600px] mx-auto px-6 py-6">
+  <div id="classify-view"></div>
+  <div id="rank-view" class="hidden"></div>
+</main>
+
+<!-- Drawer -->
+<div id="drawer" class="fixed inset-0 z-40 hidden">
+  <div id="drawer-overlay" class="absolute inset-0 bg-black/30"></div>
+  <div id="drawer-panel" class="absolute right-0 top-0 h-full w-[540px] bg-white shadow-2xl overflow-y-auto scroll-soft p-6"></div>
+</div>
+
+<!-- Start modal -->
+<div id="start-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+  <div class="absolute inset-0 bg-black/40"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-[540px] p-6">
+    <h2 class="text-[20px] font-semibold mb-2">Starting state</h2>
+    <p class="text-[14px] text-[#16140e8c] mb-5">How would you like to start the meeting?</p>
+    <div class="grid gap-3">
+      <button class="start-option text-left p-4 rounded-xl border border-[#756b571a] hover:bg-[#f6f5f3] transition" data-mode="firstpass">
+        <div class="font-semibold text-[14px] mb-1">Use Bernardo's first-pass priorities</div>
+        <div class="text-[13px] text-[#16140e8c]">Features pre-tiered as a starting point. Leaders adjust the tiers first, then vote on each one.</div>
+      </button>
+      <button class="start-option text-left p-4 rounded-xl border-2 border-[#090806ec] bg-[#f6f5f3] hover:bg-[#eae8e4] transition" data-mode="scratch">
+        <div class="font-semibold text-[14px] mb-1">Start from scratch <span class="text-[11px] font-normal text-[#16140e8c] ml-1">(Recommended)</span></div>
+        <div class="text-[13px] text-[#16140e8c]">All 44 features unclassified. Tier each one from zero — avoids any anchoring on pre-set priorities.</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FEATURES = [{"id": 1, "category": "Pricing model", "feature": "TPV tiering (dynamic price thresholds)", "description": "Pricing should change dynamically based on merchant TPV thresholds, instead of the single fixed tier used today. Expected in most mature markets.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item d: 'Include TPV tiering — price changes depending on tpv thresholds').", "notes": "Foundational pricing model change.", "priority": "High"}, {"id": 2, "category": "Pricing model", "feature": "Dynamic minimum fee", "description": "Minimum volume fee adjusts dynamically with expected TPV, instead of the fixed flat value used today.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback list shared 2026-04-22 via DM with Nicolo Meoli (item a: 'Dynamic pricing, start with dynamic minimum fee').", "notes": "Distinct from TPV tiering; can be built independently.", "priority": "High"}, {"id": 3, "category": "Pricing model", "feature": "Flat rate pricing", "description": "Support a flat rate pricing model (single all-in fee regardless of card mix/channel), relevant for Spain and potentially other markets where competitors lead with flat pricing.", "countries": "ES, potentially UK, IT", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item c: 'We need to include flat rate — relevant for Spain and maybe other markets'); related to Nicolo message 2026-04-24: 'support proper IC+ or flat fee'.", "notes": "Enables competitive entry in southern European markets.", "priority": "High"}, {"id": 4, "category": "Pricing model", "feature": "Real IC++ (scheme fee passthrough, not predicted)", "description": "True IC++ pricing where interchange and card scheme fees are passed through as actually charged, not predicted. Today scheme fees are estimated, creating deviation risk vs. competitors passing through actual fees.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item b: 'Real IC++'); Nicolo Meoli in #pricing 2026-04-09 (responding to Branimir #3): 'card scheme fees are predicted because we do not yet have the tooling in place to calculate them in real time'.", "notes": "Depends on CSF automation. Backend engine work, not a v2 prototype concern.", "priority": "High"}, {"id": 5, "category": "Pricing model", "feature": "Automation of card scheme fees (real-time CSF engine)", "description": "Calculate card scheme fees automatically and in real time, rather than relying on periodic predictions/estimates. Pre-requisite for a credible IC++ offering and eliminates manual CSF corrections.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item c: 'Automation of card scheme fees'); echoed in #mastercard-ic-calculation and Nicolo Meoli in #pricing, 2026-04-09.", "notes": "Backend engine work. Pre-req for Real IC++.", "priority": "High"}, {"id": 6, "category": "Pricing model", "feature": "Company-level pricing (single legal entity)", "description": "Price the relationship with a single legal entity (CID) at the company level — one offer prices all stores/MIDs under that company, with take rate and approval happening once for the whole company. Includes the multi-store / multi-terminal case (see dedicated row).", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item e: 'Price at the company level vs the organisation level — should be 2 separate features'); Filip Kordić, #temp-pricing-calc-global-rollout, 2026-03-06.", "notes": "Core to v2.", "priority": "High"}, {"id": 7, "category": "Pricing model", "feature": "Organisation-level pricing (linked entities)", "description": "Price the relationship across multiple legal entities (CIDs) in the same economic group. Combined TPV across linked CIDs is used to assign the correct tier so the merchant is priced as a single relationship.", "countries": "HR", "refs": "Filip Kordić, #temp-pricing-calc-global-rollout, 2026-03-06 (thread 1772801094.577599); Nicolo Meoli 2026-04-24 (item e: organisation-level as separate feature).", "notes": "Calculator must be company-agnostic. Needs alignment with IMO1 scope on multi-company.", "priority": "Medium"}, {"id": 8, "category": "Pricing model", "feature": "Multi-store / terminals per store", "description": "Part of company-level pricing: a single offer prices multiple stores (and multiple terminals per store) with different rates within the same company (CID). Today large businesses with 10+ terminals have everything added to one MID; sales has to manually unlink and re-add.", "countries": "IS, HR, HU", "refs": "SPLAT-549 (Backlog; 'New Calc — Terminals', multi-MID); Confluence IS 'Add proper amount of terminals per Store' (Nice to Have); Ivana Iseni, #temp-pricing-calc-global-rollout; IMO1 #25, #27.", "notes": "Sub-feature of company-level pricing. Interlocks with IMO1 #25 (revamped upsell) and #27 (multi-store onboarding).", "priority": "High"}, {"id": 9, "category": "Approval", "feature": "Multi-MID approval routing", "description": "Today the approval flow only applies to the first store onboarded through the pricing calculator (at MID level). For multi-MID merchants, additional MIDs bypass approval, even though the offer is created at CID level. With company-level pricing, approval should happen once at the company level, using take rate as the main metric.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #4).", "notes": "Solved by v2 via company-level approval (take rate as main metric). Depends on Company-level pricing.", "priority": "High"}, {"id": 10, "category": "Offer management", "feature": "Edit existing offers", "description": "Offers are immutable today — any change requires creating a new offer from scratch. Users want to edit an existing offer (typo, rate adjustment) without losing history.", "countries": "IS, HU, CZ/SK, HR", "refs": "SPLAT-550 (Backlog; edit scope); Confluence IS 'Edit/Delete Offers' (Urgent); Branimir Zorko list, #pricing, 2026-04-08 (item #6); Adam Kubina, #pricing-calc-rollout-cz-sk, 2026-01-28.", "notes": "The new Sales App (IMO1 #25) solves this since offers live inside a lead.", "priority": "High"}, {"id": 11, "category": "New sale", "feature": "Pre-fill merchant info from HubSpot / lead", "description": "When opening the calculator from a lead, auto-populate merchant name, legal entity, expected volume, MCC, country. Today calculator and HubSpot are disconnected — agents calculate, then onboard, with no link back.", "countries": "HR, HU, CZ/SK, PT", "refs": "Group DM Bernardo / Ivana Iseni / Márcio Correia / Filip Kapetanović, 2026-02 (Filip K. end-to-end flow); Paola Villalpando Castro, #data-onboarding-and-cdd, 2026-04.", "notes": "HubSpot <> Sales App integration already being scoped by Paola Villalpando Castro.", "priority": "High"}, {"id": 12, "category": "Upsell", "feature": "Self-upsell of products (merchant)", "description": "Merchant adds additional products (terminals, ECOM, MOTO, PBL) to an existing store/company via the Business Portal, with pricing calculated automatically. No seller involvement required. Store-level self-upsell is tracked separately.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item i: 'Self upsell of products is not there'); IMO1 #31 (Self-service upsell for merchants); IMO1 #28 (Self-service offer renegotiation).", "notes": "Direct dependency on IMO1 #31. Pricing calculator must expose self-serve pricing logic.", "priority": "High"}, {"id": 13, "category": "Upsell", "feature": "Assisted upsell of products", "description": "Seller-assisted flow to add products (terminals, ECOM, MOTO, PBL) to an existing merchant with pricing calculated in the calculator. Today the calculator only supports new-sale flows. Store-level upsell is tracked separately.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item j: 'Upsell of products is not there'); IMO1 #25 ('Revamped assisted upsell flow and pricing calculator').", "notes": "Direct dependency on IMO1 #25. A primary driver of v2 work.", "priority": "High"}, {"id": 14, "category": "Upsell", "feature": "Upsell of stores (add store to existing merchant)", "description": "Add a new store to an existing merchant (seller-assisted or self-service), with pricing calculated per store under the company and approval routed correctly. Distinct from product upsell — this expands the company structure.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item k: 'Upsell of stores is not there').", "notes": "Complements assisted and self-upsell flows. Interlocks with company-level pricing.", "priority": "High"}, {"id": 15, "category": "New sale", "feature": "EPOS pricing in calculator", "description": "Support EPOS (integrated point-of-sale) as a product/subscription priceable within the calculator.", "countries": "All countries (UK first)", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item l: 'EPOS is not there'); IMO1 #29 (Teya POS onboarding).", "notes": "Interlocks with IMO1 #29. Significant for UK/growth markets.", "priority": "High"}, {"id": 16, "category": "DCC", "feature": "DCC revenue share", "description": "Support DCC revenue-share offers where the merchant receives a share of DCC revenue. Today the calculator does not model merchant DCC revenue share at all.", "countries": "IS, HR", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item g: 'DCC revenue share is not there'); SPLAT-526 (DCC Revenue Share).", "notes": "Paired with DCC flexible margin.", "priority": "High"}, {"id": 17, "category": "DCC", "feature": "DCC flexible margin", "description": "Let sales adjust the DCC margin per offer instead of using a single global rate. Merchants want up to 4% markup configurability.", "countries": "IS, HR", "refs": "SPLAT-526; #proj-dcc-flexible-pricing: Humphrey Kelly PRD + Tech Plan (2026-02); Hafliði Sigurðarson 2026-04 (IS members waiting for 4% markup).", "notes": "Known gap in v2. High demand in IS and HR. v2 prototype has surcharge toggle only.", "priority": "High"}, {"id": 18, "category": "Retention", "feature": "Retention tool for CR and sales", "description": "A tool for Customer Relations and sales to calculate retention offers (repricing with guardrails) for at-risk merchants. Distinct from new-sale pricing.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item h: 'Creating a retention tool for CR and sales to calculate retention offers').", "notes": "Pricing use case outside the current calculator scope; may need its own workflow.", "priority": "High"}, {"id": 19, "category": "Offer management", "feature": "Revenue breakdown visible in offer", "description": "Agents and approvers want to see the expected revenue breakdown (acquiring, POS rental, DCC, scheme, IC, interest on settlement delays) per offer to judge margin before sending.", "countries": "IS, HR, HU", "refs": "SPLAT-526 (DCC Revenue Share — sub-ask); Confluence IS 'Revenue Breakdown (detailed)' (Urgent); related to Branimir list items #2–#3 on CSF visibility.", "notes": "v2 shows Teya take rate but full revenue split still partial.", "priority": "High"}, {"id": 20, "category": "Approval", "feature": "Fee deviation visibility on pending offers", "description": "Approvers should immediately see how far below minimum price a submitted offer is, as a % or bps deviation. Today only checks are Net Sales Revenue or manual TPV plug-ins.", "countries": "HU, HR", "refs": "David Schmidt (HU), #sales-stakeholders, 2026-04-13; Filip Kordić (HR), #temp-pricing-calc-global-rollout, 2026-03-06.", "notes": "Considered in v2 prototype.", "priority": "High"}, {"id": 21, "category": "Approval", "feature": "Approval notification for seller", "description": "Notify the seller when their offer is approved or rejected. Today the only way to know is to check back office manually.", "countries": "HU, HR", "refs": "IH-3558; Confluence SP2 'Missing notification to sellers and sales managers' (HU, High); Branimir Zorko list, #pricing, 2026-04-08 (item #5).", "notes": "In progress in existing calculator; included in v2.", "priority": "High"}, {"id": 22, "category": "Approval", "feature": "Approval notification for sales manager", "description": "Notify the sales manager (approver) when an offer is assigned to them for review.", "countries": "HU, HR", "refs": "IH-3558; Confluence SP2 'Missing notification to sellers and sales managers' (HU, High); Branimir Zorko list, #pricing, 2026-04-08 (item #5).", "notes": "In progress in existing calculator; included in v2.", "priority": "High"}, {"id": 23, "category": "Approval", "feature": "AI offer analysis & approval recommendation for sales managers", "description": "AI analyses submitted offers against historical approvals, market benchmarks, and pricing policy, and gives the sales manager a recommendation (approve / do not approve). If 'do not approve', suggests the pricing at which the offer should be approved.", "countries": "All countries", "refs": "Bernardo Olinto feedback during Approval flow breakdown discussion with Nicolo Meoli, 2026-04-24.", "notes": "New item — not previously scoped. Related to Fee deviation visibility and Counteroffer flow.", "priority": "Medium"}, {"id": 24, "category": "Pricing model", "feature": "Seasonal merchant pricing (HR)", "description": "Seasonal merchant pricing not set up correctly — dividing TPV by 12 months makes HR uncompetitive for merchants operating <6 months/year. Proposal sent >1 month ago, not implemented.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #7); Ivana Iseni GDM with Paulo Castro, 2026-02 (Mateo Lovrenčić model: divide by 6 months).", "notes": "Related to IMO1 #46 (Enhanced seasonality and one-off events declaration).", "priority": "High"}, {"id": 25, "category": "Offer management", "feature": "Visual presentation of offers to merchants", "description": "Improve how the offer is visually presented to the merchant — layout, branding, clarity of fee breakdown, professional appearance. Generated offer document today is hard to read and inconsistent.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item h: 'Visual presentation of offers to merchants').", "notes": "Within IMO1 scope; considered in Sales App and new registration flow.", "priority": "High"}, {"id": 26, "category": "Pricing model", "feature": "Unblended offer customisation (per card brand / channel)", "description": "Enable individual rate negotiation for unblended offers, including AMEX & other scheme rates.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item e).", "notes": "v2 supports multi-rate; customisation depth per offer limited.", "priority": "Medium"}, {"id": 27, "category": "Pricing model", "feature": "Annual vs. monthly TPV as input", "description": "Allow the agent to enter merchant TPV as either annual or monthly, with the calculator deriving the other figure. Today input is monthly-only, penalising seasonal merchants and forcing manual conversions.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item f).", "notes": "Related to but distinct from Seasonal merchant pricing (HR).", "priority": "Medium"}, {"id": 28, "category": "Approval", "feature": "Counteroffer flow (manager adjusts + sends back with note)", "description": "When an offer is close to acceptable thresholds, managers cannot formally adjust values or structure a counterproposal back to the agent.", "countries": "HU, CZ/SK", "refs": "Confluence SP2 'Allow managers to create counteroffers' (Sales Managers source).", "notes": "Solved in v2 — managers adjust and send back with a note.", "priority": "Medium"}, {"id": 29, "category": "Offer management", "feature": "Offer templates by segment", "description": "Pre-built offer templates for common merchant segments (hospitality, retail, e-com) to speed up high-volume low-value deals.", "countries": "HR, HU", "refs": "Bernardo Olinto DM with Tiago Loriato Simões, 2025-08.", "notes": "Sales App will enable sharing an offer directly with the prospect via email.", "priority": "Medium"}, {"id": 30, "category": "Offer management", "feature": "Sharable offer link / PDF export", "description": "Agents need a sharable offer link and/or 'Download as PDF' so the offer can be emailed to the merchant. Today agents screenshot offers — unprofessional and hard to read.", "countries": "CZ/SK", "refs": "EPSSD-416 ('Offer Export Functionality', To Do); Confluence SP2 (Adam Kubina, CZ field).", "notes": "Covered by Sales App + email share flow.", "priority": "Medium"}, {"id": 31, "category": "Approval", "feature": "Requester field on Offers list", "description": "Make the offer requester clearly visible in the main offer view without opening details or history.", "countries": "HU, HR", "refs": "EPSSD-445; Confluence SP2 (HU sales teams); David Schmidt, #temp-pricing-calc-global-rollout, Oct 2025.", "notes": "Considered in v2 prototype for Back Office.", "priority": "Medium"}, {"id": 32, "category": "Approval", "feature": "Missing fields in approval view", "description": "Add membership plan, offer name (e.g. Thrive), and seasonality to the detailed offers page in Back Office and Partner Portal.", "countries": "HU, HR", "refs": "Confluence SP2 'Missing fields in approval view' (Pricing team, medium).", "notes": "Considered in v2 prototype.", "priority": "Medium"}, {"id": 33, "category": "Approval", "feature": "Attach statement from previous provider (approval view)", "description": "Upload the merchant's statement from their previous provider to the approval request, so managers can judge exceptions with full context.", "countries": "HU", "refs": "Confluence SP2 'Attach statement from previous provider' (Sales Managers, medium).", "notes": "Already available in existing calculator; considered in v2.", "priority": "Medium"}, {"id": 34, "category": "New sale", "feature": "Upload statement during offer creation", "description": "Allow the agent to upload the merchant's previous-provider statement when building the offer, not only at approval. The statement is used to (1) pre-fill fields when creating a lead (volume, MCC, card mix, etc.), (2) support more accurate pricing and reduce back-and-forth, and (3) feed the AI offer analysis so it can give the sales manager a recommendation to approve or reject.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item a: 'upload statement is there just as part of the approval flow but its not there as part of the offer creation').", "notes": "Distinct from the approval-view statement upload.", "priority": "Medium"}, {"id": 35, "category": "New sale", "feature": "MOTO pricing in calculator", "description": "MOTO (Mail Order / Telephone Order) is already supported in the pricing calculator as a surcharge on top of the base rate. This item confirms ongoing support and any refinements needed to the surcharge model.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item f: 'Moto/PBL are not there but they are in the calculator'); IMO1 #36 (Revamped MOTO onboarding); IMO1 #37 (MOTO self-service).", "notes": "Interlocks with IMO1 #36, #37.", "priority": "Medium"}, {"id": 36, "category": "New sale", "feature": "PBL (Pay by Link) pricing in calculator", "description": "Pay-by-Link (PBL) is not currently in the pricing calculator. Add it as a surcharge on top of the base rate, following the same model as MOTO.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item f).", "notes": "Paired with MOTO in Nicolo's note.", "priority": "Medium"}, {"id": 37, "category": "Offer management", "feature": "Delete / void offers", "description": "Cannot delete or void a draft/expired offer. Drafts accumulate and clutter back office; users cannot clean up test offers.", "countries": "IS, HU, CZ/SK", "refs": "Confluence IS 'Edit/Delete Offers' (Urgent); Adam Kubina, #pricing-calc-rollout-cz-sk.", "notes": "Sales App solves this via closing/losing a lead.", "priority": "Medium"}, {"id": 38, "category": "Offer management", "feature": "Search through offers", "description": "No search/filter in the Offers tab. Slow to find a specific offer when onboarding multiple merchants.", "countries": "IS, HR", "refs": "Confluence IS (under Edit/Delete Offers block); Branimir Zorko list, #pricing, 2026-04-08 (item #8).", "notes": "New Sales App removes standalone Offers tab; offers live inside leads.", "priority": "Medium"}, {"id": 39, "category": "New sale", "feature": "Bulk terminal rental reduction", "description": "Users need to change terminal rental pricing individually for each terminal. For merchants with multiple terminals this becomes tedious and error-prone. A design fix is needed — either a sensible default or a bulk edit across all selected terminals.", "countries": "CZ/SK, HR", "refs": "Confluence SP2 'Bulk terminal rental reduction' (Adam Kubina, CZ field); Branimir Zorko list, #pricing, 2026-04-08 (item #10).", "notes": "Considered in v2 prototype.", "priority": "Medium"}, {"id": 40, "category": "New sale", "feature": "ECOM plugin — CNP fees not shown", "description": "When agents add a store with the ECOM plugin, CNP fees are already displayed for unblended pricing, and for blended pricing the CNP rate matches the blended rate. The gap is specifically for IC++ (dynamic rate) offers: the estimated ICF and CSC costs for CNP transactions are not shown.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #1); Ivana Iseni, #temp-pricing-calc-global-rollout.", "notes": "Gap specific to IC++ offers.", "priority": "Medium"}, {"id": 41, "category": "New sale", "feature": "Shopify fee", "description": "For ECOM merchants using Shopify, IS adds 0.35% onto the blended fee to account for the Shopify fee. No way to configure this in the new flow.", "countries": "IS", "refs": "Confluence IS 'Shopify Fee' (Urgent, 2026-04-10 Sales Platform Office Hours).", "notes": "IS-specific configuration need.", "priority": "Medium"}, {"id": 42, "category": "Pricing model", "feature": "Delayed delivery risk price suggestion", "description": "Calculator automatically applies a delayed-delivery-risk premium per business activity code without knowing the merchant's actual risk profile. Inflates suggested rate for non-shipping merchants (e.g. hotels).", "countries": "IS", "refs": "SPLAT-657 (Backlog; e.g. 3.96% blended for hotels); Confluence IS 'Delayed Delivery Risk Price Suggestion' (Urgent).", "notes": "IS-specific calibration of risk premium.", "priority": "Medium"}, {"id": 43, "category": "New sale", "feature": "Virtual cards (ECOM)", "description": "Calculator does not allow the user to insert ecommerce virtual card volume, which bears significantly higher costs than regular ecommerce volume.", "countries": "IS", "refs": "Breno Cavour feedback 2026-04-22 (IS-specific item on virtual cards).", "notes": "Distinct from DCC items.", "priority": "Medium"}, {"id": 44, "category": "Offer management", "feature": "Sorting offers by TPV / requester / pricing", "description": "Request to enable sorting in the Offers list by TPV, requester, and pricing. The Offers screen will be deprecated with the new Sales App — offers will live inside leads, so this item is no longer needed in its original form.", "countries": "HU", "refs": "Confluence SP2 (HU sales teams, low); David Schmidt, #temp-pricing-calc-global-rollout, Oct 2025.", "notes": "Deprecated by new Sales App design.", "priority": "Low"}];
+
+const CATEGORIES = ['Pricing model','New sale','Upsell','Approval','Offer management','DCC','Retention'];
+const CATEGORY_COLORS = {
+  'Pricing model':    { bg: '#E1D5E7', text: '#4A2C6A' },
+  'New sale':         { bg: '#D5E8D4', text: '#2B5429' },
+  'Upsell':           { bg: '#FFF2CC', text: '#7A5E00' },
+  'Approval':         { bg: '#F8CECC', text: '#8B1A12' },
+  'Offer management': { bg: '#DAE8FC', text: '#1E3A8A' },
+  'DCC':              { bg: '#FAD9D5', text: '#8B1A12' },
+  'Retention':        { bg: '#E8E8E8', text: '#444' },
+};
+const COUNTRIES = ['UK','HU','IS','CZ/SK','HR','PT','IT','ES'];
+const COUNTRY_COLORS = {
+  'UK': '#155dfc', 'HU': '#bb4d00', 'IS': '#497d00',
+  'CZ/SK': '#6d770d', 'HR': '#e7000b', 'PT': '#e17100',
+  'IT': '#5f4f30', 'ES': '#fbbf24'
+};
+const PRIORITIES = ['High','Medium','Low'];
+const PRIORITY_META = {
+  'High':   { color: '#e7000b', bg: '#fb2c361a' },
+  'Medium': { color: '#bb4d00', bg: '#fe9a001a' },
+  'Low':    { color: '#497d00', bg: '#7ccf001a' },
+};
+
+const SCORE_LABELS = {
+  0: 'None',
+  1: 'Nice to have',
+  2: 'Important',
+  3: 'Critical',
+};
+
+const STATE_KEY = 'pricing-prio-state-v3';
+
+let state = loadState();
+
+function defaultState(mode) {
+  return {
+    mode: 'classify',
+    features: FEATURES.map(f => ({
+      id: f.id,
+      priority: mode === 'firstpass' ? f.priority : null,
+      scores: {},
+    })),
+    categoryFilter: CATEGORIES.slice(),
+    countryFilter: COUNTRIES.slice(),
+  };
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
+    if (saved && saved.features) return saved;
+  } catch(e) {}
+  return null;
+}
+
+function saveState() {
+  if (state) localStorage.setItem(STATE_KEY, JSON.stringify(state));
+}
+
+function totalScore(st) {
+  return Object.values(st.scores || {}).reduce((s, n) => s + (n || 0), 0);
+}
+
+function cycleScore(id, country) {
+  const st = state.features.find(x => x.id === id);
+  if (!st.scores) st.scores = {};
+  const cur = st.scores[country] || 0;
+  const next = (cur + 1) % 4;
+  if (next === 0) delete st.scores[country];
+  else st.scores[country] = next;
+  render();
+}
+
+function setScore(id, country, value) {
+  const st = state.features.find(x => x.id === id);
+  if (!st.scores) st.scores = {};
+  if (!value) delete st.scores[country];
+  else st.scores[country] = value;
+  render();
+}
+
+// --- Start modal ---
+function showStartModal() { document.getElementById('start-modal').classList.remove('hidden'); }
+document.querySelectorAll('.start-option').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state = defaultState(btn.dataset.mode);
+    document.getElementById('start-modal').classList.add('hidden');
+    saveState();
+    render();
+  });
+});
+
+// --- Mode toggle ---
+function setMode(m) { state.mode = m; render(); }
+document.getElementById('mode-classify').addEventListener('click', () => setMode('classify'));
+document.getElementById('mode-rank').addEventListener('click', () => {
+  const unclassified = state.features.filter(f => !f.priority).length;
+  if (unclassified > 0 && !confirm(unclassified + ' feature(s) still unclassified. Switch to Rank anyway?')) return;
+  setMode('rank');
+});
+
+// --- Reset ---
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (confirm('Reset all classifications and votes?')) {
+    localStorage.removeItem(STATE_KEY);
+    state = null;
+    showStartModal();
+  }
+});
+
+// --- Export ---
+document.getElementById('export-btn').addEventListener('click', () => {
+  const NL = String.fromCharCode(10);
+  const rows = [['#','Category','Feature','Priority','Countries requesting','Total score',...COUNTRIES.map(c => c + ' score'),'Description']];
+  FEATURES.forEach(f => {
+    const st = state.features.find(x => x.id === f.id);
+    rows.push([
+      f.id, f.category, f.feature, st.priority || '(unclassified)', f.countries || '', totalScore(st),
+      ...COUNTRIES.map(c => (st.scores && st.scores[c]) || 0),
+      (f.description || '').split(NL).join(' ')
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => {
+    const s = String(v == null ? '' : v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }).join(',')).join(NL);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'prioritisation-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+});
+
+// --- Filter helpers ---
+function featureMatches(f) {
+  if (!state.categoryFilter.includes(f.category)) return false;
+  if (!f.countries) return true;
+  const cs = f.countries.split(',').map(x => x.trim());
+  if (cs.some(x => x.toLowerCase().includes('all'))) return true;
+  return cs.some(c => state.countryFilter.includes(c));
+}
+
+// --- Render ---
+function render() {
+  if (!state) { showStartModal(); return; }
+  renderHeader();
+  renderPhaseBar();
+  renderFilters();
+  if (state.mode === 'classify') {
+    document.getElementById('classify-view').classList.remove('hidden');
+    document.getElementById('rank-view').classList.add('hidden');
+    renderClassifyView();
+  } else {
+    document.getElementById('classify-view').classList.add('hidden');
+    document.getElementById('rank-view').classList.remove('hidden');
+    renderRankView();
+  }
+  saveState();
+}
+
+function renderHeader() {
+  const cls = document.getElementById('mode-classify');
+  const rnk = document.getElementById('mode-rank');
+  cls.className = 'px-4 py-1.5 rounded-full text-[13px] font-medium transition ' + (state.mode === 'classify' ? 'bg-white shadow-sm text-[#090806ec]' : 'text-[#16140e8c]');
+  rnk.className = 'px-4 py-1.5 rounded-full text-[13px] font-medium transition ' + (state.mode === 'rank' ? 'bg-white shadow-sm text-[#090806ec]' : 'text-[#16140e8c]');
+}
+
+function renderPhaseBar() {
+  const classified = state.features.filter(f => f.priority).length;
+  const pct = Math.round((classified / state.features.length) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = classified + ' / ' + state.features.length;
+  const title = document.getElementById('phase-title');
+  const hint = document.getElementById('phase-hint');
+  const advance = document.getElementById('phase-advance');
+  const legend = document.getElementById('score-legend');
+  if (state.mode === 'classify') {
+    title.textContent = 'Phase 1 · Classify each feature as High, Medium, or Low';
+    hint.textContent = 'Go through each feature with the country leaders. One click on the tier badge sets it.';
+    advance.classList.toggle('hidden', classified < state.features.length);
+    advance.onclick = () => setMode('rank');
+    legend.classList.add('hidden');
+  } else {
+    title.textContent = 'Phase 2 · Score each feature per country';
+    hint.textContent = 'Click a country on the card to cycle its score: 0 → 1 → 2 → 3. Cards re-sort by total score within each tier.';
+    advance.classList.add('hidden');
+    legend.classList.remove('hidden');
+    legend.classList.add('flex');
+    legend.innerHTML =
+      '<span class="font-semibold text-[#16140e8c]">Score:</span>' +
+      ['1','2','3'].map(v => '<span class="inline-flex items-center gap-1"><span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ' + scoreClasses(parseInt(v)) + '">' + v + '</span> ' + SCORE_LABELS[parseInt(v)] + '</span>').join('<span class="text-[#756b574d]">·</span>');
+  }
+}
+
+function scoreClasses(score) {
+  if (score === 3) return 'bg-[#090806ec] text-white';
+  if (score === 2) return 'bg-[#555450] text-white';
+  if (score === 1) return 'bg-[#756b5733] text-[#090806ec]';
+  return 'bg-[#f6f5f3] text-[#16140e8c] border border-[#756b5733]';
+}
+
+function renderFilters() {
+  const cf = document.getElementById('category-filters');
+  cf.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const active = state.categoryFilter.includes(cat);
+    const btn = document.createElement('button');
+    btn.className = 'chip px-3 py-1 rounded-full text-[12px] font-medium border ' + (active ? 'border-transparent' : 'border-[#756b5733] text-[#16140e8c] bg-white');
+    if (active) { btn.style.background = CATEGORY_COLORS[cat].bg; btn.style.color = CATEGORY_COLORS[cat].text; }
+    btn.textContent = cat;
+    btn.onclick = () => {
+      const i = state.categoryFilter.indexOf(cat);
+      if (i >= 0) state.categoryFilter.splice(i, 1); else state.categoryFilter.push(cat);
+      render();
+    };
+    cf.appendChild(btn);
+  });
+  const cr = document.getElementById('country-filters');
+  cr.innerHTML = '';
+  COUNTRIES.forEach(c => {
+    const active = state.countryFilter.includes(c);
+    const btn = document.createElement('button');
+    btn.className = 'chip px-3 py-1 rounded-full text-[12px] font-medium border ' + (active ? 'text-white border-transparent' : 'border-[#756b5733] text-[#16140e8c] bg-white');
+    if (active) btn.style.background = COUNTRY_COLORS[c];
+    btn.textContent = c;
+    btn.onclick = () => {
+      const i = state.countryFilter.indexOf(c);
+      if (i >= 0) state.countryFilter.splice(i, 1); else state.countryFilter.push(c);
+      render();
+    };
+    cr.appendChild(btn);
+  });
+}
+
+// ---------- CLASSIFY VIEW ----------
+function renderClassifyView() {
+  const root = document.getElementById('classify-view');
+  root.innerHTML = '';
+  const visible = FEATURES.filter(featureMatches);
+  const unclassified = visible.filter(f => !state.features.find(s => s.id === f.id).priority);
+  if (unclassified.length > 0) root.appendChild(buildClassifySection('Unclassified', unclassified, true));
+  CATEGORIES.forEach(cat => {
+    const inCat = visible.filter(f => f.category === cat && state.features.find(s => s.id === f.id).priority);
+    if (inCat.length === 0) return;
+    root.appendChild(buildClassifySection(cat, inCat, false));
+  });
+  if (visible.length === 0) {
+    root.innerHTML = '<div class="text-center text-[14px] text-[#16140e8c] py-16">No features match the current filters.</div>';
+  }
+}
+
+function buildClassifySection(title, items, isUnclassified) {
+  const sec = document.createElement('section');
+  sec.className = 'mb-6';
+  const catColor = CATEGORY_COLORS[title] || { bg: '#f6f5f3', text: '#090806ec' };
+  const header = document.createElement('div');
+  header.className = 'flex items-center gap-3 mb-3 px-1';
+  const chipBg = isUnclassified ? '#756b571a' : catColor.bg;
+  const chipText = isUnclassified ? '#16140e8c' : catColor.text;
+  header.innerHTML =
+    '<span class="inline-block px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[1.5px]" style="background:' + chipBg + '; color:' + chipText + '">' + title + '</span>' +
+    '<span class="text-[13px] text-[#16140e8c] tabular-nums">' + items.length + '</span>';
+  sec.appendChild(header);
+  const grid = document.createElement('div');
+  grid.className = 'grid gap-2';
+  items.forEach(f => grid.appendChild(renderClassifyCard(f)));
+  sec.appendChild(grid);
+  return sec;
+}
+
+function renderClassifyCard(f) {
+  const st = state.features.find(x => x.id === f.id);
+  const card = document.createElement('div');
+  card.className = 'card bg-white rounded-xl border border-[#756b571a] p-4 animate-in grid gap-3';
+  card.style.gridTemplateColumns = '1fr auto';
+  const catColor = CATEGORY_COLORS[f.category] || { bg: '#eee', text: '#333' };
+  const countries = (f.countries || '').split(',').map(c => c.trim()).filter(Boolean);
+
+  const left = document.createElement('div');
+  left.className = 'min-w-0 cursor-pointer';
+  left.innerHTML =
+    '<div class="flex items-center gap-2 mb-1 flex-wrap">' +
+      '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + (f.category || '') + '</span>' +
+      '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
+      countries.slice(0, 8).map(c => {
+        const color = COUNTRY_COLORS[c] || '#555';
+        return '<span class="text-[10px] font-medium px-1.5 py-0.5 rounded" style="color:' + color + '; background:' + color + '14">' + escapeHtml(c) + '</span>';
+      }).join('') +
+    '</div>' +
+    '<h3 class="text-[14px] leading-[20px] font-semibold mb-1">' + escapeHtml(f.feature) + '</h3>' +
+    '<p class="text-[13px] leading-[18px] text-[#16140e8c]">' + escapeHtml(f.description || '') + '</p>';
+  left.addEventListener('click', () => openDrawer(f));
+
+  const right = document.createElement('div');
+  right.className = 'flex flex-col items-end gap-1.5';
+  right.innerHTML =
+    '<div class="flex gap-1">' +
+      PRIORITIES.map(p => {
+        const active = st.priority === p;
+        const cls = active ? ('tier-btn-active-' + p.toLowerCase()) : 'bg-white text-[#16140e8c] border-[#756b5733] hover:border-[#090806ec]';
+        return '<button class="tier-btn px-3 py-1.5 rounded-lg text-[12px] font-semibold border ' + cls + '" data-priority="' + p + '" data-id="' + f.id + '">' + p + '</button>';
+      }).join('') +
+    '</div>' +
+    (st.priority ? '<button class="text-[11px] text-[#211c1266] hover:text-[#090806ec] transition" data-clear="' + f.id + '">Clear</button>' : '');
+  right.querySelectorAll('.tier-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const p = btn.dataset.priority;
+      const st2 = state.features.find(x => x.id === id);
+      st2.priority = (st2.priority === p) ? null : p;
+      render();
+    });
+  });
+  const clearBtn = right.querySelector('[data-clear]');
+  if (clearBtn) clearBtn.addEventListener('click', e => { e.stopPropagation(); st.priority = null; render(); });
+
+  card.appendChild(left);
+  card.appendChild(right);
+  return card;
+}
+
+// ---------- RANK VIEW ----------
+function renderRankView() {
+  const root = document.getElementById('rank-view');
+  root.innerHTML = '';
+  const board = document.createElement('div');
+  board.className = 'grid grid-cols-3 gap-4';
+  PRIORITIES.forEach(p => {
+    const col = document.createElement('div');
+    col.className = 'column rounded-2xl border-2 border-dashed border-transparent p-3 transition-colors';
+    col.style.minHeight = '600px';
+    col.dataset.priority = p;
+    const meta = PRIORITY_META[p];
+    const items = FEATURES.filter(f => {
+      const st = state.features.find(x => x.id === f.id);
+      return st.priority === p && featureMatches(f);
+    });
+    items.sort((a, b) => {
+      const fa = state.features.find(x => x.id === a.id);
+      const fb = state.features.find(x => x.id === b.id);
+      return totalScore(fb) - totalScore(fa) || a.id - b.id;
+    });
+    const head = document.createElement('div');
+    head.className = 'flex items-center gap-2 mb-3 px-1';
+    head.innerHTML =
+      '<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[12px] font-semibold uppercase tracking-[1.5px]" style="background:' + meta.bg + '; color:' + meta.color + '">' +
+        '<span class="w-2 h-2 rounded-full" style="background:' + meta.color + '"></span>' + p +
+      '</span>' +
+      '<span class="text-[14px] text-[#16140e8c] tabular-nums">' + items.length + '</span>';
+    col.appendChild(head);
+    const list = document.createElement('div');
+    list.className = 'flex flex-col gap-2';
+    items.forEach(f => list.appendChild(renderRankCard(f)));
+    if (items.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'text-center text-[13px] text-[#211c1266] py-10 border border-dashed border-[#756b5733] rounded-xl';
+      empty.textContent = 'Drop cards here';
+      list.appendChild(empty);
+    }
+    col.appendChild(list);
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      const id = parseInt(e.dataTransfer.getData('text/plain'));
+      const st = state.features.find(x => x.id === id);
+      if (st && st.priority !== p) { st.priority = p; render(); }
+    });
+    board.appendChild(col);
+  });
+  root.appendChild(board);
+  const unclassified = state.features.filter(f => !f.priority).length;
+  if (unclassified > 0) {
+    const warn = document.createElement('div');
+    warn.className = 'mt-6 bg-[#fe9a001a] border border-[#ff690080] rounded-xl p-3 text-[13px] text-[#bb4d00]';
+    warn.textContent = unclassified + ' feature(s) still unclassified — switch to Classify to tier them.';
+    root.appendChild(warn);
+  }
+}
+
+function renderRankCard(f) {
+  const st = state.features.find(x => x.id === f.id);
+  const total = totalScore(st);
+  const card = document.createElement('div');
+  card.className = 'card bg-white rounded-xl border border-[#756b571a] p-3 animate-in';
+  card.draggable = true;
+  card.dataset.id = f.id;
+  const catColor = CATEGORY_COLORS[f.category] || { bg: '#eee', text: '#333' };
+
+  const header = document.createElement('div');
+  header.className = 'flex items-start justify-between gap-2 mb-2 cursor-grab';
+  header.innerHTML =
+    '<div class="flex items-center gap-1 flex-wrap min-w-0">' +
+      '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px] whitespace-nowrap" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + (f.category || '') + '</span>' +
+      '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
+    '</div>' +
+    '<div class="flex items-center gap-1">' +
+      '<span class="text-[10px] font-semibold uppercase tracking-[1px] text-[#16140e8c]">Total</span>' +
+      '<span class="px-2 py-0.5 rounded-md bg-[#e1e51a] text-[#29320c] text-[13px] font-semibold tabular-nums">' + total + '</span>' +
+    '</div>';
+
+  const body = document.createElement('div');
+  body.className = 'cursor-pointer';
+  body.innerHTML =
+    '<h3 class="text-[14px] leading-[20px] font-semibold mb-1">' + escapeHtml(f.feature) + '</h3>' +
+    '<p class="text-[12px] leading-[16px] text-[#16140e8c] mb-3">' + escapeHtml((f.description || '').slice(0, 140)) + ((f.description || '').length > 140 ? '…' : '') + '</p>';
+  body.addEventListener('click', () => openDrawer(f));
+
+  const scoreRow = document.createElement('div');
+  scoreRow.className = 'grid grid-cols-4 gap-1.5';
+  COUNTRIES.forEach(c => {
+    const score = (st.scores && st.scores[c]) || 0;
+    const color = COUNTRY_COLORS[c];
+    const chip = document.createElement('button');
+    chip.className = 'score-chip flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg border';
+    chip.style.borderColor = score > 0 ? color : '#756b5733';
+    chip.style.background = score > 0 ? (color + (score === 1 ? '14' : score === 2 ? '33' : '66')) : '#ffffff';
+    chip.innerHTML =
+      '<span class="text-[11px] font-semibold" style="color:' + (score > 0 ? (score === 3 ? 'white' : color) : '#16140e8c') + '">' + c + '</span>' +
+      '<span class="text-[11px] font-semibold tabular-nums" style="color:' + (score > 0 ? (score === 3 ? 'white' : color) : '#211c1266') + '">' + score + '</span>';
+    if (score === 3) chip.style.background = color;
+    chip.addEventListener('click', e => { e.stopPropagation(); cycleScore(f.id, c); });
+    scoreRow.appendChild(chip);
+  });
+
+  card.appendChild(header);
+  card.appendChild(body);
+  card.appendChild(scoreRow);
+
+  card.addEventListener('dragstart', e => { card.classList.add('dragging'); e.dataTransfer.setData('text/plain', String(f.id)); e.dataTransfer.effectAllowed = 'move'; });
+  card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  return card;
+}
+
+// ---------- DRAWER ----------
+function openDrawer(f) {
+  const panel = document.getElementById('drawer-panel');
+  const st = state.features.find(x => x.id === f.id);
+  const total = totalScore(st);
+  const catColor = CATEGORY_COLORS[f.category] || { bg: '#eee', text: '#333' };
+  const countries = (f.countries || '').split(',').map(c => c.trim()).filter(Boolean);
+
+  panel.innerHTML =
+    '<div class="flex items-start justify-between gap-3 mb-4">' +
+      '<div class="flex items-center gap-2">' +
+        '<span class="inline-block px-2 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + (f.category || '') + '</span>' +
+        '<span class="text-[12px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
+      '</div>' +
+      '<button id="drawer-close" class="w-8 h-8 rounded-full hover:bg-[#f6f5f3] flex items-center justify-center">✕</button>' +
+    '</div>' +
+    '<h2 class="text-[22px] leading-[30px] font-semibold mb-3 text-balance">' + escapeHtml(f.feature) + '</h2>' +
+    '<p class="text-[14px] leading-[20px] text-[#16140e8c] mb-5 text-pretty">' + escapeHtml(f.description || '') + '</p>' +
+
+    '<div class="grid grid-cols-2 gap-3 mb-5">' +
+      '<div class="bg-[#f6f5f3] rounded-lg p-3">' +
+        '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-1">Priority</div>' +
+        '<div class="text-[14px] font-medium">' + (st.priority || '—') + '</div>' +
+      '</div>' +
+      '<div class="bg-[#f6f5f3] rounded-lg p-3">' +
+        '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-1">Total score</div>' +
+        '<div class="text-[14px] font-medium tabular-nums">' + total + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="mb-5">' +
+      '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Set priority</div>' +
+      '<div class="flex gap-1">' +
+        PRIORITIES.map(p => {
+          const active = st.priority === p;
+          const cls = active ? ('tier-btn-active-' + p.toLowerCase()) : 'bg-white text-[#16140e8c] border-[#756b5733]';
+          return '<button class="drawer-tier-btn tier-btn flex-1 py-2 rounded-lg text-[13px] font-semibold border ' + cls + '" data-priority="' + p + '">' + p + '</button>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+
+    '<div class="mb-5">' +
+      '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Score by country</div>' +
+      '<div class="bg-white border border-[#756b571a] rounded-lg p-3 space-y-2">' +
+        COUNTRIES.map(c => {
+          const score = (st.scores && st.scores[c]) || 0;
+          const color = COUNTRY_COLORS[c];
+          return '<div class="flex items-center justify-between gap-3">' +
+            '<span class="text-[13px] font-medium">' + c + '</span>' +
+            '<div class="flex items-center gap-1">' +
+              [0,1,2,3].map(v => {
+                const active = score === v;
+                const bg = active ? (v === 0 ? '#f6f5f3' : color) : '#ffffff';
+                const fg = active ? (v === 0 ? '#16140e8c' : 'white') : '#16140e8c';
+                const border = active ? (v === 0 ? '#756b5733' : color) : '#756b5733';
+                return '<button class="drawer-score-btn w-9 h-8 rounded-lg text-[12px] font-semibold border transition" data-country="' + c + '" data-value="' + v + '" style="background:' + bg + '; color:' + fg + '; border-color:' + border + '">' + v + '</button>';
+              }).join('') +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+      '<div class="text-[11px] text-[#211c1266] mt-2">0 · None &nbsp;·&nbsp; 1 · Nice to have &nbsp;·&nbsp; 2 · Important &nbsp;·&nbsp; 3 · Critical</div>' +
+    '</div>' +
+
+    '<div class="mb-5">' +
+      '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Countries requesting</div>' +
+      '<div class="flex flex-wrap gap-1">' +
+        countries.map(c => {
+          const color = COUNTRY_COLORS[c] || '#555';
+          return '<span class="text-[12px] font-medium px-2 py-1 rounded" style="color:' + color + '; background:' + color + '14">' + escapeHtml(c) + '</span>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+
+    (f.refs ? '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Source refs</div><p class="text-[12px] leading-[18px] text-[#16140e8c]">' + escapeHtml(f.refs) + '</p></div>' : '') +
+    (f.notes ? '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Notes</div><p class="text-[12px] leading-[18px] text-[#16140e8c]">' + escapeHtml(f.notes) + '</p></div>' : '');
+
+  document.getElementById('drawer').classList.remove('hidden');
+  document.getElementById('drawer-close').onclick = closeDrawer;
+  document.getElementById('drawer-overlay').onclick = closeDrawer;
+  panel.querySelectorAll('.drawer-tier-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.priority;
+      st.priority = (st.priority === p) ? null : p;
+      render();
+      openDrawer(f);
+    });
+  });
+  panel.querySelectorAll('.drawer-score-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const c = btn.dataset.country;
+      const v = parseInt(btn.dataset.value);
+      setScore(f.id, c, v);
+      openDrawer(f);
+    });
+  });
+}
+function closeDrawer() { document.getElementById('drawer').classList.add('hidden'); }
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+if (!state) { state = defaultState('scratch'); saveState(); } render();
+</script>
+</body>
+</html>
