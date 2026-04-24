@@ -9,111 +9,76 @@
 <style>
   html, body { font-family: "Figtree", sans-serif; -webkit-font-smoothing: antialiased; }
   .tabular-nums { font-variant-numeric: tabular-nums; }
-  .card.dragging { opacity: 0.4; transform: scale(0.98); }
-  .column.drag-over { background-color: #e1e51a1a; border-color: #6d770d; }
-  .card { transition: box-shadow 150ms ease, opacity 150ms ease, border-color 150ms ease; }
+  .card { transition: box-shadow 150ms ease, border-color 150ms ease; }
   .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04); }
   .chip { transition: all 150ms ease; }
   .animate-in { opacity: 0; animation: fadeInUp 300ms ease-out forwards; }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .scroll-soft::-webkit-scrollbar { width: 8px; }
   .scroll-soft::-webkit-scrollbar-thumb { background: #756b574d; border-radius: 4px; }
-  .tier-btn { transition: all 150ms ease; }
-  .tier-btn-active-high   { background: #fb2c36; color: white; border-color: #fb2c36; }
-  .tier-btn-active-medium { background: #e17100; color: white; border-color: #e17100; }
-  .tier-btn-active-low    { background: #5ea500; color: white; border-color: #5ea500; }
-  .progress-bar { transition: width 400ms ease; }
-  .score-chip { user-select: none; cursor: pointer; transition: all 150ms ease; }
-  .score-chip:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-  .score-chip:active { transform: translateY(0); }
+  .score-btn { transition: all 150ms ease; }
+  .score-btn:hover:not(.active) { border-color: #090806ec; }
 </style>
 </head>
 <body class="bg-[#f6f5f3] min-h-screen text-[#090806ec]">
 
-<!-- Header -->
-<header class="bg-white border-b border-[#756b571a] sticky top-0 z-30">
-  <div class="max-w-[1600px] mx-auto px-6 py-3 flex items-center gap-4">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-[#e1e51a] flex items-center justify-center">
-        <span class="text-[#29320c] font-semibold text-sm">T</span>
+<!-- LANDING: select role -->
+<div id="landing" class="min-h-screen flex items-center justify-center p-6">
+  <div class="w-full max-w-[720px]">
+    <div class="text-center mb-8">
+      <div class="inline-flex w-12 h-12 rounded-xl bg-[#e1e51a] items-center justify-center mb-4">
+        <span class="text-[#29320c] font-semibold text-lg">T</span>
       </div>
-      <div>
-        <h1 class="text-[16px] leading-[22px] font-semibold">Pricing Calculator — Prioritisation</h1>
-        <p class="text-[11px] leading-[14px] text-[#16140e8c]">44 features · country leaders meeting tool</p>
-      </div>
+      <h1 class="text-[28px] leading-[36px] font-semibold mb-2 text-balance">Pricing Calculator — Prioritisation</h1>
+      <p class="text-[15px] text-[#16140e8c] text-balance">You have 15 minutes to score the features you believe are most urgent for your country. Scores: <span class="font-semibold">1</span> Nice to have · <span class="font-semibold">2</span> Important · <span class="font-semibold">3</span> Critical.</p>
     </div>
 
-    <!-- Mode toggle -->
-    <div class="ml-4 flex items-center gap-1 bg-[#f6f5f3] rounded-full p-1">
-      <button id="mode-classify" class="px-4 py-1.5 rounded-full text-[13px] font-medium transition">1 · Classify</button>
-      <button id="mode-rank" class="px-4 py-1.5 rounded-full text-[13px] font-medium transition">2 · Rank</button>
-    </div>
+    <div class="bg-white rounded-2xl border border-[#756b571a] p-6">
+      <h2 class="text-[13px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-3">Which country are you representing?</h2>
+      <div id="country-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6"></div>
 
-    <div class="flex-1"></div>
-
-    <div class="flex items-center gap-2">
-      <button id="reset-btn" class="px-3 py-1.5 text-[13px] font-medium text-[#16140e8c] hover:text-[#090806ec] transition">Reset</button>
-      <button id="export-btn" class="px-4 py-1.5 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-black transition">Export CSV</button>
+      <div class="border-t border-[#756b571a] pt-5">
+        <h2 class="text-[13px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-3">Facilitator</h2>
+        <button id="role-facilitator" class="w-full text-left p-4 rounded-xl border border-[#756b571a] hover:bg-[#f6f5f3] transition">
+          <div class="font-semibold text-[14px] mb-1">I'm facilitating (Bernardo / Nicolo)</div>
+          <div class="text-[13px] text-[#16140e8c]">See aggregated results across all country leaders, sorted by total score.</div>
+        </button>
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- Phase bar -->
-  <div class="max-w-[1600px] mx-auto px-6 pb-3">
-    <div class="bg-[#f6f5f3] rounded-xl p-3 flex items-center gap-4">
-      <div class="flex-1 min-w-0">
-        <div id="phase-title" class="text-[13px] font-semibold"></div>
-        <div id="phase-hint" class="text-[12px] text-[#16140e8c] mt-0.5"></div>
-      </div>
-      <div id="score-legend" class="hidden items-center gap-2 text-[11px] text-[#16140e8c]"></div>
-      <div class="flex items-center gap-2">
-        <div class="w-40 h-1.5 bg-[#756b571a] rounded-full overflow-hidden">
-          <div id="progress-bar" class="progress-bar h-full bg-[#090806ec]" style="width: 0%"></div>
+<!-- MAIN APP (hidden until role selected) -->
+<div id="app" class="hidden">
+  <header class="bg-white border-b border-[#756b571a] sticky top-0 z-30">
+    <div class="max-w-[1400px] mx-auto px-6 py-3 flex items-center gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-8 h-8 rounded-lg bg-[#e1e51a] flex items-center justify-center flex-shrink-0">
+          <span class="text-[#29320c] font-semibold text-sm">T</span>
         </div>
-        <span id="progress-text" class="text-[12px] tabular-nums text-[#16140e8c] font-medium"></span>
+        <div class="min-w-0">
+          <h1 class="text-[15px] leading-[20px] font-semibold truncate">Pricing Calculator — Prioritisation</h1>
+          <div id="role-line" class="text-[11px] leading-[14px] text-[#16140e8c]"></div>
+        </div>
       </div>
-      <button id="phase-advance" class="hidden px-3 py-1.5 rounded-lg bg-[#e1e51a] text-[#29320c] text-[13px] font-semibold hover:bg-[#eaea48] transition">Move to ranking →</button>
+      <div class="flex-1"></div>
+      <div id="progress-badge" class="hidden items-center gap-2 text-[12px] text-[#16140e8c]"></div>
+      <button id="change-role-btn" class="px-3 py-1.5 text-[13px] font-medium text-[#16140e8c] hover:text-[#090806ec] transition">Change role</button>
+      <button id="export-btn" class="hidden px-4 py-1.5 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-black transition">Export CSV</button>
     </div>
-  </div>
+    <div id="filter-bar" class="max-w-[1400px] mx-auto px-6 pb-3 flex items-center gap-2 flex-wrap">
+      <span class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mr-1">Category</span>
+      <div id="category-filters" class="flex gap-1.5 flex-wrap"></div>
+    </div>
+  </header>
 
-  <!-- Filters -->
-  <div class="max-w-[1600px] mx-auto px-6 pb-3 flex items-center gap-2 flex-wrap">
-    <span class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mr-1">Category</span>
-    <div id="category-filters" class="flex gap-1.5 flex-wrap"></div>
-    <div class="w-px h-5 bg-[#756b571a] mx-2"></div>
-    <span class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mr-1">Country</span>
-    <div id="country-filters" class="flex gap-1.5 flex-wrap"></div>
-  </div>
-</header>
-
-<!-- Content area -->
-<main class="max-w-[1600px] mx-auto px-6 py-6">
-  <div id="classify-view"></div>
-  <div id="rank-view" class="hidden"></div>
-</main>
+  <main id="main" class="max-w-[1400px] mx-auto px-6 py-6"></main>
+</div>
 
 <!-- Drawer -->
 <div id="drawer" class="fixed inset-0 z-40 hidden">
   <div id="drawer-overlay" class="absolute inset-0 bg-black/30"></div>
   <div id="drawer-panel" class="absolute right-0 top-0 h-full w-[540px] bg-white shadow-2xl overflow-y-auto scroll-soft p-6"></div>
-</div>
-
-<!-- Start modal -->
-<div id="start-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
-  <div class="absolute inset-0 bg-black/40"></div>
-  <div class="relative bg-white rounded-2xl shadow-2xl w-[540px] p-6">
-    <h2 class="text-[20px] font-semibold mb-2">Starting state</h2>
-    <p class="text-[14px] text-[#16140e8c] mb-5">How would you like to start the meeting?</p>
-    <div class="grid gap-3">
-      <button class="start-option text-left p-4 rounded-xl border border-[#756b571a] hover:bg-[#f6f5f3] transition" data-mode="firstpass">
-        <div class="font-semibold text-[14px] mb-1">Use Bernardo's first-pass priorities</div>
-        <div class="text-[13px] text-[#16140e8c]">Features pre-tiered as a starting point. Leaders adjust the tiers first, then vote on each one.</div>
-      </button>
-      <button class="start-option text-left p-4 rounded-xl border-2 border-[#090806ec] bg-[#f6f5f3] hover:bg-[#eae8e4] transition" data-mode="scratch">
-        <div class="font-semibold text-[14px] mb-1">Start from scratch <span class="text-[11px] font-normal text-[#16140e8c] ml-1">(Recommended)</span></div>
-        <div class="text-[13px] text-[#16140e8c]">All 44 features unclassified. Tier each one from zero — avoids any anchoring on pre-set priorities.</div>
-      </button>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -129,115 +94,111 @@ const CATEGORY_COLORS = {
   'DCC':              { bg: '#FAD9D5', text: '#8B1A12' },
   'Retention':        { bg: '#E8E8E8', text: '#444' },
 };
-const COUNTRIES = ['UK','HU','IS','CZ/SK','HR','PT','IT','ES'];
+const COUNTRIES = [
+  { code: 'UK', label: 'United Kingdom' },
+  { code: 'HU', label: 'Hungary' },
+  { code: 'IS', label: 'Iceland' },
+  { code: 'CZ/SK', label: 'Czechia / Slovakia' },
+  { code: 'HR', label: 'Croatia' },
+  { code: 'PT', label: 'Portugal' },
+  { code: 'IT', label: 'Italy' },
+  { code: 'ES', label: 'Spain' },
+];
+const COUNTRY_CODES = COUNTRIES.map(c => c.code);
 const COUNTRY_COLORS = {
   'UK': '#155dfc', 'HU': '#bb4d00', 'IS': '#497d00',
   'CZ/SK': '#6d770d', 'HR': '#e7000b', 'PT': '#e17100',
   'IT': '#5f4f30', 'ES': '#fbbf24'
 };
-const PRIORITIES = ['High','Medium','Low'];
-const PRIORITY_META = {
-  'High':   { color: '#e7000b', bg: '#fb2c361a' },
-  'Medium': { color: '#bb4d00', bg: '#fe9a001a' },
-  'Low':    { color: '#497d00', bg: '#7ccf001a' },
-};
 
-const SCORE_LABELS = {
-  0: 'None',
-  1: 'Nice to have',
-  2: 'Important',
-  3: 'Critical',
-};
+const STATE_KEY = 'prio-state-v4';
+const ROLE_KEY = 'prio-role-v4';
 
-const STATE_KEY = 'pricing-prio-state-v3';
+// State shape:
+// { scores: { "UK": { 1: 3, 2: 1, ... }, "HU": { ... }, ... } }
+// In this local-only version, every user's data lives here. Firebase will
+// replace this with a shared store where each role only writes their slot.
 
+let role = loadRole();
 let state = loadState();
+let categoryFilter = CATEGORIES.slice();
 
-function defaultState(mode) {
-  return {
-    mode: 'classify',
-    features: FEATURES.map(f => ({
-      id: f.id,
-      priority: mode === 'firstpass' ? f.priority : null,
-      scores: {},
-    })),
-    categoryFilter: CATEGORIES.slice(),
-    countryFilter: COUNTRIES.slice(),
-  };
+function loadRole() {
+  try { return JSON.parse(localStorage.getItem(ROLE_KEY) || 'null'); } catch(e) { return null; }
 }
-
+function saveRole(r) {
+  role = r;
+  if (r) localStorage.setItem(ROLE_KEY, JSON.stringify(r));
+  else localStorage.removeItem(ROLE_KEY);
+}
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
-    if (saved && saved.features) return saved;
+    if (saved && saved.scores) return saved;
   } catch(e) {}
-  return null;
+  return { scores: {} };
 }
+function saveState() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
 
-function saveState() {
-  if (state) localStorage.setItem(STATE_KEY, JSON.stringify(state));
+function getScore(country, featureId) {
+  return (state.scores && state.scores[country] && state.scores[country][featureId]) || 0;
 }
-
-function totalScore(st) {
-  return Object.values(st.scores || {}).reduce((s, n) => s + (n || 0), 0);
-}
-
-function cycleScore(id, country) {
-  const st = state.features.find(x => x.id === id);
-  if (!st.scores) st.scores = {};
-  const cur = st.scores[country] || 0;
-  const next = (cur + 1) % 4;
-  if (next === 0) delete st.scores[country];
-  else st.scores[country] = next;
+function setScore(country, featureId, value) {
+  if (!state.scores) state.scores = {};
+  if (!state.scores[country]) state.scores[country] = {};
+  if (!value) delete state.scores[country][featureId];
+  else state.scores[country][featureId] = value;
+  saveState();
   render();
 }
-
-function setScore(id, country, value) {
-  const st = state.features.find(x => x.id === id);
-  if (!st.scores) st.scores = {};
-  if (!value) delete st.scores[country];
-  else st.scores[country] = value;
-  render();
+function totalScore(featureId) {
+  let t = 0;
+  COUNTRY_CODES.forEach(c => { t += getScore(c, featureId); });
+  return t;
 }
 
-// --- Start modal ---
-function showStartModal() { document.getElementById('start-modal').classList.remove('hidden'); }
-document.querySelectorAll('.start-option').forEach(btn => {
-  btn.addEventListener('click', () => {
-    state = defaultState(btn.dataset.mode);
-    document.getElementById('start-modal').classList.add('hidden');
-    saveState();
-    render();
+// ---------- LANDING ----------
+function renderLanding() {
+  const grid = document.getElementById('country-grid');
+  grid.innerHTML = '';
+  COUNTRIES.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'p-3 rounded-xl border border-[#756b571a] bg-white hover:bg-[#f6f5f3] transition text-left';
+    btn.innerHTML =
+      '<div class="flex items-center gap-2 mb-1">' +
+        '<span class="w-2 h-2 rounded-full" style="background:' + COUNTRY_COLORS[c.code] + '"></span>' +
+        '<span class="text-[13px] font-semibold">' + c.code + '</span>' +
+      '</div>' +
+      '<div class="text-[12px] text-[#16140e8c]">' + c.label + '</div>';
+    btn.onclick = () => { saveRole({ type: 'voter', country: c.code }); showApp(); };
+    grid.appendChild(btn);
   });
-});
+  document.getElementById('role-facilitator').onclick = () => { saveRole({ type: 'facilitator' }); showApp(); };
+}
 
-// --- Mode toggle ---
-function setMode(m) { state.mode = m; render(); }
-document.getElementById('mode-classify').addEventListener('click', () => setMode('classify'));
-document.getElementById('mode-rank').addEventListener('click', () => {
-  const unclassified = state.features.filter(f => !f.priority).length;
-  if (unclassified > 0 && !confirm(unclassified + ' feature(s) still unclassified. Switch to Rank anyway?')) return;
-  setMode('rank');
-});
+function showApp() {
+  document.getElementById('landing').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  render();
+}
+function showLanding() {
+  document.getElementById('landing').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+}
 
-// --- Reset ---
-document.getElementById('reset-btn').addEventListener('click', () => {
-  if (confirm('Reset all classifications and votes?')) {
-    localStorage.removeItem(STATE_KEY);
-    state = null;
-    showStartModal();
-  }
-});
+document.getElementById('change-role-btn').onclick = () => {
+  saveRole(null);
+  showLanding();
+};
 
-// --- Export ---
-document.getElementById('export-btn').addEventListener('click', () => {
+document.getElementById('export-btn').onclick = () => {
   const NL = String.fromCharCode(10);
-  const rows = [['#','Category','Feature','Priority','Countries requesting','Total score',...COUNTRIES.map(c => c + ' score'),'Description']];
+  const rows = [['#','Category','Feature','Priority','Countries requesting','Total score', ...COUNTRY_CODES.map(c => c + ' score'), 'Description']];
   FEATURES.forEach(f => {
-    const st = state.features.find(x => x.id === f.id);
+    const total = totalScore(f.id);
     rows.push([
-      f.id, f.category, f.feature, st.priority || '(unclassified)', f.countries || '', totalScore(st),
-      ...COUNTRIES.map(c => (st.scores && st.scores[c]) || 0),
+      f.id, f.category, f.feature, f.priority || '', f.countries || '', total,
+      ...COUNTRY_CODES.map(c => getScore(c, f.id)),
       (f.description || '').split(NL).join(' ')
     ]);
   });
@@ -250,162 +211,106 @@ document.getElementById('export-btn').addEventListener('click', () => {
   a.href = URL.createObjectURL(blob);
   a.download = 'prioritisation-' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
-});
+};
 
-// --- Filter helpers ---
-function featureMatches(f) {
-  if (!state.categoryFilter.includes(f.category)) return false;
-  if (!f.countries) return true;
-  const cs = f.countries.split(',').map(x => x.trim());
-  if (cs.some(x => x.toLowerCase().includes('all'))) return true;
-  return cs.some(c => state.countryFilter.includes(c));
-}
-
-// --- Render ---
+// ---------- RENDER ----------
 function render() {
-  if (!state) { showStartModal(); return; }
-  renderHeader();
-  renderPhaseBar();
+  if (!role) { showLanding(); return; }
+  const roleLine = document.getElementById('role-line');
+  const progressBadge = document.getElementById('progress-badge');
+  const exportBtn = document.getElementById('export-btn');
+
+  if (role.type === 'voter') {
+    const color = COUNTRY_COLORS[role.country];
+    const label = (COUNTRIES.find(c => c.code === role.country) || {}).label || role.country;
+    roleLine.innerHTML = '<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full" style="background:' + color + '"></span>Voting as <span class="font-semibold" style="color:' + color + '">' + label + '</span></span>';
+    const count = Object.keys((state.scores && state.scores[role.country]) || {}).length;
+    progressBadge.innerHTML = '<span class="tabular-nums font-medium">' + count + '</span> feature' + (count === 1 ? '' : 's') + ' scored';
+    progressBadge.classList.remove('hidden');
+    progressBadge.classList.add('flex');
+    exportBtn.classList.add('hidden');
+  } else {
+    roleLine.textContent = 'Facilitator view · aggregated results';
+    progressBadge.classList.add('hidden');
+    exportBtn.classList.remove('hidden');
+  }
+
   renderFilters();
-  if (state.mode === 'classify') {
-    document.getElementById('classify-view').classList.remove('hidden');
-    document.getElementById('rank-view').classList.add('hidden');
-    renderClassifyView();
-  } else {
-    document.getElementById('classify-view').classList.add('hidden');
-    document.getElementById('rank-view').classList.remove('hidden');
-    renderRankView();
-  }
-  saveState();
-}
-
-function renderHeader() {
-  const cls = document.getElementById('mode-classify');
-  const rnk = document.getElementById('mode-rank');
-  cls.className = 'px-4 py-1.5 rounded-full text-[13px] font-medium transition ' + (state.mode === 'classify' ? 'bg-white shadow-sm text-[#090806ec]' : 'text-[#16140e8c]');
-  rnk.className = 'px-4 py-1.5 rounded-full text-[13px] font-medium transition ' + (state.mode === 'rank' ? 'bg-white shadow-sm text-[#090806ec]' : 'text-[#16140e8c]');
-}
-
-function renderPhaseBar() {
-  const classified = state.features.filter(f => f.priority).length;
-  const pct = Math.round((classified / state.features.length) * 100);
-  document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('progress-text').textContent = classified + ' / ' + state.features.length;
-  const title = document.getElementById('phase-title');
-  const hint = document.getElementById('phase-hint');
-  const advance = document.getElementById('phase-advance');
-  const legend = document.getElementById('score-legend');
-  if (state.mode === 'classify') {
-    title.textContent = 'Phase 1 · Classify each feature as High, Medium, or Low';
-    hint.textContent = 'Go through each feature with the country leaders. One click on the tier badge sets it.';
-    advance.classList.toggle('hidden', classified < state.features.length);
-    advance.onclick = () => setMode('rank');
-    legend.classList.add('hidden');
-  } else {
-    title.textContent = 'Phase 2 · Score each feature per country';
-    hint.textContent = 'Click a country on the card to cycle its score: 0 → 1 → 2 → 3. Cards re-sort by total score within each tier.';
-    advance.classList.add('hidden');
-    legend.classList.remove('hidden');
-    legend.classList.add('flex');
-    legend.innerHTML =
-      '<span class="font-semibold text-[#16140e8c]">Score:</span>' +
-      ['1','2','3'].map(v => '<span class="inline-flex items-center gap-1"><span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ' + scoreClasses(parseInt(v)) + '">' + v + '</span> ' + SCORE_LABELS[parseInt(v)] + '</span>').join('<span class="text-[#756b574d]">·</span>');
-  }
-}
-
-function scoreClasses(score) {
-  if (score === 3) return 'bg-[#090806ec] text-white';
-  if (score === 2) return 'bg-[#555450] text-white';
-  if (score === 1) return 'bg-[#756b5733] text-[#090806ec]';
-  return 'bg-[#f6f5f3] text-[#16140e8c] border border-[#756b5733]';
+  renderMain();
 }
 
 function renderFilters() {
   const cf = document.getElementById('category-filters');
   cf.innerHTML = '';
   CATEGORIES.forEach(cat => {
-    const active = state.categoryFilter.includes(cat);
+    const active = categoryFilter.includes(cat);
     const btn = document.createElement('button');
     btn.className = 'chip px-3 py-1 rounded-full text-[12px] font-medium border ' + (active ? 'border-transparent' : 'border-[#756b5733] text-[#16140e8c] bg-white');
     if (active) { btn.style.background = CATEGORY_COLORS[cat].bg; btn.style.color = CATEGORY_COLORS[cat].text; }
     btn.textContent = cat;
     btn.onclick = () => {
-      const i = state.categoryFilter.indexOf(cat);
-      if (i >= 0) state.categoryFilter.splice(i, 1); else state.categoryFilter.push(cat);
+      const i = categoryFilter.indexOf(cat);
+      if (i >= 0) categoryFilter.splice(i, 1); else categoryFilter.push(cat);
       render();
     };
     cf.appendChild(btn);
   });
-  const cr = document.getElementById('country-filters');
-  cr.innerHTML = '';
-  COUNTRIES.forEach(c => {
-    const active = state.countryFilter.includes(c);
-    const btn = document.createElement('button');
-    btn.className = 'chip px-3 py-1 rounded-full text-[12px] font-medium border ' + (active ? 'text-white border-transparent' : 'border-[#756b5733] text-[#16140e8c] bg-white');
-    if (active) btn.style.background = COUNTRY_COLORS[c];
-    btn.textContent = c;
-    btn.onclick = () => {
-      const i = state.countryFilter.indexOf(c);
-      if (i >= 0) state.countryFilter.splice(i, 1); else state.countryFilter.push(c);
-      render();
-    };
-    cr.appendChild(btn);
-  });
 }
 
-// ---------- CLASSIFY VIEW ----------
-function renderClassifyView() {
-  const root = document.getElementById('classify-view');
-  root.innerHTML = '';
-  const visible = FEATURES.filter(featureMatches);
-  const unclassified = visible.filter(f => !state.features.find(s => s.id === f.id).priority);
-  if (unclassified.length > 0) root.appendChild(buildClassifySection('Unclassified', unclassified, true));
+function renderMain() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  if (role.type === 'voter') renderVoterView(main);
+  else renderFacilitatorView(main);
+}
+
+// ---------- VOTER VIEW ----------
+function renderVoterView(root) {
+  const hint = document.createElement('div');
+  hint.className = 'mb-5 bg-white rounded-xl border border-[#756b571a] p-4 text-[13px] text-[#16140e8c]';
+  hint.innerHTML =
+    '<div class="font-semibold text-[#090806ec] mb-1">How to score</div>' +
+    'Tap a score for each feature you care about. Leave blank for features that are not important to your country. There is no limit — score as many as you like, but be honest about what is truly Critical vs Nice to have.';
+  root.appendChild(hint);
+
   CATEGORIES.forEach(cat => {
-    const inCat = visible.filter(f => f.category === cat && state.features.find(s => s.id === f.id).priority);
+    const inCat = FEATURES.filter(f => f.category === cat && categoryFilter.includes(cat));
     if (inCat.length === 0) return;
-    root.appendChild(buildClassifySection(cat, inCat, false));
+    const sec = document.createElement('section');
+    sec.className = 'mb-6';
+    const catColor = CATEGORY_COLORS[cat];
+    const header = document.createElement('div');
+    header.className = 'flex items-center gap-3 mb-3 px-1';
+    header.innerHTML =
+      '<span class="inline-block px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[1.5px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + cat + '</span>' +
+      '<span class="text-[13px] text-[#16140e8c] tabular-nums">' + inCat.length + '</span>';
+    sec.appendChild(header);
+    const grid = document.createElement('div');
+    grid.className = 'grid gap-2';
+    inCat.forEach(f => grid.appendChild(renderVoterCard(f)));
+    sec.appendChild(grid);
+    root.appendChild(sec);
   });
-  if (visible.length === 0) {
-    root.innerHTML = '<div class="text-center text-[14px] text-[#16140e8c] py-16">No features match the current filters.</div>';
-  }
 }
 
-function buildClassifySection(title, items, isUnclassified) {
-  const sec = document.createElement('section');
-  sec.className = 'mb-6';
-  const catColor = CATEGORY_COLORS[title] || { bg: '#f6f5f3', text: '#090806ec' };
-  const header = document.createElement('div');
-  header.className = 'flex items-center gap-3 mb-3 px-1';
-  const chipBg = isUnclassified ? '#756b571a' : catColor.bg;
-  const chipText = isUnclassified ? '#16140e8c' : catColor.text;
-  header.innerHTML =
-    '<span class="inline-block px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[1.5px]" style="background:' + chipBg + '; color:' + chipText + '">' + title + '</span>' +
-    '<span class="text-[13px] text-[#16140e8c] tabular-nums">' + items.length + '</span>';
-  sec.appendChild(header);
-  const grid = document.createElement('div');
-  grid.className = 'grid gap-2';
-  items.forEach(f => grid.appendChild(renderClassifyCard(f)));
-  sec.appendChild(grid);
-  return sec;
-}
-
-function renderClassifyCard(f) {
-  const st = state.features.find(x => x.id === f.id);
+function renderVoterCard(f) {
   const card = document.createElement('div');
   card.className = 'card bg-white rounded-xl border border-[#756b571a] p-4 animate-in grid gap-3';
   card.style.gridTemplateColumns = '1fr auto';
-  const catColor = CATEGORY_COLORS[f.category] || { bg: '#eee', text: '#333' };
+  const catColor = CATEGORY_COLORS[f.category];
+  const myScore = getScore(role.country, f.id);
   const countries = (f.countries || '').split(',').map(c => c.trim()).filter(Boolean);
 
   const left = document.createElement('div');
   left.className = 'min-w-0 cursor-pointer';
   left.innerHTML =
     '<div class="flex items-center gap-2 mb-1 flex-wrap">' +
-      '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + (f.category || '') + '</span>' +
+      '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + f.category + '</span>' +
       '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
       countries.slice(0, 8).map(c => {
         const color = COUNTRY_COLORS[c] || '#555';
-        return '<span class="text-[10px] font-medium px-1.5 py-0.5 rounded" style="color:' + color + '; background:' + color + '14">' + escapeHtml(c) + '</span>';
+        const isMine = c === role.country;
+        return '<span class="text-[10px] font-medium px-1.5 py-0.5 rounded ' + (isMine ? 'ring-1' : '') + '" style="color:' + color + '; background:' + color + '14; ' + (isMine ? 'box-shadow: 0 0 0 1px ' + color : '') + '">' + escapeHtml(c) + '</span>';
       }).join('') +
     '</div>' +
     '<h3 class="text-[14px] leading-[20px] font-semibold mb-1">' + escapeHtml(f.feature) + '</h3>' +
@@ -413,160 +318,149 @@ function renderClassifyCard(f) {
   left.addEventListener('click', () => openDrawer(f));
 
   const right = document.createElement('div');
-  right.className = 'flex flex-col items-end gap-1.5';
-  right.innerHTML =
-    '<div class="flex gap-1">' +
-      PRIORITIES.map(p => {
-        const active = st.priority === p;
-        const cls = active ? ('tier-btn-active-' + p.toLowerCase()) : 'bg-white text-[#16140e8c] border-[#756b5733] hover:border-[#090806ec]';
-        return '<button class="tier-btn px-3 py-1.5 rounded-lg text-[12px] font-semibold border ' + cls + '" data-priority="' + p + '" data-id="' + f.id + '">' + p + '</button>';
-      }).join('') +
-    '</div>' +
-    (st.priority ? '<button class="text-[11px] text-[#211c1266] hover:text-[#090806ec] transition" data-clear="' + f.id + '">Clear</button>' : '');
-  right.querySelectorAll('.tier-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const id = parseInt(btn.dataset.id);
-      const p = btn.dataset.priority;
-      const st2 = state.features.find(x => x.id === id);
-      st2.priority = (st2.priority === p) ? null : p;
-      render();
-    });
+  right.className = 'flex items-center gap-1';
+  [0, 1, 2, 3].forEach(v => {
+    const active = myScore === v;
+    const btn = document.createElement('button');
+    btn.className = 'score-btn w-10 h-10 rounded-lg text-[13px] font-semibold border ' + (active ? 'active' : '');
+    if (active) {
+      if (v === 0) { btn.style.background = '#f6f5f3'; btn.style.color = '#16140e8c'; btn.style.borderColor = '#756b5733'; }
+      else { btn.style.background = COUNTRY_COLORS[role.country]; btn.style.color = 'white'; btn.style.borderColor = COUNTRY_COLORS[role.country]; }
+    } else {
+      btn.style.background = 'white'; btn.style.color = '#16140e8c'; btn.style.borderColor = '#756b5733';
+    }
+    btn.textContent = v;
+    btn.title = ['None','Nice to have','Important','Critical'][v];
+    btn.onclick = e => { e.stopPropagation(); setScore(role.country, f.id, v); };
+    right.appendChild(btn);
   });
-  const clearBtn = right.querySelector('[data-clear]');
-  if (clearBtn) clearBtn.addEventListener('click', e => { e.stopPropagation(); st.priority = null; render(); });
-
   card.appendChild(left);
   card.appendChild(right);
   return card;
 }
 
-// ---------- RANK VIEW ----------
-function renderRankView() {
-  const root = document.getElementById('rank-view');
-  root.innerHTML = '';
-  const board = document.createElement('div');
-  board.className = 'grid grid-cols-3 gap-4';
-  PRIORITIES.forEach(p => {
-    const col = document.createElement('div');
-    col.className = 'column rounded-2xl border-2 border-dashed border-transparent p-3 transition-colors';
-    col.style.minHeight = '600px';
-    col.dataset.priority = p;
-    const meta = PRIORITY_META[p];
-    const items = FEATURES.filter(f => {
-      const st = state.features.find(x => x.id === f.id);
-      return st.priority === p && featureMatches(f);
-    });
-    items.sort((a, b) => {
-      const fa = state.features.find(x => x.id === a.id);
-      const fb = state.features.find(x => x.id === b.id);
-      return totalScore(fb) - totalScore(fa) || a.id - b.id;
-    });
-    const head = document.createElement('div');
-    head.className = 'flex items-center gap-2 mb-3 px-1';
-    head.innerHTML =
-      '<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[12px] font-semibold uppercase tracking-[1.5px]" style="background:' + meta.bg + '; color:' + meta.color + '">' +
-        '<span class="w-2 h-2 rounded-full" style="background:' + meta.color + '"></span>' + p +
-      '</span>' +
-      '<span class="text-[14px] text-[#16140e8c] tabular-nums">' + items.length + '</span>';
-    col.appendChild(head);
-    const list = document.createElement('div');
-    list.className = 'flex flex-col gap-2';
-    items.forEach(f => list.appendChild(renderRankCard(f)));
-    if (items.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'text-center text-[13px] text-[#211c1266] py-10 border border-dashed border-[#756b5733] rounded-xl';
-      empty.textContent = 'Drop cards here';
-      list.appendChild(empty);
-    }
-    col.appendChild(list);
-    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
-    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
-    col.addEventListener('drop', e => {
-      e.preventDefault();
-      col.classList.remove('drag-over');
-      const id = parseInt(e.dataTransfer.getData('text/plain'));
-      const st = state.features.find(x => x.id === id);
-      if (st && st.priority !== p) { st.priority = p; render(); }
-    });
-    board.appendChild(col);
-  });
-  root.appendChild(board);
-  const unclassified = state.features.filter(f => !f.priority).length;
-  if (unclassified > 0) {
-    const warn = document.createElement('div');
-    warn.className = 'mt-6 bg-[#fe9a001a] border border-[#ff690080] rounded-xl p-3 text-[13px] text-[#bb4d00]';
-    warn.textContent = unclassified + ' feature(s) still unclassified — switch to Classify to tier them.';
-    root.appendChild(warn);
-  }
+// ---------- FACILITATOR VIEW ----------
+function renderFacilitatorView(root) {
+  // Summary bar
+  const summary = document.createElement('div');
+  summary.className = 'mb-5 bg-white rounded-xl border border-[#756b571a] p-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 text-center';
+  const totalFeatures = FEATURES.length;
+  summary.innerHTML = '<div><div class="text-[11px] uppercase tracking-[1.5px] text-[#211c1266] font-semibold">Features</div><div class="text-[22px] font-semibold tabular-nums mt-1">' + totalFeatures + '</div></div>' +
+    COUNTRY_CODES.map(c => {
+      const color = COUNTRY_COLORS[c];
+      const scored = Object.keys((state.scores && state.scores[c]) || {}).length;
+      const total = FEATURES.reduce((s, f) => s + getScore(c, f.id), 0);
+      return '<div><div class="text-[11px] uppercase tracking-[1.5px] font-semibold" style="color:' + color + '">' + c + '</div>' +
+        '<div class="text-[22px] font-semibold tabular-nums mt-1">' + total + '</div>' +
+        '<div class="text-[11px] text-[#211c1266] tabular-nums">' + scored + ' scored</div></div>';
+    }).join('');
+  root.appendChild(summary);
+
+  // Sort options
+  const sortBar = document.createElement('div');
+  sortBar.className = 'flex items-center gap-2 mb-3';
+  sortBar.innerHTML =
+    '<span class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c]">Sort</span>' +
+    '<button id="sort-score" class="chip px-3 py-1 rounded-full text-[12px] font-medium border border-[#090806ec] bg-[#090806ec] text-white">By total score</button>' +
+    '<button id="sort-id" class="chip px-3 py-1 rounded-full text-[12px] font-medium border border-[#756b5733] bg-white text-[#16140e8c]">By list order</button>';
+  root.appendChild(sortBar);
+
+  const list = document.createElement('div');
+  list.className = 'grid gap-2';
+  const visible = FEATURES.filter(f => categoryFilter.includes(f.category));
+  const sorted = (window.__sortMode === 'id')
+    ? visible.slice().sort((a, b) => a.id - b.id)
+    : visible.slice().sort((a, b) => totalScore(b.id) - totalScore(a.id) || a.id - b.id);
+
+  sorted.forEach((f, i) => list.appendChild(renderResultCard(f, i + 1)));
+  root.appendChild(list);
+
+  document.getElementById('sort-score').onclick = () => { window.__sortMode = 'score'; render(); };
+  document.getElementById('sort-id').onclick = () => { window.__sortMode = 'id'; render(); };
 }
 
-function renderRankCard(f) {
-  const st = state.features.find(x => x.id === f.id);
-  const total = totalScore(st);
+function renderResultCard(f, rank) {
+  const total = totalScore(f.id);
   const card = document.createElement('div');
-  card.className = 'card bg-white rounded-xl border border-[#756b571a] p-3 animate-in';
-  card.draggable = true;
-  card.dataset.id = f.id;
-  const catColor = CATEGORY_COLORS[f.category] || { bg: '#eee', text: '#333' };
+  card.className = 'card bg-white rounded-xl border border-[#756b571a] p-4 animate-in grid gap-3';
+  card.style.gridTemplateColumns = '44px 1fr auto';
+  const catColor = CATEGORY_COLORS[f.category];
 
-  const header = document.createElement('div');
-  header.className = 'flex items-start justify-between gap-2 mb-2 cursor-grab';
-  header.innerHTML =
-    '<div class="flex items-center gap-1 flex-wrap min-w-0">' +
-      '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px] whitespace-nowrap" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + (f.category || '') + '</span>' +
+  const rankEl = document.createElement('div');
+  rankEl.className = 'flex items-center justify-center';
+  rankEl.innerHTML = '<span class="text-[22px] font-semibold text-[#211c1266] tabular-nums">' + rank + '</span>';
+
+  const mid = document.createElement('div');
+  mid.className = 'min-w-0 cursor-pointer';
+  mid.innerHTML =
+    '<div class="flex items-center gap-2 mb-1 flex-wrap">' +
+      '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + f.category + '</span>' +
       '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
     '</div>' +
-    '<div class="flex items-center gap-1">' +
-      '<span class="text-[10px] font-semibold uppercase tracking-[1px] text-[#16140e8c]">Total</span>' +
-      '<span class="px-2 py-0.5 rounded-md bg-[#e1e51a] text-[#29320c] text-[13px] font-semibold tabular-nums">' + total + '</span>' +
-    '</div>';
-
-  const body = document.createElement('div');
-  body.className = 'cursor-pointer';
-  body.innerHTML =
     '<h3 class="text-[14px] leading-[20px] font-semibold mb-1">' + escapeHtml(f.feature) + '</h3>' +
-    '<p class="text-[12px] leading-[16px] text-[#16140e8c] mb-3">' + escapeHtml((f.description || '').slice(0, 140)) + ((f.description || '').length > 140 ? '…' : '') + '</p>';
-  body.addEventListener('click', () => openDrawer(f));
+    '<div class="flex gap-1 mt-2">' +
+      COUNTRY_CODES.map(c => {
+        const s = getScore(c, f.id);
+        const color = COUNTRY_COLORS[c];
+        const bg = s === 3 ? color : s === 2 ? color + '80' : s === 1 ? color + '33' : '#f6f5f3';
+        const fg = s >= 2 ? 'white' : s === 1 ? color : '#211c1266';
+        const bd = s > 0 ? color : '#756b5733';
+        return '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border" style="background:' + bg + '; color:' + fg + '; border-color:' + bd + '">' +
+          c + '<span class="tabular-nums">' + s + '</span></span>';
+      }).join('') +
+    '</div>';
+  mid.onclick = () => openDrawer(f);
 
-  const scoreRow = document.createElement('div');
-  scoreRow.className = 'grid grid-cols-4 gap-1.5';
-  COUNTRIES.forEach(c => {
-    const score = (st.scores && st.scores[c]) || 0;
-    const color = COUNTRY_COLORS[c];
-    const chip = document.createElement('button');
-    chip.className = 'score-chip flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg border';
-    chip.style.borderColor = score > 0 ? color : '#756b5733';
-    chip.style.background = score > 0 ? (color + (score === 1 ? '14' : score === 2 ? '33' : '66')) : '#ffffff';
-    chip.innerHTML =
-      '<span class="text-[11px] font-semibold" style="color:' + (score > 0 ? (score === 3 ? 'white' : color) : '#16140e8c') + '">' + c + '</span>' +
-      '<span class="text-[11px] font-semibold tabular-nums" style="color:' + (score > 0 ? (score === 3 ? 'white' : color) : '#211c1266') + '">' + score + '</span>';
-    if (score === 3) chip.style.background = color;
-    chip.addEventListener('click', e => { e.stopPropagation(); cycleScore(f.id, c); });
-    scoreRow.appendChild(chip);
-  });
+  const right = document.createElement('div');
+  right.className = 'flex items-center';
+  right.innerHTML = '<div class="px-3 py-2 rounded-lg bg-[#e1e51a] text-[#29320c] text-[18px] font-semibold tabular-nums">' + total + '</div>';
 
-  card.appendChild(header);
-  card.appendChild(body);
-  card.appendChild(scoreRow);
-
-  card.addEventListener('dragstart', e => { card.classList.add('dragging'); e.dataTransfer.setData('text/plain', String(f.id)); e.dataTransfer.effectAllowed = 'move'; });
-  card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  card.appendChild(rankEl);
+  card.appendChild(mid);
+  card.appendChild(right);
   return card;
 }
 
 // ---------- DRAWER ----------
 function openDrawer(f) {
   const panel = document.getElementById('drawer-panel');
-  const st = state.features.find(x => x.id === f.id);
-  const total = totalScore(st);
-  const catColor = CATEGORY_COLORS[f.category] || { bg: '#eee', text: '#333' };
+  const catColor = CATEGORY_COLORS[f.category];
   const countries = (f.countries || '').split(',').map(c => c.trim()).filter(Boolean);
+  const total = totalScore(f.id);
+
+  let scoreBlock = '';
+  if (role.type === 'voter') {
+    const myScore = getScore(role.country, f.id);
+    scoreBlock =
+      '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Your score · ' + role.country + '</div>' +
+      '<div class="flex gap-1">' +
+        [0,1,2,3].map(v => {
+          const active = myScore === v;
+          const bg = active && v > 0 ? COUNTRY_COLORS[role.country] : active ? '#f6f5f3' : 'white';
+          const fg = active && v > 0 ? 'white' : '#16140e8c';
+          const border = active && v > 0 ? COUNTRY_COLORS[role.country] : '#756b5733';
+          return '<button class="drawer-score-btn flex-1 py-2 rounded-lg text-[13px] font-semibold border transition" data-value="' + v + '" style="background:' + bg + '; color:' + fg + '; border-color:' + border + '">' + v + '</button>';
+        }).join('') +
+      '</div>' +
+      '<div class="text-[11px] text-[#211c1266] mt-2">0 · None &nbsp;·&nbsp; 1 · Nice to have &nbsp;·&nbsp; 2 · Important &nbsp;·&nbsp; 3 · Critical</div></div>';
+  } else {
+    // facilitator: show all country scores
+    scoreBlock =
+      '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Scores by country</div>' +
+      '<div class="bg-white border border-[#756b571a] rounded-lg p-3 space-y-2">' +
+        COUNTRY_CODES.map(c => {
+          const s = getScore(c, f.id);
+          const color = COUNTRY_COLORS[c];
+          return '<div class="flex items-center justify-between"><span class="text-[13px] font-medium">' + c + '</span>' +
+            '<span class="text-[13px] tabular-nums font-semibold" style="color:' + (s > 0 ? color : '#211c1266') + '">' + (s || '—') + '</span></div>';
+        }).join('') +
+      '</div></div>';
+  }
 
   panel.innerHTML =
     '<div class="flex items-start justify-between gap-3 mb-4">' +
       '<div class="flex items-center gap-2">' +
-        '<span class="inline-block px-2 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + (f.category || '') + '</span>' +
+        '<span class="inline-block px-2 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + f.category + '</span>' +
         '<span class="text-[12px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
       '</div>' +
       '<button id="drawer-close" class="w-8 h-8 rounded-full hover:bg-[#f6f5f3] flex items-center justify-center">✕</button>' +
@@ -575,59 +469,16 @@ function openDrawer(f) {
     '<p class="text-[14px] leading-[20px] text-[#16140e8c] mb-5 text-pretty">' + escapeHtml(f.description || '') + '</p>' +
 
     '<div class="grid grid-cols-2 gap-3 mb-5">' +
-      '<div class="bg-[#f6f5f3] rounded-lg p-3">' +
-        '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-1">Priority</div>' +
-        '<div class="text-[14px] font-medium">' + (st.priority || '—') + '</div>' +
-      '</div>' +
-      '<div class="bg-[#f6f5f3] rounded-lg p-3">' +
-        '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-1">Total score</div>' +
-        '<div class="text-[14px] font-medium tabular-nums">' + total + '</div>' +
-      '</div>' +
+      '<div class="bg-[#f6f5f3] rounded-lg p-3"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-1">Total score</div><div class="text-[14px] font-medium tabular-nums">' + total + '</div></div>' +
+      '<div class="bg-[#f6f5f3] rounded-lg p-3"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-1">First-pass priority</div><div class="text-[14px] font-medium">' + (f.priority || '—') + '</div></div>' +
     '</div>' +
 
-    '<div class="mb-5">' +
-      '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Set priority</div>' +
-      '<div class="flex gap-1">' +
-        PRIORITIES.map(p => {
-          const active = st.priority === p;
-          const cls = active ? ('tier-btn-active-' + p.toLowerCase()) : 'bg-white text-[#16140e8c] border-[#756b5733]';
-          return '<button class="drawer-tier-btn tier-btn flex-1 py-2 rounded-lg text-[13px] font-semibold border ' + cls + '" data-priority="' + p + '">' + p + '</button>';
-        }).join('') +
-      '</div>' +
-    '</div>' +
+    scoreBlock +
 
-    '<div class="mb-5">' +
-      '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Score by country</div>' +
-      '<div class="bg-white border border-[#756b571a] rounded-lg p-3 space-y-2">' +
-        COUNTRIES.map(c => {
-          const score = (st.scores && st.scores[c]) || 0;
-          const color = COUNTRY_COLORS[c];
-          return '<div class="flex items-center justify-between gap-3">' +
-            '<span class="text-[13px] font-medium">' + c + '</span>' +
-            '<div class="flex items-center gap-1">' +
-              [0,1,2,3].map(v => {
-                const active = score === v;
-                const bg = active ? (v === 0 ? '#f6f5f3' : color) : '#ffffff';
-                const fg = active ? (v === 0 ? '#16140e8c' : 'white') : '#16140e8c';
-                const border = active ? (v === 0 ? '#756b5733' : color) : '#756b5733';
-                return '<button class="drawer-score-btn w-9 h-8 rounded-lg text-[12px] font-semibold border transition" data-country="' + c + '" data-value="' + v + '" style="background:' + bg + '; color:' + fg + '; border-color:' + border + '">' + v + '</button>';
-              }).join('') +
-            '</div>' +
-          '</div>';
-        }).join('') +
-      '</div>' +
-      '<div class="text-[11px] text-[#211c1266] mt-2">0 · None &nbsp;·&nbsp; 1 · Nice to have &nbsp;·&nbsp; 2 · Important &nbsp;·&nbsp; 3 · Critical</div>' +
-    '</div>' +
-
-    '<div class="mb-5">' +
-      '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Countries requesting</div>' +
-      '<div class="flex flex-wrap gap-1">' +
-        countries.map(c => {
-          const color = COUNTRY_COLORS[c] || '#555';
-          return '<span class="text-[12px] font-medium px-2 py-1 rounded" style="color:' + color + '; background:' + color + '14">' + escapeHtml(c) + '</span>';
-        }).join('') +
-      '</div>' +
-    '</div>' +
+    '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Countries requesting</div>' +
+    '<div class="flex flex-wrap gap-1">' +
+      countries.map(c => { const color = COUNTRY_COLORS[c] || '#555'; return '<span class="text-[12px] font-medium px-2 py-1 rounded" style="color:' + color + '; background:' + color + '14">' + escapeHtml(c) + '</span>'; }).join('') +
+    '</div></div>' +
 
     (f.refs ? '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Source refs</div><p class="text-[12px] leading-[18px] text-[#16140e8c]">' + escapeHtml(f.refs) + '</p></div>' : '') +
     (f.notes ? '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Notes</div><p class="text-[12px] leading-[18px] text-[#16140e8c]">' + escapeHtml(f.notes) + '</p></div>' : '');
@@ -635,19 +486,9 @@ function openDrawer(f) {
   document.getElementById('drawer').classList.remove('hidden');
   document.getElementById('drawer-close').onclick = closeDrawer;
   document.getElementById('drawer-overlay').onclick = closeDrawer;
-  panel.querySelectorAll('.drawer-tier-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const p = btn.dataset.priority;
-      st.priority = (st.priority === p) ? null : p;
-      render();
-      openDrawer(f);
-    });
-  });
   panel.querySelectorAll('.drawer-score-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const c = btn.dataset.country;
-      const v = parseInt(btn.dataset.value);
-      setScore(f.id, c, v);
+      setScore(role.country, f.id, parseInt(btn.dataset.value));
       openDrawer(f);
     });
   });
@@ -658,7 +499,9 @@ function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-if (!state) { state = defaultState('scratch'); saveState(); } render();
+// Init
+renderLanding();
+if (role) showApp();
 </script>
 </body>
 </html>
