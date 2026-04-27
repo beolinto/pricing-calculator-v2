@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pricing Calculator — Prioritisation</title>
+<title>Pricing Prioritisation</title>
 <script src="https://cdn.tailwindcss.com?plugins="></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   html, body { font-family: "Figtree", sans-serif; -webkit-font-smoothing: antialiased; }
@@ -26,11 +28,15 @@
 <div id="landing" class="min-h-screen flex items-center justify-center p-6">
   <div class="w-full max-w-[720px]">
     <div class="text-center mb-8">
-      <div class="inline-flex w-12 h-12 rounded-xl bg-[#e1e51a] items-center justify-center mb-4">
-        <span class="text-[#29320c] font-semibold text-lg">T</span>
+      <div class="inline-flex w-12 h-12 mb-4">
+        <svg viewBox="0 0 220.5 220.5" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+          <path fill="#151515" d="m174.54,0H45.95C20.57,0,0,20.57,0,45.95v128.59c0,25.38,20.57,45.95,45.95,45.95h128.59c25.38,0,45.95-20.57,45.95-45.95V45.95c0-25.38-20.57-45.95-45.95-45.95ZM45.69,93.99s0,0-.01,0v-38.25c21.72,0,41.5,8.28,56.37,21.84-8.75,10.29-15.36,22.46-19.14,35.81-8.22-11.73-21.82-19.4-37.22-19.41Zm129.13,0s0,0-.01,0c-25.09,0-45.43,20.35-45.43,45.45v25.32h-38.25v-25.32h0c0-20.23,7.18-38.78,19.12-53.25h0c15.35-18.59,38.58-30.44,64.57-30.44v38.25Z"/>
+          <path fill="#dde048" d="m174.82,93.99s0,0-.01,0c-25.09,0-45.43,20.35-45.43,45.45v25.32h-38.25v-25.32h0c0-20.23,7.18-38.78,19.12-53.25h0c15.35-18.59,38.58-30.44,64.57-30.44v38.25Z"/>
+          <path fill="#fff" d="m45.69,93.99s0,0-.01,0v-38.25c21.72,0,41.5,8.28,56.37,21.84-8.75,10.29-15.36,22.46-19.14,35.81-8.22-11.73-21.82-19.4-37.22-19.41Z"/>
+        </svg>
       </div>
-      <h1 class="text-[28px] leading-[36px] font-semibold mb-2 text-balance">Pricing Calculator — Prioritisation</h1>
-      <p class="text-[15px] text-[#16140e8c] text-balance">You have 15 minutes to score the features you believe are most urgent for your country. Scores: <span class="font-semibold">1</span> Nice to have · <span class="font-semibold">2</span> Important · <span class="font-semibold">3</span> Critical.</p>
+      <h1 class="text-[28px] leading-[36px] font-semibold mb-2 text-balance">Pricing Prioritisation</h1>
+      <p class="text-[15px] text-[#16140e8c] text-balance">Score every feature for your country and submit by Wednesday EOD. Scores: <span class="font-semibold">0</span> Not relevant · <span class="font-semibold">1</span> Nice to have · <span class="font-semibold">2</span> Important · <span class="font-semibold">3</span> Critical.</p>
     </div>
 
     <div class="bg-white rounded-2xl border border-[#756b571a] p-6">
@@ -53,11 +59,15 @@
   <header class="bg-white border-b border-[#756b571a] sticky top-0 z-30">
     <div class="max-w-[1400px] mx-auto px-6 py-3 flex items-center gap-4">
       <div class="flex items-center gap-3 min-w-0">
-        <div class="w-8 h-8 rounded-lg bg-[#e1e51a] flex items-center justify-center flex-shrink-0">
-          <span class="text-[#29320c] font-semibold text-sm">T</span>
+        <div class="w-8 h-8 flex items-center justify-center flex-shrink-0">
+          <svg viewBox="0 0 220.5 220.5" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+            <path fill="#151515" d="m174.54,0H45.95C20.57,0,0,20.57,0,45.95v128.59c0,25.38,20.57,45.95,45.95,45.95h128.59c25.38,0,45.95-20.57,45.95-45.95V45.95c0-25.38-20.57-45.95-45.95-45.95ZM45.69,93.99s0,0-.01,0v-38.25c21.72,0,41.5,8.28,56.37,21.84-8.75,10.29-15.36,22.46-19.14,35.81-8.22-11.73-21.82-19.4-37.22-19.41Zm129.13,0s0,0-.01,0c-25.09,0-45.43,20.35-45.43,45.45v25.32h-38.25v-25.32h0c0-20.23,7.18-38.78,19.12-53.25h0c15.35-18.59,38.58-30.44,64.57-30.44v38.25Z"/>
+            <path fill="#dde048" d="m174.82,93.99s0,0-.01,0c-25.09,0-45.43,20.35-45.43,45.45v25.32h-38.25v-25.32h0c0-20.23,7.18-38.78,19.12-53.25h0c15.35-18.59,38.58-30.44,64.57-30.44v38.25Z"/>
+            <path fill="#fff" d="m45.69,93.99s0,0-.01,0v-38.25c21.72,0,41.5,8.28,56.37,21.84-8.75,10.29-15.36,22.46-19.14,35.81-8.22-11.73-21.82-19.4-37.22-19.41Z"/>
+          </svg>
         </div>
         <div class="min-w-0">
-          <h1 class="text-[15px] leading-[20px] font-semibold truncate">Pricing Calculator — Prioritisation</h1>
+          <h1 class="text-[15px] leading-[20px] font-semibold truncate">Pricing Prioritisation</h1>
           <div id="role-line" class="text-[11px] leading-[14px] text-[#16140e8c]"></div>
         </div>
       </div>
@@ -82,16 +92,58 @@
 </div>
 
 <script>
-const FEATURES = [{"id": 1, "category": "Pricing model", "feature": "TPV tiering (dynamic price thresholds)", "description": "Pricing should change dynamically based on merchant TPV thresholds, instead of the single fixed tier used today. Expected in most mature markets.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item d: 'Include TPV tiering — price changes depending on tpv thresholds').", "notes": "Foundational pricing model change.", "priority": "High"}, {"id": 2, "category": "Pricing model", "feature": "Dynamic minimum fee", "description": "Minimum volume fee adjusts dynamically with expected TPV, instead of the fixed flat value used today.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback list shared 2026-04-22 via DM with Nicolo Meoli (item a: 'Dynamic pricing, start with dynamic minimum fee').", "notes": "Distinct from TPV tiering; can be built independently.", "priority": "High"}, {"id": 3, "category": "Pricing model", "feature": "Flat rate pricing", "description": "Support a flat rate pricing model (single all-in fee regardless of card mix/channel), relevant for Spain and potentially other markets where competitors lead with flat pricing.", "countries": "ES, potentially UK, IT", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item c: 'We need to include flat rate — relevant for Spain and maybe other markets'); related to Nicolo message 2026-04-24: 'support proper IC+ or flat fee'.", "notes": "Enables competitive entry in southern European markets.", "priority": "High"}, {"id": 4, "category": "Pricing model", "feature": "Real IC++ (scheme fee passthrough, not predicted)", "description": "True IC++ pricing where interchange and card scheme fees are passed through as actually charged, not predicted. Today scheme fees are estimated, creating deviation risk vs. competitors passing through actual fees.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item b: 'Real IC++'); Nicolo Meoli in #pricing 2026-04-09 (responding to Branimir #3): 'card scheme fees are predicted because we do not yet have the tooling in place to calculate them in real time'.", "notes": "Depends on CSF automation. Backend engine work, not a v2 prototype concern.", "priority": "High"}, {"id": 5, "category": "Pricing model", "feature": "Automation of card scheme fees (real-time CSF engine)", "description": "Calculate card scheme fees automatically and in real time, rather than relying on periodic predictions/estimates. Pre-requisite for a credible IC++ offering and eliminates manual CSF corrections.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item c: 'Automation of card scheme fees'); echoed in #mastercard-ic-calculation and Nicolo Meoli in #pricing, 2026-04-09.", "notes": "Backend engine work. Pre-req for Real IC++.", "priority": "High"}, {"id": 6, "category": "Pricing model", "feature": "Company-level pricing (single legal entity)", "description": "Price the relationship with a single legal entity (CID) at the company level — one offer prices all stores/MIDs under that company, with take rate and approval happening once for the whole company. Includes the multi-store / multi-terminal case (see dedicated row).", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item e: 'Price at the company level vs the organisation level — should be 2 separate features'); Filip Kordić, #temp-pricing-calc-global-rollout, 2026-03-06.", "notes": "Core to v2.", "priority": "High"}, {"id": 7, "category": "Pricing model", "feature": "Organisation-level pricing (linked entities)", "description": "Price the relationship across multiple legal entities (CIDs) in the same economic group. Combined TPV across linked CIDs is used to assign the correct tier so the merchant is priced as a single relationship.", "countries": "HR", "refs": "Filip Kordić, #temp-pricing-calc-global-rollout, 2026-03-06 (thread 1772801094.577599); Nicolo Meoli 2026-04-24 (item e: organisation-level as separate feature).", "notes": "Calculator must be company-agnostic. Needs alignment with IMO1 scope on multi-company.", "priority": "Medium"}, {"id": 8, "category": "Pricing model", "feature": "Multi-store / terminals per store", "description": "Part of company-level pricing: a single offer prices multiple stores (and multiple terminals per store) with different rates within the same company (CID). Today large businesses with 10+ terminals have everything added to one MID; sales has to manually unlink and re-add.", "countries": "IS, HR, HU", "refs": "SPLAT-549 (Backlog; 'New Calc — Terminals', multi-MID); Confluence IS 'Add proper amount of terminals per Store' (Nice to Have); Ivana Iseni, #temp-pricing-calc-global-rollout; IMO1 #25, #27.", "notes": "Sub-feature of company-level pricing. Interlocks with IMO1 #25 (revamped upsell) and #27 (multi-store onboarding).", "priority": "High"}, {"id": 9, "category": "Approval", "feature": "Multi-MID approval routing", "description": "Today the approval flow only applies to the first store onboarded through the pricing calculator (at MID level). For multi-MID merchants, additional MIDs bypass approval, even though the offer is created at CID level. With company-level pricing, approval should happen once at the company level, using take rate as the main metric.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #4).", "notes": "Solved by v2 via company-level approval (take rate as main metric). Depends on Company-level pricing.", "priority": "High"}, {"id": 10, "category": "Offer management", "feature": "Edit existing offers", "description": "Offers are immutable today — any change requires creating a new offer from scratch. Users want to edit an existing offer (typo, rate adjustment) without losing history.", "countries": "IS, HU, CZ/SK, HR", "refs": "SPLAT-550 (Backlog; edit scope); Confluence IS 'Edit/Delete Offers' (Urgent); Branimir Zorko list, #pricing, 2026-04-08 (item #6); Adam Kubina, #pricing-calc-rollout-cz-sk, 2026-01-28.", "notes": "The new Sales App (IMO1 #25) solves this since offers live inside a lead.", "priority": "High"}, {"id": 11, "category": "New sale", "feature": "Pre-fill merchant info from HubSpot / lead", "description": "When opening the calculator from a lead, auto-populate merchant name, legal entity, expected volume, MCC, country. Today calculator and HubSpot are disconnected — agents calculate, then onboard, with no link back.", "countries": "HR, HU, CZ/SK, PT", "refs": "Group DM Bernardo / Ivana Iseni / Márcio Correia / Filip Kapetanović, 2026-02 (Filip K. end-to-end flow); Paola Villalpando Castro, #data-onboarding-and-cdd, 2026-04.", "notes": "HubSpot <> Sales App integration already being scoped by Paola Villalpando Castro.", "priority": "High"}, {"id": 12, "category": "Upsell", "feature": "Self-upsell of products (merchant)", "description": "Merchant adds additional products (terminals, ECOM, MOTO, PBL) to an existing store/company via the Business Portal, with pricing calculated automatically. No seller involvement required. Store-level self-upsell is tracked separately.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item i: 'Self upsell of products is not there'); IMO1 #31 (Self-service upsell for merchants); IMO1 #28 (Self-service offer renegotiation).", "notes": "Direct dependency on IMO1 #31. Pricing calculator must expose self-serve pricing logic.", "priority": "High"}, {"id": 13, "category": "Upsell", "feature": "Assisted upsell of products", "description": "Seller-assisted flow to add products (terminals, ECOM, MOTO, PBL) to an existing merchant with pricing calculated in the calculator. Today the calculator only supports new-sale flows. Store-level upsell is tracked separately.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item j: 'Upsell of products is not there'); IMO1 #25 ('Revamped assisted upsell flow and pricing calculator').", "notes": "Direct dependency on IMO1 #25. A primary driver of v2 work.", "priority": "High"}, {"id": 14, "category": "Upsell", "feature": "Upsell of stores (add store to existing merchant)", "description": "Add a new store to an existing merchant (seller-assisted or self-service), with pricing calculated per store under the company and approval routed correctly. Distinct from product upsell — this expands the company structure.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item k: 'Upsell of stores is not there').", "notes": "Complements assisted and self-upsell flows. Interlocks with company-level pricing.", "priority": "High"}, {"id": 15, "category": "New sale", "feature": "EPOS pricing in calculator", "description": "Support EPOS (integrated point-of-sale) as a product/subscription priceable within the calculator.", "countries": "All countries (UK first)", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item l: 'EPOS is not there'); IMO1 #29 (Teya POS onboarding).", "notes": "Interlocks with IMO1 #29. Significant for UK/growth markets.", "priority": "High"}, {"id": 16, "category": "DCC", "feature": "DCC revenue share", "description": "Support DCC revenue-share offers where the merchant receives a share of DCC revenue. Today the calculator does not model merchant DCC revenue share at all.", "countries": "IS, HR", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item g: 'DCC revenue share is not there'); SPLAT-526 (DCC Revenue Share).", "notes": "Paired with DCC flexible margin.", "priority": "High"}, {"id": 17, "category": "DCC", "feature": "DCC flexible margin", "description": "Let sales adjust the DCC margin per offer instead of using a single global rate. Merchants want up to 4% markup configurability.", "countries": "IS, HR", "refs": "SPLAT-526; #proj-dcc-flexible-pricing: Humphrey Kelly PRD + Tech Plan (2026-02); Hafliði Sigurðarson 2026-04 (IS members waiting for 4% markup).", "notes": "Known gap in v2. High demand in IS and HR. v2 prototype has surcharge toggle only.", "priority": "High"}, {"id": 18, "category": "Retention", "feature": "Retention tool for CR and sales", "description": "A tool for Customer Relations and sales to calculate retention offers (repricing with guardrails) for at-risk merchants. Distinct from new-sale pricing.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item h: 'Creating a retention tool for CR and sales to calculate retention offers').", "notes": "Pricing use case outside the current calculator scope; may need its own workflow.", "priority": "High"}, {"id": 19, "category": "Offer management", "feature": "Revenue breakdown visible in offer", "description": "Agents and approvers want to see the expected revenue breakdown (acquiring, POS rental, DCC, scheme, IC, interest on settlement delays) per offer to judge margin before sending.", "countries": "IS, HR, HU", "refs": "SPLAT-526 (DCC Revenue Share — sub-ask); Confluence IS 'Revenue Breakdown (detailed)' (Urgent); related to Branimir list items #2–#3 on CSF visibility.", "notes": "v2 shows Teya take rate but full revenue split still partial.", "priority": "High"}, {"id": 20, "category": "Approval", "feature": "Fee deviation visibility on pending offers", "description": "Approvers should immediately see how far below minimum price a submitted offer is, as a % or bps deviation. Today only checks are Net Sales Revenue or manual TPV plug-ins.", "countries": "HU, HR", "refs": "David Schmidt (HU), #sales-stakeholders, 2026-04-13; Filip Kordić (HR), #temp-pricing-calc-global-rollout, 2026-03-06.", "notes": "Considered in v2 prototype.", "priority": "High"}, {"id": 21, "category": "Approval", "feature": "Approval notification for seller", "description": "Notify the seller when their offer is approved or rejected. Today the only way to know is to check back office manually.", "countries": "HU, HR", "refs": "IH-3558; Confluence SP2 'Missing notification to sellers and sales managers' (HU, High); Branimir Zorko list, #pricing, 2026-04-08 (item #5).", "notes": "In progress in existing calculator; included in v2.", "priority": "High"}, {"id": 22, "category": "Approval", "feature": "Approval notification for sales manager", "description": "Notify the sales manager (approver) when an offer is assigned to them for review.", "countries": "HU, HR", "refs": "IH-3558; Confluence SP2 'Missing notification to sellers and sales managers' (HU, High); Branimir Zorko list, #pricing, 2026-04-08 (item #5).", "notes": "In progress in existing calculator; included in v2.", "priority": "High"}, {"id": 23, "category": "Approval", "feature": "AI offer analysis & approval recommendation for sales managers", "description": "AI analyses submitted offers against historical approvals, market benchmarks, and pricing policy, and gives the sales manager a recommendation (approve / do not approve). If 'do not approve', suggests the pricing at which the offer should be approved.", "countries": "All countries", "refs": "Bernardo Olinto feedback during Approval flow breakdown discussion with Nicolo Meoli, 2026-04-24.", "notes": "New item — not previously scoped. Related to Fee deviation visibility and Counteroffer flow.", "priority": "Medium"}, {"id": 24, "category": "Pricing model", "feature": "Seasonal merchant pricing (HR)", "description": "Seasonal merchant pricing not set up correctly — dividing TPV by 12 months makes HR uncompetitive for merchants operating <6 months/year. Proposal sent >1 month ago, not implemented.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #7); Ivana Iseni GDM with Paulo Castro, 2026-02 (Mateo Lovrenčić model: divide by 6 months).", "notes": "Related to IMO1 #46 (Enhanced seasonality and one-off events declaration).", "priority": "High"}, {"id": 25, "category": "Offer management", "feature": "Visual presentation of offers to merchants", "description": "Improve how the offer is visually presented to the merchant — layout, branding, clarity of fee breakdown, professional appearance. Generated offer document today is hard to read and inconsistent.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item h: 'Visual presentation of offers to merchants').", "notes": "Within IMO1 scope; considered in Sales App and new registration flow.", "priority": "High"}, {"id": 26, "category": "Pricing model", "feature": "Unblended offer customisation (per card brand / channel)", "description": "Enable individual rate negotiation for unblended offers, including AMEX & other scheme rates.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item e).", "notes": "v2 supports multi-rate; customisation depth per offer limited.", "priority": "Medium"}, {"id": 27, "category": "Pricing model", "feature": "Annual vs. monthly TPV as input", "description": "Allow the agent to enter merchant TPV as either annual or monthly, with the calculator deriving the other figure. Today input is monthly-only, penalising seasonal merchants and forcing manual conversions.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item f).", "notes": "Related to but distinct from Seasonal merchant pricing (HR).", "priority": "Medium"}, {"id": 28, "category": "Approval", "feature": "Counteroffer flow (manager adjusts + sends back with note)", "description": "When an offer is close to acceptable thresholds, managers cannot formally adjust values or structure a counterproposal back to the agent.", "countries": "HU, CZ/SK", "refs": "Confluence SP2 'Allow managers to create counteroffers' (Sales Managers source).", "notes": "Solved in v2 — managers adjust and send back with a note.", "priority": "Medium"}, {"id": 29, "category": "Offer management", "feature": "Offer templates by segment", "description": "Pre-built offer templates for common merchant segments (hospitality, retail, e-com) to speed up high-volume low-value deals.", "countries": "HR, HU", "refs": "Bernardo Olinto DM with Tiago Loriato Simões, 2025-08.", "notes": "Sales App will enable sharing an offer directly with the prospect via email.", "priority": "Medium"}, {"id": 30, "category": "Offer management", "feature": "Sharable offer link / PDF export", "description": "Agents need a sharable offer link and/or 'Download as PDF' so the offer can be emailed to the merchant. Today agents screenshot offers — unprofessional and hard to read.", "countries": "CZ/SK", "refs": "EPSSD-416 ('Offer Export Functionality', To Do); Confluence SP2 (Adam Kubina, CZ field).", "notes": "Covered by Sales App + email share flow.", "priority": "Medium"}, {"id": 31, "category": "Approval", "feature": "Requester field on Offers list", "description": "Make the offer requester clearly visible in the main offer view without opening details or history.", "countries": "HU, HR", "refs": "EPSSD-445; Confluence SP2 (HU sales teams); David Schmidt, #temp-pricing-calc-global-rollout, Oct 2025.", "notes": "Considered in v2 prototype for Back Office.", "priority": "Medium"}, {"id": 32, "category": "Approval", "feature": "Missing fields in approval view", "description": "Add membership plan, offer name (e.g. Thrive), and seasonality to the detailed offers page in Back Office and Partner Portal.", "countries": "HU, HR", "refs": "Confluence SP2 'Missing fields in approval view' (Pricing team, medium).", "notes": "Considered in v2 prototype.", "priority": "Medium"}, {"id": 33, "category": "Approval", "feature": "Attach statement from previous provider (approval view)", "description": "Upload the merchant's statement from their previous provider to the approval request, so managers can judge exceptions with full context.", "countries": "HU", "refs": "Confluence SP2 'Attach statement from previous provider' (Sales Managers, medium).", "notes": "Already available in existing calculator; considered in v2.", "priority": "Medium"}, {"id": 34, "category": "New sale", "feature": "Upload statement during offer creation", "description": "Allow the agent to upload the merchant's previous-provider statement when building the offer, not only at approval. The statement is used to (1) pre-fill fields when creating a lead (volume, MCC, card mix, etc.), (2) support more accurate pricing and reduce back-and-forth, and (3) feed the AI offer analysis so it can give the sales manager a recommendation to approve or reject.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item a: 'upload statement is there just as part of the approval flow but its not there as part of the offer creation').", "notes": "Distinct from the approval-view statement upload.", "priority": "Medium"}, {"id": 35, "category": "New sale", "feature": "MOTO pricing in calculator", "description": "MOTO (Mail Order / Telephone Order) is already supported in the pricing calculator as a surcharge on top of the base rate. This item confirms ongoing support and any refinements needed to the surcharge model.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item f: 'Moto/PBL are not there but they are in the calculator'); IMO1 #36 (Revamped MOTO onboarding); IMO1 #37 (MOTO self-service).", "notes": "Interlocks with IMO1 #36, #37.", "priority": "Medium"}, {"id": 36, "category": "New sale", "feature": "PBL (Pay by Link) pricing in calculator", "description": "Pay-by-Link (PBL) is not currently in the pricing calculator. Add it as a surcharge on top of the base rate, following the same model as MOTO.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item f).", "notes": "Paired with MOTO in Nicolo's note.", "priority": "Medium"}, {"id": 37, "category": "Offer management", "feature": "Delete / void offers", "description": "Cannot delete or void a draft/expired offer. Drafts accumulate and clutter back office; users cannot clean up test offers.", "countries": "IS, HU, CZ/SK", "refs": "Confluence IS 'Edit/Delete Offers' (Urgent); Adam Kubina, #pricing-calc-rollout-cz-sk.", "notes": "Sales App solves this via closing/losing a lead.", "priority": "Medium"}, {"id": 38, "category": "Offer management", "feature": "Search through offers", "description": "No search/filter in the Offers tab. Slow to find a specific offer when onboarding multiple merchants.", "countries": "IS, HR", "refs": "Confluence IS (under Edit/Delete Offers block); Branimir Zorko list, #pricing, 2026-04-08 (item #8).", "notes": "New Sales App removes standalone Offers tab; offers live inside leads.", "priority": "Medium"}, {"id": 39, "category": "New sale", "feature": "Bulk terminal rental reduction", "description": "Users need to change terminal rental pricing individually for each terminal. For merchants with multiple terminals this becomes tedious and error-prone. A design fix is needed — either a sensible default or a bulk edit across all selected terminals.", "countries": "CZ/SK, HR", "refs": "Confluence SP2 'Bulk terminal rental reduction' (Adam Kubina, CZ field); Branimir Zorko list, #pricing, 2026-04-08 (item #10).", "notes": "Considered in v2 prototype.", "priority": "Medium"}, {"id": 40, "category": "New sale", "feature": "ECOM plugin — CNP fees not shown", "description": "When agents add a store with the ECOM plugin, CNP fees are already displayed for unblended pricing, and for blended pricing the CNP rate matches the blended rate. The gap is specifically for IC++ (dynamic rate) offers: the estimated ICF and CSC costs for CNP transactions are not shown.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #1); Ivana Iseni, #temp-pricing-calc-global-rollout.", "notes": "Gap specific to IC++ offers.", "priority": "Medium"}, {"id": 41, "category": "New sale", "feature": "Shopify fee", "description": "For ECOM merchants using Shopify, IS adds 0.35% onto the blended fee to account for the Shopify fee. No way to configure this in the new flow.", "countries": "IS", "refs": "Confluence IS 'Shopify Fee' (Urgent, 2026-04-10 Sales Platform Office Hours).", "notes": "IS-specific configuration need.", "priority": "Medium"}, {"id": 42, "category": "Pricing model", "feature": "Delayed delivery risk price suggestion", "description": "Calculator automatically applies a delayed-delivery-risk premium per business activity code without knowing the merchant's actual risk profile. Inflates suggested rate for non-shipping merchants (e.g. hotels).", "countries": "IS", "refs": "SPLAT-657 (Backlog; e.g. 3.96% blended for hotels); Confluence IS 'Delayed Delivery Risk Price Suggestion' (Urgent).", "notes": "IS-specific calibration of risk premium.", "priority": "Medium"}, {"id": 43, "category": "New sale", "feature": "Virtual cards (ECOM)", "description": "Calculator does not allow the user to insert ecommerce virtual card volume, which bears significantly higher costs than regular ecommerce volume.", "countries": "IS", "refs": "Breno Cavour feedback 2026-04-22 (IS-specific item on virtual cards).", "notes": "Distinct from DCC items.", "priority": "Medium"}, {"id": 44, "category": "Offer management", "feature": "Sorting offers by TPV / requester / pricing", "description": "Request to enable sorting in the Offers list by TPV, requester, and pricing. The Offers screen will be deprecated with the new Sales App — offers will live inside leads, so this item is no longer needed in its original form.", "countries": "HU", "refs": "Confluence SP2 (HU sales teams, low); David Schmidt, #temp-pricing-calc-global-rollout, Oct 2025.", "notes": "Deprecated by new Sales App design.", "priority": "Low"}];
+const FEATURES = [
+  {"id": 1, "category": "Pricing model", "feature": "TPV tiering (dynamic price thresholds)", "description": "Pricing should change dynamically based on merchant TPV. E.g. customer onboarded at 1% with 10k TPV — if they process 15k then the price drops to 0.8%, and if they only do 5k then it increases to 1.2%.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item d: 'Include TPV tiering — price changes depending on tpv thresholds').", "notes": "Foundational pricing model change.", "priority": "High"},
+  {"id": 2, "category": "Pricing model", "feature": "Dynamic minimum fee", "description": "Minimum volume fee adjusts dynamically with expected TPV, instead of the fixed flat value used today.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback list shared 2026-04-22 via DM with Nicolo Meoli (item a: 'Dynamic pricing, start with dynamic minimum fee').", "notes": "Distinct from TPV tiering; can be built independently.", "priority": "High"},
+  {"id": 3, "category": "Pricing model", "feature": "Flat rate pricing", "description": "The customer pays a fixed fee for up to a specific TPV threshold and then they are charged a percentage. E.g. £50 up to 5,000 monthly TPV and then 1%.", "countries": "ES, potentially UK, IT", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item c: 'We need to include flat rate — relevant for Spain and maybe other markets'); related to Nicolo message 2026-04-24: 'support proper IC+ or flat fee'.", "notes": "Enables competitive entry in southern European markets.", "priority": "High"},
+  {"id": 4, "category": "Pricing model", "feature": "Real IC++ (scheme fee passthrough, not predicted)", "description": "True IC++ pricing where interchange and card scheme fees are passed through as actually charged, not predicted. Today scheme fees are estimated, creating deviation risk vs. competitors passing through actual fees.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item b: 'Real IC++'); Nicolo Meoli in #pricing 2026-04-09 (responding to Branimir #3): 'card scheme fees are predicted because we do not yet have the tooling in place to calculate them in real time'.", "notes": "Depends on CSF automation. Backend engine work, not a v2 prototype concern.", "priority": "High"},
+  {"id": 5, "category": "Pricing model", "feature": "Improvement of CSF prediction", "description": "Today we predict one card scheme fee to be applied to all transactions. We will define more granularity without going all the way to predict a per-transaction rate (e.g. one for CNP debit, CNP credit, CP debit, CP credit).", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item c: 'Automation of card scheme fees'); echoed in #mastercard-ic-calculation and Nicolo Meoli in #pricing, 2026-04-09.", "notes": "Backend engine work. Pre-req for Real IC++.", "priority": "High"},
+  {"id": 6, "category": "Pricing calculator new sale", "feature": "Company-level pricing (single legal entity)", "description": "Ability to create offers at the company level, with multi-store onboarding included.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item e: 'Price at the company level vs the organisation level — should be 2 separate features'); Filip Kordić, #temp-pricing-calc-global-rollout, 2026-03-06.", "notes": "Core to v2.", "priority": "High"},
+  {"id": 7, "category": "Pricing calculator new sale", "feature": "Organisation-level pricing (linked entities)", "description": "Ability to create offers at the organisation level, covering multiple companies under the same legal entity.", "countries": "HR", "refs": "Filip Kordić, #temp-pricing-calc-global-rollout, 2026-03-06 (thread 1772801094.577599); Nicolo Meoli 2026-04-24 (item e: organisation-level as separate feature).", "notes": "Calculator must be company-agnostic. Needs alignment with IMO1 scope on multi-company.", "priority": "Medium"},
+  {"id": 9, "category": "Approval Flow", "feature": "Multi-MID approval routing", "description": "Today the approval flow only applies to the first store onboarded through the pricing calculator (at MID level). For multi-MID merchants, additional MIDs bypass approval, even though the offer is created at CID level. With company-level pricing, approval should happen once at the company level, using take rate as the main metric.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #4).", "notes": "Solved by v2 via company-level approval (take rate as main metric). Depends on Company-level pricing.", "priority": "High"},
+  {"id": 10, "category": "Offer management", "feature": "Edit existing offers", "description": "Offers are immutable today — any change requires creating a new offer from scratch. Users want to edit an existing offer (typo, rate adjustment) without losing history.", "countries": "IS, HU, CZ/SK, HR", "refs": "SPLAT-550 (Backlog; edit scope); Confluence IS 'Edit/Delete Offers' (Urgent); Branimir Zorko list, #pricing, 2026-04-08 (item #6); Adam Kubina, #pricing-calc-rollout-cz-sk, 2026-01-28.", "notes": "The new Sales App (IMO1 #25) solves this since offers live inside a lead.", "priority": "High"},
+  {"id": 12, "category": "Pricing calculator upsell", "feature": "Self-upsell of products (merchant)", "description": "Merchant adds additional products (terminals, ECOM, MOTO, PBL) to an existing store/company via the Business Portal/App, with pricing calculated automatically. No seller involvement required.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item i); IMO1 #31; IMO1 #28.", "notes": "Direct dependency on IMO1 #31. Pricing calculator must expose self-serve pricing logic.", "priority": "High"},
+  {"id": 47, "category": "Pricing calculator upsell", "feature": "Self-upsell of stores (merchant)", "description": "Merchant adds a new store to an existing company via the Business Portal/App, with pricing calculated automatically and approval routed correctly. Expands the company structure without seller involvement.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item k).", "notes": "Self-service counterpart to the assisted store upsell flow.", "priority": "High"},
+  {"id": 13, "category": "Pricing calculator upsell", "feature": "Assisted upsell of products", "description": "Seller-assisted flow to add products (terminals, ECOM, MOTO, PBL) to an existing merchant with pricing calculated in the calculator. Today the calculator only supports new-sale flows.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item j); IMO1 #25 ('Revamped assisted upsell flow and pricing calculator').", "notes": "Direct dependency on IMO1 #25. A primary driver of v2 work.", "priority": "High"},
+  {"id": 14, "category": "Pricing calculator upsell", "feature": "Assisted upsell of stores", "description": "Seller-assisted flow to add a new store to an existing merchant, with pricing calculated per store under the company and approval routed correctly. Expands the company structure.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item k).", "notes": "Assisted counterpart to the self-service store upsell flow.", "priority": "High"},
+  {"id": 15, "category": "Pricing calculator new sale", "feature": "EPOS pricing in calculator", "description": "Support EPOS (integrated point-of-sale) as a product/subscription priceable within the calculator.", "countries": "All countries (UK first)", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item l: 'EPOS is not there'); IMO1 #29 (Teya POS onboarding).", "notes": "Interlocks with IMO1 #29. Significant for UK/growth markets.", "priority": "High"},
+  {"id": 16, "category": "Pricing calculator new sale", "feature": "DCC revenue share", "description": "Support DCC revenue-share offers where the merchant receives a share of DCC revenue. Today the calculator does not model merchant DCC revenue share at all.", "countries": "IS, HR", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item g: 'DCC revenue share is not there'); SPLAT-526 (DCC Revenue Share).", "notes": "Paired with DCC flexible margin.", "priority": "High"},
+  {"id": 17, "category": "Pricing calculator new sale", "feature": "DCC flexible margin", "description": "Let sales adjust the DCC margin per offer instead of using a single global rate. Merchants want up to 4% markup configurability.", "countries": "IS, HR", "refs": "SPLAT-526; #proj-dcc-flexible-pricing: Humphrey Kelly PRD + Tech Plan (2026-02); Hafliði Sigurðarson 2026-04 (IS members waiting for 4% markup).", "notes": "Known gap in v2. High demand in IS and HR. v2 prototype has surcharge toggle only.", "priority": "High"},
+  {"id": 18, "category": "Retention", "feature": "Retention tool for CR and sales", "description": "A tool for Customer Relations and sales to calculate retention offers (repricing with guardrails) for at-risk merchants. Distinct from new-sale pricing.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item h: 'Creating a retention tool for CR and sales to calculate retention offers').", "notes": "Pricing use case outside the current calculator scope; may need its own workflow.", "priority": "High"},
+  {"id": 19, "category": "Offer management", "feature": "Teya P&L visible to agent in offer", "description": "Show the agent Teya's full P&L on the offer (acquiring, POS rental, DCC, scheme, IC, interest on settlement delays). Gives the agent more ground to negotiate with the prospect and helps build trust during the conversation.", "countries": "PT", "refs": "Portugal request.", "notes": "v2 shows Teya take rate but full P&L breakdown still partial.", "priority": "High"},
+  {"id": 20, "category": "Approval Flow", "feature": "Fee deviation visibility on pending offers", "description": "Approvers should immediately see how far below minimum price a submitted offer is, as a % or bps deviation. Today only checks are Net Sales Revenue or manual TPV plug-ins.", "countries": "HU, HR", "refs": "David Schmidt (HU), #sales-stakeholders, 2026-04-13; Filip Kordić (HR), #temp-pricing-calc-global-rollout, 2026-03-06.", "notes": "Considered in v2 prototype.", "priority": "High"},
+  {"id": 21, "category": "Approval Flow", "feature": "Approval notification for seller", "description": "Notify the seller when their offer is approved or rejected. Today the only way to know is to check back office manually.", "countries": "UK, HU, HR", "refs": "IH-3558; Confluence SP2 'Missing notification to sellers and sales managers' (HU, High); Branimir Zorko list, #pricing, 2026-04-08 (item #5).", "notes": "In progress in existing calculator; included in v2.", "priority": "High"},
+  {"id": 22, "category": "Approval Flow", "feature": "Approval notification for sales manager", "description": "Notify the sales manager (approver) when an offer is assigned to them for review.", "countries": "UK, HU, HR", "refs": "IH-3558; Confluence SP2 'Missing notification to sellers and sales managers' (HU, High); Branimir Zorko list, #pricing, 2026-04-08 (item #5).", "notes": "In progress in existing calculator; included in v2.", "priority": "High"},
+  {"id": 23, "category": "Approval Flow", "feature": "AI offer analysis & approval recommendation for sales managers", "description": "AI analyses submitted offers against historical approvals, market benchmarks, and pricing policy, and gives the sales manager a recommendation (approve / do not approve). If 'do not approve', suggests the pricing at which the offer should be approved.", "countries": "All countries", "refs": "Bernardo Olinto feedback during Approval flow breakdown discussion with Nicolo Meoli, 2026-04-24.", "notes": "New item — not previously scoped. Related to Fee deviation visibility and Counteroffer flow.", "priority": "Medium"},
+  {"id": 24, "category": "Pricing calculator new sale", "feature": "Seasonal merchant pricing", "description": "Seasonal merchant pricing not set up correctly — dividing TPV by 12 months makes HR uncompetitive for merchants operating fewer than 6 months per year.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #7); Ivana Iseni GDM with Paulo Castro, 2026-02 (Mateo Lovrenčić model: divide by 6 months).", "notes": "Related to IMO1 #46 (Enhanced seasonality and one-off events declaration).", "priority": "High"},
+  {"id": 25, "category": "Offer management", "feature": "Visual presentation of offers to merchants", "description": "Improve how the offer is visually presented to the merchant — layout, branding, clarity of fee breakdown, professional appearance. Generated offer document today is hard to read and inconsistent.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item h: 'Visual presentation of offers to merchants').", "notes": "Within IMO1 scope; considered in Sales App and new registration flow.", "priority": "High"},
+  {"id": 26, "category": "Pricing calculator new sale", "feature": "Unblended offer customisation (per card brand / channel)", "description": "Enable individual rate negotiation for unblended offers, including AMEX & other scheme rates.", "countries": "UK, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item e).", "notes": "v2 supports multi-rate; customisation depth per offer limited.", "priority": "Medium"},
+  {"id": 27, "category": "Pricing calculator new sale", "feature": "Annual vs. monthly TPV as input", "description": "Allow the agent to enter merchant TPV as either annual or monthly, with the calculator deriving the other figure. Today input is monthly-only, penalising seasonal merchants and forcing manual conversions.", "countries": "HR, HU, CZ/SK", "refs": "Breno Cavour feedback 2026-04-22 (item f).", "notes": "Related to but distinct from Seasonal merchant pricing.", "priority": "Medium"},
+  {"id": 28, "category": "Approval Flow", "feature": "Counteroffer flow (manager adjusts + sends back with note)", "description": "When an offer is close to acceptable thresholds, managers cannot formally adjust values or structure a counterproposal back to the agent.", "countries": "HU, CZ/SK", "refs": "Confluence SP2 'Allow managers to create counteroffers' (Sales Managers source).", "notes": "Solved in v2 — managers adjust and send back with a note.", "priority": "Medium"},
+  {"id": 29, "category": "Offer management", "feature": "Offer templates by segment", "description": "Pre-built offer templates for common merchant segments (hospitality, retail, e-com) to speed up high-volume low-value deals.", "countries": "HR, HU", "refs": "Bernardo Olinto DM with Tiago Loriato Simões, 2025-08.", "notes": "Sales App will enable sharing an offer directly with the prospect via email.", "priority": "Medium"},
+  {"id": 31, "category": "Approval Flow", "feature": "Requester field on Offers list", "description": "Make the offer requester clearly visible in the main offer view without opening details or history.", "countries": "HU, HR", "refs": "EPSSD-445; Confluence SP2 (HU sales teams); David Schmidt, #temp-pricing-calc-global-rollout, Oct 2025.", "notes": "Considered in v2 prototype for Back Office.", "priority": "Medium"},
+  {"id": 32, "category": "Approval Flow", "feature": "Missing fields in approval view", "description": "Add membership plan, offer name (e.g. Thrive), and seasonality to the detailed offers page in Back Office and Partner Portal.", "countries": "HU, HR", "refs": "Confluence SP2 'Missing fields in approval view' (Pricing team, medium).", "notes": "Considered in v2 prototype.", "priority": "Medium"},
+  {"id": 34, "category": "Pricing calculator new sale", "feature": "Upload statement during offer creation", "description": "Allow the agent to upload the merchant's previous-provider statement when building the offer, not only at approval. The statement is used to (1) pre-fill fields when creating a lead (volume, MCC, card mix, etc.), (2) support more accurate pricing and reduce back-and-forth, and (3) feed the AI offer analysis so it can give the sales manager a recommendation to approve or reject.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item a: 'upload statement is there just as part of the approval flow but its not there as part of the offer creation').", "notes": "Distinct from the approval-view statement upload.", "priority": "Medium"},
+  {"id": 36, "category": "Pricing model", "feature": "PBL surcharge", "description": "Pay-by-Link (PBL) is not currently in the pricing calculator. Add it as a surcharge on top of the base rate, following the same model as MOTO.", "countries": "All countries", "refs": "Nicolo Meoli DM with Bernardo Olinto, 2026-04-24 (item f).", "notes": "Paired with MOTO in Nicolo's note.", "priority": "Medium"},
+  {"id": 37, "category": "Offer management", "feature": "Delete / void offers", "description": "Cannot delete or void a draft/expired offer. Drafts accumulate and clutter back office; users cannot clean up test offers.", "countries": "IS, HU, CZ/SK", "refs": "Confluence IS 'Edit/Delete Offers' (Urgent); Adam Kubina, #pricing-calc-rollout-cz-sk.", "notes": "Sales App solves this via closing/losing a lead.", "priority": "Medium"},
+  {"id": 38, "category": "Offer management", "feature": "Search through offers", "description": "No search/filter in the Offers tab. Slow to find a specific offer when onboarding multiple merchants.", "countries": "IS, HR", "refs": "Confluence IS (under Edit/Delete Offers block); Branimir Zorko list, #pricing, 2026-04-08 (item #8).", "notes": "New Sales App removes standalone Offers tab; offers live inside leads.", "priority": "Medium"},
+  {"id": 39, "category": "Pricing calculator new sale", "feature": "Bulk terminal rental reduction", "description": "Users need to change terminal rental pricing individually for each terminal. For merchants with multiple terminals this becomes tedious and error-prone. A design fix is needed — either a sensible default or a bulk edit across all selected terminals.", "countries": "CZ/SK, HR", "refs": "Confluence SP2 'Bulk terminal rental reduction' (Adam Kubina, CZ field); Branimir Zorko list, #pricing, 2026-04-08 (item #10).", "notes": "Considered in v2 prototype.", "priority": "Medium"},
+  {"id": 40, "category": "Pricing calculator new sale", "feature": "ECOM plugin — CNP fees not shown", "description": "When agents add a store with the ECOM plugin, CNP fees are already displayed for unblended pricing, and for blended pricing the CNP rate matches the blended rate. The gap is specifically for IC++ (dynamic rate) offers: the estimated ICF and CSC costs for CNP transactions are not shown.", "countries": "HR", "refs": "Branimir Zorko list, #pricing, 2026-04-08 (item #1); Ivana Iseni, #temp-pricing-calc-global-rollout.", "notes": "Gap specific to IC++ offers.", "priority": "Medium"},
+  {"id": 41, "category": "Pricing model", "feature": "E-commerce surcharges", "description": "Add a configurable surcharge on top of the blended fee for ECOM merchants using third-party e-commerce providers (e.g. Shopify, WooCommerce). Applies to all e-commerce providers, not just one.", "countries": "IS", "refs": "Confluence IS 'Shopify Fee' (Urgent, 2026-04-10 Sales Platform Office Hours).", "notes": "Generalised from the original Shopify-specific request.", "priority": "Medium"},
+  {"id": 42, "category": "Pricing calculator new sale", "feature": "Delayed delivery risk price suggestion", "description": "Calculator automatically applies a delayed-delivery-risk premium per business activity code without knowing the merchant's actual risk profile. Inflates suggested rate for non-shipping merchants (e.g. hotels).", "countries": "IS", "refs": "SPLAT-657 (Backlog; e.g. 3.96% blended for hotels); Confluence IS 'Delayed Delivery Risk Price Suggestion' (Urgent).", "notes": "IS-specific calibration of risk premium.", "priority": "Medium"},
+  {"id": 43, "category": "Pricing calculator new sale", "feature": "Virtual cards (ECOM)", "description": "Calculator does not allow the user to insert ecommerce virtual card volume, which bears significantly higher costs than regular ecommerce volume.", "countries": "IS", "refs": "Breno Cavour feedback 2026-04-22 (IS-specific item on virtual cards).", "notes": "Distinct from DCC items.", "priority": "Medium"},
+  {"id": 44, "category": "Offer management", "feature": "Sorting offers by TPV / requester / pricing", "description": "Request to enable sorting in the Offers list by TPV, requester, and pricing. The Offers screen will be deprecated with the new Sales App — offers will live inside leads, so this item is no longer needed in its original form.", "countries": "HU", "refs": "Confluence SP2 (HU sales teams, low); David Schmidt, #temp-pricing-calc-global-rollout, Oct 2025.", "notes": "Deprecated by new Sales App design.", "priority": "Low"},
+  {"id": 45, "category": "Pricing model", "feature": "Roll-out of contract in countries other than UK", "description": "Capability to onboard customers with contracts and use them as a pricing negotiation lever.", "countries": "All countries", "refs": "", "notes": "", "priority": "Medium"},
+  {"id": 46, "category": "Pricing calculator new sale", "feature": "Ability to negotiate terminal rent and PayOnce price", "description": "Ability to negotiate terminal rental fees and the PayOnce price within the calculator.", "countries": "All countries", "refs": "", "notes": "", "priority": "Medium"}
+];
 
-const CATEGORIES = ['Pricing model','New sale','Upsell','Approval','Offer management','DCC','Retention'];
+const CATEGORIES = ['Pricing model','Pricing calculator new sale','Pricing calculator upsell','Approval Flow','Offer management','Retention'];
 const CATEGORY_COLORS = {
   'Pricing model':    { bg: '#E1D5E7', text: '#4A2C6A' },
-  'New sale':         { bg: '#D5E8D4', text: '#2B5429' },
-  'Upsell':           { bg: '#FFF2CC', text: '#7A5E00' },
-  'Approval':         { bg: '#F8CECC', text: '#8B1A12' },
+  'Pricing calculator new sale':         { bg: '#D5E8D4', text: '#2B5429' },
+  'Pricing calculator upsell':           { bg: '#FFF2CC', text: '#7A5E00' },
+  'Approval Flow':    { bg: '#F8CECC', text: '#8B1A12' },
   'Offer management': { bg: '#DAE8FC', text: '#1E3A8A' },
-  'DCC':              { bg: '#FAD9D5', text: '#8B1A12' },
   'Retention':        { bg: '#E8E8E8', text: '#444' },
 };
 const COUNTRIES = [
@@ -111,18 +163,41 @@ const COUNTRY_COLORS = {
   'IT': '#5f4f30', 'ES': '#fbbf24'
 };
 
-const STATE_KEY = 'prio-state-v4';
-const ROLE_KEY = 'prio-role-v4';
+// ---------- FIREBASE ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyBJoMXuq2bXgyii_upZQUFKyOCL5Aed3HY",
+  authDomain: "teya-pricing-priorities.firebaseapp.com",
+  databaseURL: "https://teya-pricing-priorities-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "teya-pricing-priorities",
+  storageBucket: "teya-pricing-priorities.firebasestorage.app",
+  messagingSenderId: "142719708176",
+  appId: "1:142719708176:web:4cdf88ee9622d11255ae95"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const rootRef = db.ref('/');
 
-// State shape:
-// { scores: { "UK": { 1: 3, 2: 1, ... }, ... }, customFeatures: [{ id, country, category, feature, description, ts }] }
-// In this local-only version, every user's data lives here. Firebase will
-// replace this with a shared store.
+const ROLE_KEY = 'prio-role-v5';
+const USER_KEY = 'prio-user-id-v1';
 
+// Persistent userId so the same browser can re-claim its country
+function getUserId() {
+  let id = localStorage.getItem(USER_KEY);
+  if (!id) {
+    id = 'u-' + Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
+    localStorage.setItem(USER_KEY, id);
+  }
+  return id;
+}
+const USER_ID = getUserId();
+
+// State shape mirrors Firebase /
+// { scores: { "UK": { 1: 3, ... } }, customFeatures: { keyId: {...} }, submissions: { "UK": {...} }, claims: { "UK": { userId, claimedAt } } }
 let role = loadRole();
-let state = loadState();
+let state = { scores: {}, customFeatures: {}, submissions: {}, claims: {} };
 let categoryFilter = CATEGORIES.slice();
-function allFeatures() { return FEATURES.concat(state.customFeatures || []); }
+let showOnlyMissing = false;
+let firstSnapshot = true;
 
 function loadRole() {
   try { return JSON.parse(localStorage.getItem(ROLE_KEY) || 'null'); } catch(e) { return null; }
@@ -132,21 +207,90 @@ function saveRole(r) {
   if (r) localStorage.setItem(ROLE_KEY, JSON.stringify(r));
   else localStorage.removeItem(ROLE_KEY);
 }
-function loadState() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
-    if (saved && saved.scores) {
-      if (!saved.customFeatures) saved.customFeatures = [];
-      return saved;
+
+// Subscribe to live updates
+rootRef.on('value', snap => {
+  const v = snap.val() || {};
+  state.scores = v.scores || {};
+  state.customFeatures = v.customFeatures || {};
+  state.submissions = v.submissions || {};
+  state.claims = v.claims || {};
+  // If our claimed country was released, drop our role
+  if (role && role.type === 'voter') {
+    const claim = state.claims[role.country];
+    if (!claim || claim.userId !== USER_ID) {
+      // no longer ours
+      saveRole(null);
+      showLanding();
+      return;
     }
-  } catch(e) {}
-  return { scores: {}, customFeatures: [] };
+  }
+  render();
+  firstSnapshot = false;
+});
+
+function customFeaturesArr() {
+  return Object.keys(state.customFeatures || {}).map(k => Object.assign({ _key: k }, state.customFeatures[k]));
 }
-function saveState() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+function allFeatures() { return FEATURES.concat(customFeaturesArr()); }
+function requiredFeatureIds() { return FEATURES.map(f => f.id); }
+function votedRequiredCount(country) {
+  return requiredFeatureIds().filter(id => hasVoted(country, id)).length;
+}
+function missingRequiredIds(country) {
+  return requiredFeatureIds().filter(id => !hasVoted(country, id));
+}
+function isSubmitted(country) {
+  return !!(state.submissions && state.submissions[country]);
+}
+function markSubmitted(country) {
+  db.ref('/submissions/' + country).set({ submittedAt: Date.now(), votedCount: votedRequiredCount(country) });
+}
+function unsubmit(country) {
+  db.ref('/submissions/' + country).remove();
+}
+
+// Country claim helpers
+function claimCountry(country) {
+  return db.ref('/claims/' + country).transaction(curr => {
+    if (curr && curr.userId && curr.userId !== USER_ID) return; // abort
+    return { userId: USER_ID, claimedAt: Date.now() };
+  }).then(res => {
+    if (!res.committed) throw new Error('Country already claimed');
+    return res.snapshot.val();
+  });
+}
+function releaseClaim(country) {
+  return db.ref('/claims/' + country).remove();
+}
+function isClaimedByMe(country) {
+  return state.claims && state.claims[country] && state.claims[country].userId === USER_ID;
+}
+function isClaimedByOther(country) {
+  return state.claims && state.claims[country] && state.claims[country].userId && state.claims[country].userId !== USER_ID;
+}
+
+// Reset utility for testing — append ?reset=1 to URL
+if (new URLSearchParams(location.search).get('reset') === '1') {
+  if (confirm('Wipe all votes, custom features, submissions, and claims?')) {
+    Promise.all([
+      db.ref('/scores').remove(),
+      db.ref('/customFeatures').remove(),
+      db.ref('/submissions').remove(),
+      db.ref('/claims').remove()
+    ]).then(() => {
+      saveRole(null);
+      localStorage.removeItem(USER_KEY);
+      location.href = location.pathname;
+    });
+  } else {
+    history.replaceState({}, '', location.pathname);
+  }
+}
 
 function addCustomFeature(payload) {
-  if (!state.customFeatures) state.customFeatures = [];
-  const id = 'C' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  const ref = db.ref('/customFeatures').push();
+  const id = ref.key;
   const f = {
     id: id,
     custom: true,
@@ -157,43 +301,47 @@ function addCustomFeature(payload) {
     countries: role.country,
     ts: Date.now()
   };
-  state.customFeatures.push(f);
-  // auto-score "Critical" for the proposer if they want — but better leave it neutral so they explicitly score
-  saveState();
-  render();
+  ref.set(f);
   return f;
 }
 function updateCustomFeature(id, payload) {
-  const f = (state.customFeatures || []).find(x => x.id === id);
-  if (!f) return;
-  Object.assign(f, payload);
-  saveState();
-  render();
+  db.ref('/customFeatures/' + id).update(payload);
 }
 function deleteCustomFeature(id) {
-  state.customFeatures = (state.customFeatures || []).filter(x => x.id !== id);
-  // remove all scores for this feature
+  // remove the feature
+  db.ref('/customFeatures/' + id).remove();
+  // remove all scores for this feature across countries
   Object.keys(state.scores || {}).forEach(c => {
-    if (state.scores[c] && state.scores[c][id] != null) delete state.scores[c][id];
+    if (state.scores[c] && state.scores[c][id] != null) {
+      db.ref('/scores/' + c + '/' + id).remove();
+    }
   });
-  saveState();
-  render();
 }
 
 function getScore(country, featureId) {
-  return (state.scores && state.scores[country] && state.scores[country][featureId]) || 0;
+  if (state.scores && state.scores[country] && state.scores[country][featureId] != null) return state.scores[country][featureId];
+  return null; // null = not voted
+}
+function hasVoted(country, featureId) {
+  return state.scores && state.scores[country] && state.scores[country][featureId] != null;
 }
 function setScore(country, featureId, value) {
-  if (!state.scores) state.scores = {};
-  if (!state.scores[country]) state.scores[country] = {};
-  if (!value) delete state.scores[country][featureId];
-  else state.scores[country][featureId] = value;
-  saveState();
-  render();
+  const path = '/scores/' + country + '/' + featureId;
+  // clicking the same value again = un-vote
+  if (state.scores[country] && state.scores[country][featureId] === value) {
+    db.ref(path).remove();
+  } else {
+    db.ref(path).set(value);
+  }
+}
+function scoreValue(country, featureId) {
+  // numeric value for totals — unvoted counts as 0
+  const s = getScore(country, featureId);
+  return s == null ? 0 : s;
 }
 function totalScore(featureId) {
   let t = 0;
-  COUNTRY_CODES.forEach(c => { t += getScore(c, featureId); });
+  COUNTRY_CODES.forEach(c => { t += scoreValue(c, featureId); });
   return t;
 }
 
@@ -261,15 +409,38 @@ function renderLanding() {
   const grid = document.getElementById('country-grid');
   grid.innerHTML = '';
   COUNTRIES.forEach(c => {
+    const claimedByMe = isClaimedByMe(c.code);
+    const claimedByOther = isClaimedByOther(c.code);
     const btn = document.createElement('button');
-    btn.className = 'p-3 rounded-xl border border-[#756b571a] bg-white hover:bg-[#f6f5f3] transition text-left';
+    let classes = 'p-3 rounded-xl border text-left transition';
+    if (claimedByMe) classes += ' bg-white border-[#090806ec]';
+    else if (claimedByOther) classes += ' bg-[#f6f5f3] border-[#756b571a] cursor-not-allowed opacity-60';
+    else classes += ' bg-white border-[#756b571a] hover:bg-[#f6f5f3]';
+    btn.className = classes;
+
+    let badge = '';
+    if (claimedByMe) badge = '<span class="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded" style="background:#16a34a22; color:#15803d">Yours ✓</span>';
+    else if (claimedByOther) badge = '<span class="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded" style="background:#f6f5f3; color:#211c1266">Taken</span>';
+
     btn.innerHTML =
       '<div class="flex items-center gap-2 mb-1">' +
         '<span class="w-2 h-2 rounded-full" style="background:' + COUNTRY_COLORS[c.code] + '"></span>' +
         '<span class="text-[13px] font-semibold">' + c.code + '</span>' +
+        badge +
       '</div>' +
       '<div class="text-[12px] text-[#16140e8c]">' + c.label + '</div>';
-    btn.onclick = () => { saveRole({ type: 'voter', country: c.code }); showApp(); };
+
+    btn.disabled = claimedByOther;
+    btn.onclick = () => {
+      if (claimedByOther) return;
+      claimCountry(c.code).then(() => {
+        saveRole({ type: 'voter', country: c.code });
+        showApp();
+      }).catch(err => {
+        alert(c.label + ' was just claimed by another country leader. Please pick a different country.');
+        renderLanding();
+      });
+    };
     grid.appendChild(btn);
   });
   document.getElementById('role-facilitator').onclick = () => { saveRole({ type: 'facilitator' }); showApp(); };
@@ -286,8 +457,18 @@ function showLanding() {
 }
 
 document.getElementById('change-role-btn').onclick = () => {
-  saveRole(null);
-  showLanding();
+  if (role && role.type === 'voter') {
+    if (!confirm('Release ' + role.country + '? Your votes are saved, but the country will become available for someone else to claim.')) return;
+    releaseClaim(role.country).then(() => {
+      saveRole(null);
+      showLanding();
+      renderLanding();
+    });
+  } else {
+    saveRole(null);
+    showLanding();
+    renderLanding();
+  }
 };
 
 document.getElementById('export-btn').onclick = () => {
@@ -299,10 +480,13 @@ document.getElementById('export-btn').onclick = () => {
       f.id, f.category, f.feature,
       f.custom ? ('Added by ' + (f.country || '')) : 'Original list',
       f.priority || '', f.countries || '', total,
-      ...COUNTRY_CODES.map(c => getScore(c, f.id)),
+      ...COUNTRY_CODES.map(c => hasVoted(c, f.id) ? scoreValue(c, f.id) : ''),
       (f.description || '').split(NL).join(' ')
     ]);
   });
+  // Submission status row at the end
+  rows.push([]);
+  rows.push(['Submission status', '', '', '', '', '', '', ...COUNTRY_CODES.map(c => isSubmitted(c) ? 'Submitted ' + new Date(state.submissions[c].submittedAt).toLocaleString() : 'Not submitted'), '']);
   const csv = rows.map(r => r.map(v => {
     const s = String(v == null ? '' : v);
     return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
@@ -316,7 +500,13 @@ document.getElementById('export-btn').onclick = () => {
 
 // ---------- RENDER ----------
 function render() {
-  if (!role) { showLanding(); return; }
+  // Always clean up the floating submit bar; voter view re-creates it as needed
+  const existingBar = document.getElementById('submit-bar');
+  if (existingBar) existingBar.remove();
+  const mainEl = document.getElementById('main');
+  if (mainEl) mainEl.style.paddingBottom = '';
+
+  if (!role) { renderLanding(); showLanding(); return; }
   const roleLine = document.getElementById('role-line');
   const progressBadge = document.getElementById('progress-badge');
   const exportBtn = document.getElementById('export-btn');
@@ -324,9 +514,19 @@ function render() {
   if (role.type === 'voter') {
     const color = COUNTRY_COLORS[role.country];
     const label = (COUNTRIES.find(c => c.code === role.country) || {}).label || role.country;
-    roleLine.innerHTML = '<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full" style="background:' + color + '"></span>Voting as <span class="font-semibold" style="color:' + color + '">' + label + '</span></span>';
-    const count = Object.keys((state.scores && state.scores[role.country]) || {}).length;
-    progressBadge.innerHTML = '<span class="tabular-nums font-medium">' + count + '</span> feature' + (count === 1 ? '' : 's') + ' scored';
+    const submitted = isSubmitted(role.country);
+    const submittedBadge = submitted ? ' <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold" style="background:#16a34a22; color:#15803d">Submitted ✓</span>' : '';
+    roleLine.innerHTML = '<span class="inline-flex items-center gap-1.5 flex-wrap"><span class="w-1.5 h-1.5 rounded-full" style="background:' + color + '"></span>Voting as <span class="font-semibold" style="color:' + color + '">' + label + '</span>' + submittedBadge + '</span>';
+    const total = requiredFeatureIds().length;
+    const done = votedRequiredCount(role.country);
+    const pct = total ? Math.round(done / total * 100) : 0;
+    progressBadge.innerHTML =
+      '<div class="flex items-center gap-2">' +
+        '<div class="text-[12px] tabular-nums"><span class="font-semibold">' + done + '</span> / ' + total + '</div>' +
+        '<div class="w-32 h-2 rounded-full bg-[#f6f5f3] overflow-hidden">' +
+          '<div class="h-full" style="width:' + pct + '%; background:' + color + '; transition: width 200ms ease"></div>' +
+        '</div>' +
+      '</div>';
     progressBadge.classList.remove('hidden');
     progressBadge.classList.add('flex');
     exportBtn.classList.add('hidden');
@@ -367,12 +567,17 @@ function renderMain() {
 
 // ---------- VOTER VIEW ----------
 function renderVoterView(root) {
+  const total = requiredFeatureIds().length;
+  const done = votedRequiredCount(role.country);
+  const missing = total - done;
+  const submitted = isSubmitted(role.country);
+
   const hint = document.createElement('div');
   hint.className = 'mb-5 bg-white rounded-xl border border-[#756b571a] p-4 flex items-start gap-4';
   hint.innerHTML =
     '<div class="flex-1 text-[13px] text-[#16140e8c]">' +
       '<div class="font-semibold text-[#090806ec] mb-1">How to score</div>' +
-      'Tap a score for each feature you care about. Leave blank for features that are not important to your country. There is no limit — score as many as you like, but be honest about what is truly Critical vs Nice to have. Missing something? Add it with the button on the right.' +
+      '<span class="font-semibold">0</span> Not relevant for my country · <span class="font-semibold">1</span> Nice to have · <span class="font-semibold">2</span> Important · <span class="font-semibold">3</span> Critical. Score each feature for your country — your progress is saved as you go. Missing something? Add it with the button on the right.' +
     '</div>' +
     '<button id="add-feature-btn" class="flex-shrink-0 px-3 py-2 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-black transition flex items-center gap-1.5">' +
       '<span class="text-[15px] leading-none">+</span> Add a feature' +
@@ -380,8 +585,25 @@ function renderVoterView(root) {
   root.appendChild(hint);
   document.getElementById('add-feature-btn').onclick = () => openAddFeatureModal(null);
 
+  // Filter toggle
+  if (missing > 0) {
+    const filter = document.createElement('div');
+    filter.className = 'mb-4 flex items-center gap-2';
+    filter.innerHTML =
+      '<button id="toggle-missing" class="chip px-3 py-1.5 rounded-full text-[12px] font-medium border ' + (showOnlyMissing ? 'border-[#090806ec] bg-[#090806ec] text-white' : 'border-[#756b5733] bg-white text-[#16140e8c]') + '">' +
+        (showOnlyMissing ? 'Showing what\'s left to score' : 'Show only what\'s left to score') +
+      '</button>';
+    root.appendChild(filter);
+    document.getElementById('toggle-missing').onclick = () => { showOnlyMissing = !showOnlyMissing; render(); };
+  } else {
+    showOnlyMissing = false;
+  }
+
   CATEGORIES.forEach(cat => {
-    const inCat = allFeatures().filter(f => f.category === cat && categoryFilter.includes(cat));
+    let inCat = allFeatures().filter(f => f.category === cat && categoryFilter.includes(cat));
+    if (showOnlyMissing) {
+      inCat = inCat.filter(f => !f.custom && !hasVoted(role.country, f.id));
+    }
     if (inCat.length === 0) return;
     const sec = document.createElement('section');
     sec.className = 'mb-6';
@@ -398,6 +620,110 @@ function renderVoterView(root) {
     sec.appendChild(grid);
     root.appendChild(sec);
   });
+
+  // Submit bar (sticky at bottom of content)
+  renderSubmitBar(root);
+}
+
+function renderSubmitBar(root) {
+  const total = requiredFeatureIds().length;
+  const done = votedRequiredCount(role.country);
+  const missing = total - done;
+  const submitted = isSubmitted(role.country);
+  const ready = missing === 0;
+
+  // Remove any prior sticky bar and add bottom padding to main so cards aren't hidden behind it
+  const existing = document.getElementById('submit-bar');
+  if (existing) existing.remove();
+  const main = document.getElementById('main');
+  if (main) main.style.paddingBottom = '140px';
+
+  const wrap = document.createElement('div');
+  wrap.id = 'submit-bar';
+  wrap.className = 'fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#756b571a] shadow-[0_-4px_16px_rgba(0,0,0,0.04)]';
+  const bar = document.createElement('div');
+  bar.className = 'max-w-[1400px] mx-auto px-6 py-4 flex items-center gap-4 flex-wrap';
+  wrap.appendChild(bar);
+  let leftHtml;
+  if (submitted) {
+    const ts = new Date(state.submissions[role.country].submittedAt).toLocaleString();
+    leftHtml =
+      '<div class="flex-1">' +
+        '<div class="flex items-center gap-2 mb-1">' +
+          '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold" style="background:#16a34a22; color:#15803d">Submitted ✓</span>' +
+          '<span class="text-[13px] text-[#16140e8c]">' + ts + '</span>' +
+        '</div>' +
+        '<div class="text-[13px]">Thanks! You can still edit your scores until Wednesday EOD. If you change anything, re-submit.</div>' +
+      '</div>';
+  } else if (ready) {
+    leftHtml =
+      '<div class="flex-1">' +
+        '<div class="text-[15px] font-semibold mb-0.5">You\'re ready to submit ✓</div>' +
+        '<div class="text-[13px] text-[#16140e8c]">Submit when you want — you can still edit until Wednesday EOD.</div>' +
+      '</div>';
+  } else if (done === 0) {
+    leftHtml =
+      '<div class="flex-1">' +
+        '<div class="text-[15px] font-semibold mb-0.5">Score features to get started</div>' +
+        '<div class="text-[13px] text-[#16140e8c]">No rush — your progress is saved. You can leave and come back any time before Wednesday EOD.</div>' +
+      '</div>';
+  } else {
+    leftHtml =
+      '<div class="flex-1">' +
+        '<div class="text-[15px] font-semibold mb-0.5">Keep going</div>' +
+        '<div class="text-[13px] text-[#16140e8c]">Your progress is saved. Submit when all features are scored — you have until Wednesday EOD.</div>' +
+      '</div>';
+  }
+
+  let rightHtml;
+  if (submitted) {
+    rightHtml =
+      '<div class="flex gap-2">' +
+        '<button id="resubmit-btn" class="px-4 py-2 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-black' + (ready ? '' : ' opacity-50 cursor-not-allowed') + '"' + (ready ? '' : ' disabled') + '>Re-submit</button>' +
+        '<button id="unsubmit-btn" class="px-4 py-2 rounded-lg bg-white text-[#16140e8c] text-[13px] font-medium border border-[#756b5733] hover:bg-[#f6f5f3]">Unsubmit</button>' +
+      '</div>';
+  } else {
+    rightHtml =
+      '<button id="submit-btn" class="px-5 py-2.5 rounded-lg ' + (ready ? 'bg-[#090806ec] text-white hover:bg-black' : 'bg-[#f6f5f3] text-[#211c1266] cursor-not-allowed') + ' text-[14px] font-semibold"' + (ready ? '' : ' disabled') + '>Submit votes</button>';
+  }
+
+  bar.innerHTML = leftHtml + rightHtml;
+  document.body.appendChild(wrap);
+
+  const subBtn = document.getElementById('submit-btn');
+  if (subBtn) subBtn.onclick = () => openSubmitConfirm();
+  const reBtn = document.getElementById('resubmit-btn');
+  if (reBtn && ready) reBtn.onclick = () => openSubmitConfirm(true);
+  const unBtn = document.getElementById('unsubmit-btn');
+  if (unBtn) unBtn.onclick = () => {
+    if (confirm('Unsubmit your votes? You can resubmit anytime before Wednesday EOD.')) {
+      unsubmit(role.country);
+    }
+  };
+}
+
+function openSubmitConfirm(isResubmit) {
+  const total = requiredFeatureIds().length;
+  const done = votedRequiredCount(role.country);
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+  overlay.innerHTML =
+    '<div class="absolute inset-0 bg-black/40"></div>' +
+    '<div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-[460px] p-6">' +
+      '<h2 class="text-[18px] font-semibold mb-1">' + (isResubmit ? 'Re-submit your votes?' : 'Submit your votes?') + '</h2>' +
+      '<p class="text-[13px] text-[#16140e8c] mb-5">You scored <span class="font-semibold">' + done + '</span> of ' + total + ' features for ' + role.country + '. You can come back and edit until Wednesday EOD.</p>' +
+      '<div class="flex justify-end gap-2">' +
+        '<button id="confirm-cancel" class="px-4 py-2 rounded-lg text-[13px] font-medium border border-[#756b5733] hover:bg-[#f6f5f3]">Cancel</button>' +
+        '<button id="confirm-submit" class="px-4 py-2 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-black">' + (isResubmit ? 'Re-submit' : 'Submit') + '</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  document.getElementById('confirm-cancel').onclick = close;
+  document.getElementById('confirm-submit').onclick = () => {
+    markSubmitted(role.country);
+    close();
+  };
 }
 
 function renderVoterCard(f) {
@@ -413,7 +739,7 @@ function renderVoterCard(f) {
   left.className = 'min-w-0 cursor-pointer';
   const customBadge = f.custom
     ? '<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style="background:#e1e51a33; color:#5a6500">+ Added' + (f.country ? ' by ' + escapeHtml(f.country) : '') + '</span>'
-    : '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>';
+    : '';
   left.innerHTML =
     '<div class="flex items-center gap-2 mb-1 flex-wrap">' +
       '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + f.category + '</span>' +
@@ -435,20 +761,20 @@ function renderVoterCard(f) {
     }, 0);
   }
 
+  const voted = hasVoted(role.country, f.id);
   const right = document.createElement('div');
   right.className = 'flex items-center gap-1';
   [0, 1, 2, 3].forEach(v => {
-    const active = myScore === v;
+    const active = voted && myScore === v;
     const btn = document.createElement('button');
     btn.className = 'score-btn w-10 h-10 rounded-lg text-[13px] font-semibold border ' + (active ? 'active' : '');
     if (active) {
-      if (v === 0) { btn.style.background = '#f6f5f3'; btn.style.color = '#16140e8c'; btn.style.borderColor = '#756b5733'; }
-      else { btn.style.background = COUNTRY_COLORS[role.country]; btn.style.color = 'white'; btn.style.borderColor = COUNTRY_COLORS[role.country]; }
+      btn.style.background = COUNTRY_COLORS[role.country]; btn.style.color = 'white'; btn.style.borderColor = COUNTRY_COLORS[role.country];
     } else {
       btn.style.background = 'white'; btn.style.color = '#16140e8c'; btn.style.borderColor = '#756b5733';
     }
     btn.textContent = v;
-    btn.title = ['None','Nice to have','Important','Critical'][v];
+    btn.title = ['Not relevant for my country','Nice to have','Important','Critical'][v];
     btn.onclick = e => { e.stopPropagation(); setScore(role.country, f.id, v); };
     right.appendChild(btn);
   });
@@ -464,16 +790,56 @@ function renderFacilitatorView(root) {
   summary.className = 'mb-5 bg-white rounded-xl border border-[#756b571a] p-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 text-center';
   const totalFeatures = allFeatures().length;
   const customCount = (state.customFeatures || []).length;
+  const requiredTotal = requiredFeatureIds().length;
   summary.innerHTML = '<div><div class="text-[11px] uppercase tracking-[1.5px] text-[#211c1266] font-semibold">Features</div><div class="text-[22px] font-semibold tabular-nums mt-1">' + totalFeatures + '</div>' + (customCount ? '<div class="text-[11px] text-[#211c1266] tabular-nums">' + customCount + ' added</div>' : '') + '</div>' +
     COUNTRY_CODES.map(c => {
       const color = COUNTRY_COLORS[c];
-      const scored = Object.keys((state.scores && state.scores[c]) || {}).length;
-      const total = allFeatures().reduce((s, f) => s + getScore(c, f.id), 0);
+      const voted = votedRequiredCount(c);
+      const total = allFeatures().reduce((s, f) => s + scoreValue(c, f.id), 0);
+      const submitted = isSubmitted(c);
+      const statusBadge = submitted
+        ? '<div class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold mt-1" style="background:#16a34a22; color:#15803d">Submitted ✓</div>'
+        : voted === requiredTotal
+          ? '<div class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold mt-1" style="background:#fff7e6; color:#a05a00">Ready, not submitted</div>'
+          : '<div class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold mt-1" style="background:#f6f5f3; color:#211c1266">' + (requiredTotal - voted) + ' missing</div>';
       return '<div><div class="text-[11px] uppercase tracking-[1.5px] font-semibold" style="color:' + color + '">' + c + '</div>' +
         '<div class="text-[22px] font-semibold tabular-nums mt-1">' + total + '</div>' +
-        '<div class="text-[11px] text-[#211c1266] tabular-nums">' + scored + ' scored</div></div>';
+        '<div class="text-[11px] text-[#211c1266] tabular-nums">' + voted + ' / ' + requiredTotal + ' scored</div>' +
+        statusBadge + '</div>';
     }).join('');
   root.appendChild(summary);
+
+  // Claims management
+  const claimsBar = document.createElement('div');
+  claimsBar.className = 'mb-5 bg-white rounded-xl border border-[#756b571a] p-4';
+  const claimedCountries = COUNTRY_CODES.filter(c => state.claims && state.claims[c]);
+  const unclaimedCountries = COUNTRY_CODES.filter(c => !(state.claims && state.claims[c]));
+  claimsBar.innerHTML =
+    '<div class="flex items-center justify-between mb-2 flex-wrap gap-2">' +
+      '<div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c]">Country claims · ' + claimedCountries.length + ' / ' + COUNTRY_CODES.length + '</div>' +
+      '<div class="text-[11px] text-[#211c1266]">Click ✕ to release a country and free it up for someone else.</div>' +
+    '</div>' +
+    '<div class="flex flex-wrap gap-2">' +
+      COUNTRY_CODES.map(c => {
+        const color = COUNTRY_COLORS[c];
+        const claimed = state.claims && state.claims[c];
+        if (claimed) {
+          const ts = new Date(claimed.claimedAt).toLocaleString();
+          return '<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[12px] font-medium border" style="border-color:' + color + '; background:' + color + '14; color:' + color + '" title="Claimed ' + ts + '">' +
+            c + '<button class="release-claim-btn ml-1 w-4 h-4 rounded hover:bg-white/40 inline-flex items-center justify-center text-[11px]" data-country="' + c + '" title="Release claim">✕</button></div>';
+        }
+        return '<div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[12px] font-medium border border-[#756b5733] bg-white text-[#211c1266]">' + c + ' <span class="text-[10px] text-[#211c1266]">free</span></div>';
+      }).join('') +
+    '</div>';
+  root.appendChild(claimsBar);
+  claimsBar.querySelectorAll('.release-claim-btn').forEach(btn => {
+    btn.onclick = () => {
+      const c = btn.dataset.country;
+      if (confirm('Release ' + c + '? The country leader will lose access and another leader can claim it.')) {
+        releaseClaim(c);
+      }
+    };
+  });
 
   // Sort options
   const sortBar = document.createElement('div');
@@ -526,13 +892,14 @@ function renderResultCard(f, rank) {
     '<h3 class="text-[14px] leading-[20px] font-semibold mb-1">' + escapeHtml(f.feature) + '</h3>' +
     '<div class="flex gap-1 mt-2">' +
       COUNTRY_CODES.map(c => {
-        const s = getScore(c, f.id);
+        const s = scoreValue(c, f.id);
+        const v = hasVoted(c, f.id);
         const color = COUNTRY_COLORS[c];
-        const bg = s === 3 ? color : s === 2 ? color + '80' : s === 1 ? color + '33' : '#f6f5f3';
-        const fg = s >= 2 ? 'white' : s === 1 ? color : '#211c1266';
-        const bd = s > 0 ? color : '#756b5733';
+        const bg = !v ? '#f6f5f3' : s === 3 ? color : s === 2 ? color + '80' : s === 1 ? color + '33' : color + '18';
+        const fg = !v ? '#211c1266' : s >= 2 ? 'white' : s === 1 ? color : color;
+        const bd = v ? color : '#756b5733';
         return '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border" style="background:' + bg + '; color:' + fg + '; border-color:' + bd + '">' +
-          c + '<span class="tabular-nums">' + s + '</span></span>';
+          c + '<span class="tabular-nums">' + (v ? s : '—') + '</span></span>';
       }).join('') +
     '</div>';
   mid.onclick = () => openDrawer(f);
@@ -557,18 +924,19 @@ function openDrawer(f) {
   let scoreBlock = '';
   if (role.type === 'voter') {
     const myScore = getScore(role.country, f.id);
+    const myVoted = hasVoted(role.country, f.id);
     scoreBlock =
       '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Your score · ' + role.country + '</div>' +
       '<div class="flex gap-1">' +
         [0,1,2,3].map(v => {
-          const active = myScore === v;
-          const bg = active && v > 0 ? COUNTRY_COLORS[role.country] : active ? '#f6f5f3' : 'white';
-          const fg = active && v > 0 ? 'white' : '#16140e8c';
-          const border = active && v > 0 ? COUNTRY_COLORS[role.country] : '#756b5733';
+          const active = myVoted && myScore === v;
+          const bg = active ? COUNTRY_COLORS[role.country] : 'white';
+          const fg = active ? 'white' : '#16140e8c';
+          const border = active ? COUNTRY_COLORS[role.country] : '#756b5733';
           return '<button class="drawer-score-btn flex-1 py-2 rounded-lg text-[13px] font-semibold border transition" data-value="' + v + '" style="background:' + bg + '; color:' + fg + '; border-color:' + border + '">' + v + '</button>';
         }).join('') +
       '</div>' +
-      '<div class="text-[11px] text-[#211c1266] mt-2">0 · None &nbsp;·&nbsp; 1 · Nice to have &nbsp;·&nbsp; 2 · Important &nbsp;·&nbsp; 3 · Critical</div></div>';
+      '<div class="text-[11px] text-[#211c1266] mt-2">0 · Not relevant &nbsp;·&nbsp; 1 · Nice to have &nbsp;·&nbsp; 2 · Important &nbsp;·&nbsp; 3 · Critical</div></div>';
   } else {
     // facilitator: show all country scores
     scoreBlock =
@@ -576,16 +944,17 @@ function openDrawer(f) {
       '<div class="bg-white border border-[#756b571a] rounded-lg p-3 space-y-2">' +
         COUNTRY_CODES.map(c => {
           const s = getScore(c, f.id);
+          const v = hasVoted(c, f.id);
           const color = COUNTRY_COLORS[c];
           return '<div class="flex items-center justify-between"><span class="text-[13px] font-medium">' + c + '</span>' +
-            '<span class="text-[13px] tabular-nums font-semibold" style="color:' + (s > 0 ? color : '#211c1266') + '">' + (s || '—') + '</span></div>';
+            '<span class="text-[13px] tabular-nums font-semibold" style="color:' + (v ? color : '#211c1266') + '">' + (v ? s : '—') + '</span></div>';
         }).join('') +
       '</div></div>';
   }
 
   const idChip = f.custom
     ? '<span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded" style="background:#e1e51a33; color:#5a6500">+ Added' + (f.country ? ' by ' + escapeHtml(f.country) : '') + '</span>'
-    : '<span class="text-[12px] text-[#211c1266] tabular-nums">#' + f.id + '</span>';
+    : (role.type === 'facilitator' ? '<span class="text-[12px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' : '');
   panel.innerHTML =
     '<div class="flex items-start justify-between gap-3 mb-4">' +
       '<div class="flex items-center gap-2">' +
@@ -609,8 +978,7 @@ function openDrawer(f) {
       countries.map(c => { const color = COUNTRY_COLORS[c] || '#555'; return '<span class="text-[12px] font-medium px-2 py-1 rounded" style="color:' + color + '; background:' + color + '14">' + escapeHtml(c) + '</span>'; }).join('') +
     '</div></div>' +
 
-    (f.refs ? '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Source refs</div><p class="text-[12px] leading-[18px] text-[#16140e8c]">' + escapeHtml(f.refs) + '</p></div>' : '') +
-    (f.notes ? '<div class="mb-5"><div class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#211c1266] mb-2">Notes</div><p class="text-[12px] leading-[18px] text-[#16140e8c]">' + escapeHtml(f.notes) + '</p></div>' : '');
+    '';
 
   document.getElementById('drawer').classList.remove('hidden');
   document.getElementById('drawer-close').onclick = closeDrawer;
