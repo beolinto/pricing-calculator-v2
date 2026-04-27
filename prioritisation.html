@@ -115,13 +115,14 @@ const STATE_KEY = 'prio-state-v4';
 const ROLE_KEY = 'prio-role-v4';
 
 // State shape:
-// { scores: { "UK": { 1: 3, 2: 1, ... }, "HU": { ... }, ... } }
+// { scores: { "UK": { 1: 3, 2: 1, ... }, ... }, customFeatures: [{ id, country, category, feature, description, ts }] }
 // In this local-only version, every user's data lives here. Firebase will
-// replace this with a shared store where each role only writes their slot.
+// replace this with a shared store.
 
 let role = loadRole();
 let state = loadState();
 let categoryFilter = CATEGORIES.slice();
+function allFeatures() { return FEATURES.concat(state.customFeatures || []); }
 
 function loadRole() {
   try { return JSON.parse(localStorage.getItem(ROLE_KEY) || 'null'); } catch(e) { return null; }
@@ -134,11 +135,50 @@ function saveRole(r) {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
-    if (saved && saved.scores) return saved;
+    if (saved && saved.scores) {
+      if (!saved.customFeatures) saved.customFeatures = [];
+      return saved;
+    }
   } catch(e) {}
-  return { scores: {} };
+  return { scores: {}, customFeatures: [] };
 }
 function saveState() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+
+function addCustomFeature(payload) {
+  if (!state.customFeatures) state.customFeatures = [];
+  const id = 'C' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  const f = {
+    id: id,
+    custom: true,
+    country: role.country,
+    category: payload.category,
+    feature: payload.feature,
+    description: payload.description,
+    countries: role.country,
+    ts: Date.now()
+  };
+  state.customFeatures.push(f);
+  // auto-score "Critical" for the proposer if they want — but better leave it neutral so they explicitly score
+  saveState();
+  render();
+  return f;
+}
+function updateCustomFeature(id, payload) {
+  const f = (state.customFeatures || []).find(x => x.id === id);
+  if (!f) return;
+  Object.assign(f, payload);
+  saveState();
+  render();
+}
+function deleteCustomFeature(id) {
+  state.customFeatures = (state.customFeatures || []).filter(x => x.id !== id);
+  // remove all scores for this feature
+  Object.keys(state.scores || {}).forEach(c => {
+    if (state.scores[c] && state.scores[c][id] != null) delete state.scores[c][id];
+  });
+  saveState();
+  render();
+}
 
 function getScore(country, featureId) {
   return (state.scores && state.scores[country] && state.scores[country][featureId]) || 0;
@@ -155,6 +195,65 @@ function totalScore(featureId) {
   let t = 0;
   COUNTRY_CODES.forEach(c => { t += getScore(c, featureId); });
   return t;
+}
+
+// ---------- ADD-FEATURE MODAL ----------
+function openAddFeatureModal(existing) {
+  const overlay = document.createElement('div');
+  overlay.id = 'add-feature-modal';
+  overlay.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+  overlay.innerHTML =
+    '<div class="absolute inset-0 bg-black/40"></div>' +
+    '<div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-[520px] p-6">' +
+      '<div class="flex items-start justify-between mb-4">' +
+        '<div>' +
+          '<h2 class="text-[18px] font-semibold mb-0.5">' + (existing ? 'Edit your feature' : 'Add a missing feature') + '</h2>' +
+          '<p class="text-[12px] text-[#16140e8c]">Suggest a feature your country needs that is not on the list.</p>' +
+        '</div>' +
+        '<button id="add-close" class="w-8 h-8 rounded-full hover:bg-[#f6f5f3] flex items-center justify-center">✕</button>' +
+      '</div>' +
+      '<div class="space-y-4">' +
+        '<div>' +
+          '<label class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] block mb-1.5">Category</label>' +
+          '<select id="add-category" class="w-full px-3 py-2 rounded-lg border border-[#756b5733] text-[14px]">' +
+            CATEGORIES.map(c => '<option value="' + c + '"' + (existing && existing.category === c ? ' selected' : '') + '>' + c + '</option>').join('') +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] block mb-1.5">Feature name</label>' +
+          '<input id="add-feature" type="text" maxlength="120" placeholder="e.g. Bulk discount on rentals" class="w-full px-3 py-2 rounded-lg border border-[#756b5733] text-[14px]" value="' + escapeHtml(existing ? existing.feature : '') + '">' +
+        '</div>' +
+        '<div>' +
+          '<label class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] block mb-1.5">Description</label>' +
+          '<textarea id="add-description" rows="4" maxlength="600" placeholder="Briefly describe what is needed and why" class="w-full px-3 py-2 rounded-lg border border-[#756b5733] text-[14px] resize-none">' + escapeHtml(existing ? (existing.description || '') : '') + '</textarea>' +
+        '</div>' +
+      '</div>' +
+      '<div class="flex items-center justify-between mt-6 gap-2">' +
+        (existing ? '<button id="add-delete" class="text-[13px] font-medium text-[#e7000b] hover:underline">Delete</button>' : '<span></span>') +
+        '<div class="flex gap-2">' +
+          '<button id="add-cancel" class="px-4 py-2 rounded-lg text-[13px] font-medium border border-[#756b5733] hover:bg-[#f6f5f3]">Cancel</button>' +
+          '<button id="add-save" class="px-4 py-2 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-black">' + (existing ? 'Save' : 'Add feature') + '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  document.getElementById('add-close').onclick = close;
+  document.getElementById('add-cancel').onclick = close;
+  if (existing) {
+    document.getElementById('add-delete').onclick = () => {
+      if (confirm('Delete this feature?')) { deleteCustomFeature(existing.id); close(); }
+    };
+  }
+  document.getElementById('add-save').onclick = () => {
+    const cat = document.getElementById('add-category').value;
+    const feat = document.getElementById('add-feature').value.trim();
+    const desc = document.getElementById('add-description').value.trim();
+    if (!feat) { alert('Please enter a feature name.'); return; }
+    if (existing) updateCustomFeature(existing.id, { category: cat, feature: feat, description: desc });
+    else addCustomFeature({ category: cat, feature: feat, description: desc });
+    close();
+  };
 }
 
 // ---------- LANDING ----------
@@ -193,11 +292,13 @@ document.getElementById('change-role-btn').onclick = () => {
 
 document.getElementById('export-btn').onclick = () => {
   const NL = String.fromCharCode(10);
-  const rows = [['#','Category','Feature','Priority','Countries requesting','Total score', ...COUNTRY_CODES.map(c => c + ' score'), 'Description']];
-  FEATURES.forEach(f => {
+  const rows = [['#','Category','Feature','Source','Priority','Countries requesting','Total score', ...COUNTRY_CODES.map(c => c + ' score'), 'Description']];
+  allFeatures().forEach(f => {
     const total = totalScore(f.id);
     rows.push([
-      f.id, f.category, f.feature, f.priority || '', f.countries || '', total,
+      f.id, f.category, f.feature,
+      f.custom ? ('Added by ' + (f.country || '')) : 'Original list',
+      f.priority || '', f.countries || '', total,
       ...COUNTRY_CODES.map(c => getScore(c, f.id)),
       (f.description || '').split(NL).join(' ')
     ]);
@@ -267,14 +368,20 @@ function renderMain() {
 // ---------- VOTER VIEW ----------
 function renderVoterView(root) {
   const hint = document.createElement('div');
-  hint.className = 'mb-5 bg-white rounded-xl border border-[#756b571a] p-4 text-[13px] text-[#16140e8c]';
+  hint.className = 'mb-5 bg-white rounded-xl border border-[#756b571a] p-4 flex items-start gap-4';
   hint.innerHTML =
-    '<div class="font-semibold text-[#090806ec] mb-1">How to score</div>' +
-    'Tap a score for each feature you care about. Leave blank for features that are not important to your country. There is no limit — score as many as you like, but be honest about what is truly Critical vs Nice to have.';
+    '<div class="flex-1 text-[13px] text-[#16140e8c]">' +
+      '<div class="font-semibold text-[#090806ec] mb-1">How to score</div>' +
+      'Tap a score for each feature you care about. Leave blank for features that are not important to your country. There is no limit — score as many as you like, but be honest about what is truly Critical vs Nice to have. Missing something? Add it with the button on the right.' +
+    '</div>' +
+    '<button id="add-feature-btn" class="flex-shrink-0 px-3 py-2 rounded-lg bg-[#090806ec] text-white text-[13px] font-medium hover:bg-black transition flex items-center gap-1.5">' +
+      '<span class="text-[15px] leading-none">+</span> Add a feature' +
+    '</button>';
   root.appendChild(hint);
+  document.getElementById('add-feature-btn').onclick = () => openAddFeatureModal(null);
 
   CATEGORIES.forEach(cat => {
-    const inCat = FEATURES.filter(f => f.category === cat && categoryFilter.includes(cat));
+    const inCat = allFeatures().filter(f => f.category === cat && categoryFilter.includes(cat));
     if (inCat.length === 0) return;
     const sec = document.createElement('section');
     sec.className = 'mb-6';
@@ -295,27 +402,38 @@ function renderVoterView(root) {
 
 function renderVoterCard(f) {
   const card = document.createElement('div');
-  card.className = 'card bg-white rounded-xl border border-[#756b571a] p-4 animate-in grid gap-3';
+  card.className = 'card bg-white rounded-xl border ' + (f.custom ? 'border-dashed border-[#090806ec]/30' : 'border-[#756b571a]') + ' p-4 animate-in grid gap-3';
   card.style.gridTemplateColumns = '1fr auto';
   const catColor = CATEGORY_COLORS[f.category];
   const myScore = getScore(role.country, f.id);
   const countries = (f.countries || '').split(',').map(c => c.trim()).filter(Boolean);
+  const isMyCustom = f.custom && f.country === role.country;
 
   const left = document.createElement('div');
   left.className = 'min-w-0 cursor-pointer';
+  const customBadge = f.custom
+    ? '<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style="background:#e1e51a33; color:#5a6500">+ Added' + (f.country ? ' by ' + escapeHtml(f.country) : '') + '</span>'
+    : '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>';
   left.innerHTML =
     '<div class="flex items-center gap-2 mb-1 flex-wrap">' +
       '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + f.category + '</span>' +
-      '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
-      countries.slice(0, 8).map(c => {
+      customBadge +
+      (f.custom ? '' : countries.slice(0, 8).map(c => {
         const color = COUNTRY_COLORS[c] || '#555';
         const isMine = c === role.country;
         return '<span class="text-[10px] font-medium px-1.5 py-0.5 rounded ' + (isMine ? 'ring-1' : '') + '" style="color:' + color + '; background:' + color + '14; ' + (isMine ? 'box-shadow: 0 0 0 1px ' + color : '') + '">' + escapeHtml(c) + '</span>';
-      }).join('') +
+      }).join('')) +
+      (isMyCustom ? '<button class="edit-custom-btn text-[11px] text-[#16140e8c] hover:text-[#090806ec] underline ml-1">Edit</button>' : '') +
     '</div>' +
     '<h3 class="text-[14px] leading-[20px] font-semibold mb-1">' + escapeHtml(f.feature) + '</h3>' +
     '<p class="text-[13px] leading-[18px] text-[#16140e8c]">' + escapeHtml(f.description || '') + '</p>';
   left.addEventListener('click', () => openDrawer(f));
+  if (isMyCustom) {
+    setTimeout(() => {
+      const eb = left.querySelector('.edit-custom-btn');
+      if (eb) eb.onclick = (e) => { e.stopPropagation(); openAddFeatureModal(f); };
+    }, 0);
+  }
 
   const right = document.createElement('div');
   right.className = 'flex items-center gap-1';
@@ -344,12 +462,13 @@ function renderFacilitatorView(root) {
   // Summary bar
   const summary = document.createElement('div');
   summary.className = 'mb-5 bg-white rounded-xl border border-[#756b571a] p-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 text-center';
-  const totalFeatures = FEATURES.length;
-  summary.innerHTML = '<div><div class="text-[11px] uppercase tracking-[1.5px] text-[#211c1266] font-semibold">Features</div><div class="text-[22px] font-semibold tabular-nums mt-1">' + totalFeatures + '</div></div>' +
+  const totalFeatures = allFeatures().length;
+  const customCount = (state.customFeatures || []).length;
+  summary.innerHTML = '<div><div class="text-[11px] uppercase tracking-[1.5px] text-[#211c1266] font-semibold">Features</div><div class="text-[22px] font-semibold tabular-nums mt-1">' + totalFeatures + '</div>' + (customCount ? '<div class="text-[11px] text-[#211c1266] tabular-nums">' + customCount + ' added</div>' : '') + '</div>' +
     COUNTRY_CODES.map(c => {
       const color = COUNTRY_COLORS[c];
       const scored = Object.keys((state.scores && state.scores[c]) || {}).length;
-      const total = FEATURES.reduce((s, f) => s + getScore(c, f.id), 0);
+      const total = allFeatures().reduce((s, f) => s + getScore(c, f.id), 0);
       return '<div><div class="text-[11px] uppercase tracking-[1.5px] font-semibold" style="color:' + color + '">' + c + '</div>' +
         '<div class="text-[22px] font-semibold tabular-nums mt-1">' + total + '</div>' +
         '<div class="text-[11px] text-[#211c1266] tabular-nums">' + scored + ' scored</div></div>';
@@ -367,10 +486,14 @@ function renderFacilitatorView(root) {
 
   const list = document.createElement('div');
   list.className = 'grid gap-2';
-  const visible = FEATURES.filter(f => categoryFilter.includes(f.category));
+  const visible = allFeatures().filter(f => categoryFilter.includes(f.category));
   const sorted = (window.__sortMode === 'id')
-    ? visible.slice().sort((a, b) => a.id - b.id)
-    : visible.slice().sort((a, b) => totalScore(b.id) - totalScore(a.id) || a.id - b.id);
+    ? visible.slice().sort((a, b) => {
+        const an = typeof a.id === 'number' ? a.id : 9999;
+        const bn = typeof b.id === 'number' ? b.id : 9999;
+        return an - bn;
+      })
+    : visible.slice().sort((a, b) => totalScore(b.id) - totalScore(a.id));
 
   sorted.forEach((f, i) => list.appendChild(renderResultCard(f, i + 1)));
   root.appendChild(list);
@@ -392,10 +515,13 @@ function renderResultCard(f, rank) {
 
   const mid = document.createElement('div');
   mid.className = 'min-w-0 cursor-pointer';
+  const idChip = f.custom
+    ? '<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style="background:#e1e51a33; color:#5a6500">+ Added' + (f.country ? ' by ' + escapeHtml(f.country) : '') + '</span>'
+    : '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>';
   mid.innerHTML =
     '<div class="flex items-center gap-2 mb-1 flex-wrap">' +
       '<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + f.category + '</span>' +
-      '<span class="text-[11px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
+      idChip +
     '</div>' +
     '<h3 class="text-[14px] leading-[20px] font-semibold mb-1">' + escapeHtml(f.feature) + '</h3>' +
     '<div class="flex gap-1 mt-2">' +
@@ -457,11 +583,14 @@ function openDrawer(f) {
       '</div></div>';
   }
 
+  const idChip = f.custom
+    ? '<span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded" style="background:#e1e51a33; color:#5a6500">+ Added' + (f.country ? ' by ' + escapeHtml(f.country) : '') + '</span>'
+    : '<span class="text-[12px] text-[#211c1266] tabular-nums">#' + f.id + '</span>';
   panel.innerHTML =
     '<div class="flex items-start justify-between gap-3 mb-4">' +
       '<div class="flex items-center gap-2">' +
         '<span class="inline-block px-2 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[1px]" style="background:' + catColor.bg + '; color:' + catColor.text + '">' + f.category + '</span>' +
-        '<span class="text-[12px] text-[#211c1266] tabular-nums">#' + f.id + '</span>' +
+        idChip +
       '</div>' +
       '<button id="drawer-close" class="w-8 h-8 rounded-full hover:bg-[#f6f5f3] flex items-center justify-center">✕</button>' +
     '</div>' +
