@@ -1106,10 +1106,9 @@
           </div>
         </div>
       </div>
-      <!-- Progress: step 1 of 4 in onboarding create-offer flow (Offer, Business account, Card machines, Product usage) -->
+      <!-- Progress: step 1 of 3 in onboarding create-offer flow (Offer, Card machines, Product usage) -->
       <div style="display:flex;gap:6px;padding:0 16px 12px">
         <div style="flex:1;height:4px;border-radius:2px;background:#090806ec"></div>
-        <div style="flex:1;height:4px;border-radius:2px;background:#8f867633"></div>
         <div style="flex:1;height:4px;border-radius:2px;background:#8f867633"></div>
         <div style="flex:1;height:4px;border-radius:2px;background:#8f867633"></div>
       </div>
@@ -1718,96 +1717,6 @@
         <button onclick="confirmBaSelection()" style="width:100%;background:#090806ec;color:white;font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:32px;padding:16px;cursor:pointer">Confirm selection</button>
       </div>
     </div>
-</div>
-
-<!-- ═══ SCREEN 05b: BUSINESS ACCOUNT PLAN (only shown when settlement = Teya BA) ═══ -->
-<div id="s-05b" class="sp sr" style="display:flex;flex-direction:column">
-<!-- Pinned header -->
-<div style="flex-shrink:0">
-  <div class="flex items-center justify-between px-6 pt-4 bg-[#f6f5f3]" style="height:50px"><span class="text-[15px] font-semibold text-[#090806ec]">9:41</span><div class="flex items-center gap-1.5"><svg width="17" height="12" viewBox="0 0 17 12" fill="#090806ec"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#090806ec" stroke-opacity="0.35"/><rect x="1.5" y="1.5" width="16" height="9" rx="2.5" fill="#090806ec"/><path d="M23 4v4a2 2 0 000-4z" fill="#090806ec" fill-opacity="0.4"/></svg></div></div>
-  <div class="bg-[#f6f5f3] border-b border-[#756b571a]">
-    <div class="relative flex items-center justify-center px-4" style="height:56px">
-      <button onclick="go('05')" class="absolute left-4 flex items-center gap-1 text-[#090806ec] active:opacity-60"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[16px] font-medium">Back</span></button>
-      <span class="text-[16px] font-semibold text-[#090806ec]">Business account</span>
-    </div>
-  </div>
-</div>
-
-<div class="ss">
-  <div class="px-4 pt-4 pb-6">
-    <div style="margin-bottom:16px">
-      <h2 style="font-size:20px;font-weight:600;color:#090806ec;margin:0 0 4px;line-height:1.2">Choose a business account plan</h2>
-      <p style="font-size:13px;color:#16140e8c;margin:0;line-height:1.45">All plans are included at no extra cost. Upgrade for more features.</p>
-    </div>
-
-    <div id="ba-tier-cards-05b" style="display:flex;flex-direction:column;gap:10px">
-      <!-- Light -->
-      <div class="ba-tier-card" data-tier="light" onclick="selectBaTierOn05b('light')" role="radio" aria-checked="false" tabindex="0" style="background:white;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.05);padding:16px;cursor:pointer;transition:box-shadow 200ms,opacity 200ms;opacity:0.7">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <img src="light.png" alt="Teya BA Light" style="width:44px;height:32px;object-fit:contain;flex-shrink:0">
-            <div>
-              <p style="font-size:15px;font-weight:600;color:#090806ec;margin:0">Teya BA Light</p>
-              <p style="font-size:11px;color:#16140e8c;margin:1px 0 0">Entry-level business account</p>
-            </div>
-          </div>
-          <span style="font-size:11px;font-weight:600;color:#497d00;background:#7ccf001a;padding:3px 9px;border-radius:20px">Free</span>
-        </div>
-        <div style="border-top:1px solid #756b571a;padding-top:10px;display:flex;flex-direction:column;gap:6px">
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">1 physical card</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">1 virtual card</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">&pound;10k/mo EFT out</span></div>
-        </div>
-      </div>
-
-      <!-- Silver (default) -->
-      <div class="ba-tier-card selected" data-tier="silver" onclick="selectBaTierOn05b('silver')" role="radio" aria-checked="true" tabindex="0" style="background:white;border-radius:20px;box-shadow:0 0 0 1.5px #090806ec,0 4px 14px rgba(0,0,0,0.07);padding:16px;cursor:pointer;transition:box-shadow 200ms,opacity 200ms">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <img src="silver.png" alt="Teya BA Silver" style="width:44px;height:32px;object-fit:contain;flex-shrink:0">
-            <div>
-              <p style="font-size:15px;font-weight:600;color:#090806ec;margin:0">Teya BA Silver</p>
-              <p style="font-size:11px;color:#16140e8c;margin:1px 0 0">More cards + cashback</p>
-            </div>
-          </div>
-          <span style="font-size:11px;font-weight:600;color:#497d00;background:#7ccf001a;padding:3px 9px;border-radius:20px">Free</span>
-        </div>
-        <div style="border-top:1px solid #756b571a;padding-top:10px;display:flex;flex-direction:column;gap:6px">
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">2 physical cards</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">2 virtual cards</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">&pound;25k/mo EFT out</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">0.5% cashback</span></div>
-        </div>
-      </div>
-
-      <!-- Gold -->
-      <div class="ba-tier-card" data-tier="gold" onclick="selectBaTierOn05b('gold')" role="radio" aria-checked="false" tabindex="0" style="background:white;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.05);padding:16px;cursor:pointer;transition:box-shadow 200ms,opacity 200ms;opacity:0.7">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <img src="gold.png" alt="Teya BA Gold" style="width:44px;height:32px;object-fit:contain;flex-shrink:0">
-            <div>
-              <p style="font-size:15px;font-weight:600;color:#090806ec;margin:0">Teya BA Gold</p>
-              <p style="font-size:11px;color:#16140e8c;margin:1px 0 0">Unlimited + premium features</p>
-            </div>
-          </div>
-          <span style="font-size:11px;font-weight:600;color:#497d00;background:#7ccf001a;padding:3px 9px;border-radius:20px">Free</span>
-        </div>
-        <div style="border-top:1px solid #756b571a;padding-top:10px;display:flex;flex-direction:column;gap:6px">
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">5 physical cards</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">Unlimited virtual cards</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">Unlimited EFT out</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">1% cashback</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:#090806ec">PayPoint + Cash Deposit</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CTA -->
-<div class="cta">
-  <button onclick="go('05c')" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Card machines &rarr;</button>
-</div>
 </div>
 
 <!-- ═══ SCREEN 05c: CARD MACHINES (redesigned — terminal-first, stores as assignment rows) ═══ -->
@@ -2584,35 +2493,16 @@
             <!-- Effective rate card: company base + company mods (info) + store mods — breakdown collapses -->
             <div class="animate-in px-4 mb-4" style="animation-delay:90ms">
               <div class="bg-white rounded-3xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_2px_-1px_rgba(0,0,0,0.06),0px_2px_4px_0px_rgba(0,0,0,0.04)] overflow-hidden">
-                <div class="p-4">
-                  <p class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-2">Effective rate</p>
-                  <span id="sd-rate" class="text-[28px] font-semibold text-[#090806ec] tabular-nums tracking-[-0.25px]">—</span>
-                </div>
-                <!-- Expandable breakdown -->
-                <button id="sd-breakdown-toggle" onclick="iSdToggleBreakdown()" class="w-full flex items-center justify-between px-4 py-3 border-t border-[#756b571a] active:bg-[#f6f5f3] cursor-pointer" style="background:transparent;border-left:none;border-right:none;border-bottom:none;font-family:inherit;text-align:left">
-                  <span class="text-[12px] font-medium text-[#16140e8c]" id="sd-breakdown-toggle-label">Show breakdown</span>
-                  <svg id="sd-breakdown-chev" width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:#16140e8c;transition:transform 220ms cubic-bezier(0.2,0,0,1)"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <!-- Rate + chevron toggle on a single row -->
+                <button id="sd-breakdown-toggle" onclick="iSdToggleBreakdown()" aria-label="Toggle breakdown" class="w-full flex items-end justify-between px-4 pt-4 pb-2 active:bg-[#f6f5f3] cursor-pointer" style="background:transparent;border:none;font-family:inherit;text-align:left">
+                  <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-2">Effective rate</p>
+                    <span id="sd-rate" class="text-[28px] font-semibold text-[#090806ec] tabular-nums tracking-[-0.25px]">—</span>
+                  </div>
+                  <svg id="sd-breakdown-chev" width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:#16140e8c;transition:transform 220ms cubic-bezier(0.2,0,0,1);margin-bottom:4px;flex-shrink:0"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
                 <div id="sd-breakdown-body" style="max-height:0;overflow:hidden;transition:max-height 300ms cubic-bezier(0.2,0,0,1)">
-                  <div class="px-4 pb-4 space-y-1.5">
-                    <div class="flex items-baseline justify-between">
-                      <span class="text-[12px] font-medium text-[#090806ec]">Company rate</span>
-                      <span id="sd-br-company" class="text-[12px] font-semibold text-[#090806ec] tabular-nums">—</span>
-                    </div>
-                    <div class="flex items-baseline justify-between">
-                      <span class="text-[11px] text-[#16140e8c]">Pricing structure</span>
-                      <span id="sd-br-structure" class="text-[11px] text-[#16140e8c]">Single-rate</span>
-                    </div>
-                    <div class="flex items-baseline justify-between">
-                      <span class="text-[11px] text-[#16140e8c]">Contract</span>
-                      <span id="sd-br-contract" class="text-[11px] text-[#16140e8c]">—</span>
-                    </div>
-                    <div class="flex items-baseline justify-between">
-                      <span class="text-[11px] text-[#16140e8c]">Business account</span>
-                      <span id="sd-br-bundle" class="text-[11px] text-[#16140e8c]">—</span>
-                    </div>
-                    <div id="sd-br-store" class="mt-2 pt-2 border-t border-[#756b571a] space-y-1.5"></div>
-                  </div>
+                  <div id="sd-breakdown-list" class="px-4 pb-4 space-y-1.5"></div>
                 </div>
               </div>
             </div>
@@ -2764,27 +2654,22 @@
             // Reset breakdown to collapsed on each screen open
             const body = document.getElementById('sd-breakdown-body');
             const chev = document.getElementById('sd-breakdown-chev');
-            const lbl  = document.getElementById('sd-breakdown-toggle-label');
             if (body) body.style.maxHeight = '0';
             if (chev) chev.style.transform = 'rotate(0deg)';
-            if (lbl)  lbl.textContent = 'Show breakdown';
           }
 
           // Toggle the effective-rate breakdown panel
           function iSdToggleBreakdown(){
             const body = document.getElementById('sd-breakdown-body');
             const chev = document.getElementById('sd-breakdown-chev');
-            const lbl  = document.getElementById('sd-breakdown-toggle-label');
             if (!body) return;
             const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px' && body.style.maxHeight !== '0';
             if (isOpen) {
               body.style.maxHeight = '0';
               if (chev) chev.style.transform = 'rotate(0deg)';
-              if (lbl)  lbl.textContent = 'Show breakdown';
             } else {
               body.style.maxHeight = body.scrollHeight + 'px';
               if (chev) chev.style.transform = 'rotate(180deg)';
-              if (lbl)  lbl.textContent = 'Hide breakdown';
             }
           }
 
@@ -2861,7 +2746,46 @@
             const bps = companyBase + freqMod + acctMod + pblMod + ecomMod + motoMod;
             const rateEl = document.getElementById('sd-rate');
             if (rateEl) rateEl.textContent = (bps/100).toFixed(2) + '%';
-            // Breakdown — company section
+
+            const listEl = document.getElementById('sd-breakdown-list');
+            if (listEl) {
+              const structure = v.existingPricingStructure === 'single' ? 'Single-rate'
+                             : v.existingPricingStructure === 'multi'  ? 'Multi-rate' : 'Dynamic';
+              const c = v.existingSetup && v.existingSetup.contract;
+              const contractName = c === 'flex' ? 'Flexible' : c === '12m' ? '12-month fixed' : c === '24m' ? '24-month fixed' : '—';
+              const CONTRACT_BPS = { flex: 0, '12m': -5, '24m': -10 };
+              const contractMod = CONTRACT_BPS[c] || 0;
+              const acctName = SD_ACCT_NAME[s.acct] || s.acct;
+              const fmtBps = (mod, included) => {
+                if (included || mod === 0) return { text: 'incl.', color: '#16140e8c' };
+                return {
+                  text: (mod > 0 ? '+' : '−') + Math.abs(mod) + ' bps',
+                  color: mod > 0 ? '#c0850a' : '#497d00'
+                };
+              };
+              const row = (label, value, mod, opts) => {
+                opts = opts || {};
+                const valHtml = value ? '<span class="text-[11px] text-[#090806ec]">' + value + '</span>' : '';
+                let bpsHtml = '';
+                if (!opts.noBps) {
+                  const fb = fmtBps(mod, opts.included);
+                  bpsHtml = '<span class="text-[11px] font-medium tabular-nums" style="color:' + fb.color + '">' + fb.text + '</span>';
+                }
+                return '<div class="flex items-baseline justify-between gap-3"><span class="text-[11px] text-[#16140e8c]">' + label + '</span><span class="flex items-baseline gap-2">' + valHtml + bpsHtml + '</span></div>';
+              };
+              const rows2 = [];
+              rows2.push(row('Company base rate', (companyBase/100).toFixed(2) + '%', 0, { noBps: true }));
+              rows2.push(row('Pricing structure', structure, 0, { noBps: true }));
+              rows2.push(row('Contract', contractName, contractMod, { included: contractMod === 0 }));
+              rows2.push(row('Settlement account', acctName, acctMod, { included: acctMod === 0 }));
+              rows2.push(row('Settlement frequency', s.freq, freqMod, { included: freqMod === 0 }));
+              if (pblMod)  rows2.push(row('Pay by Link surcharge', null, pblMod, {}));
+              if (ecomMod) rows2.push(row('E-commerce surcharge', null, ecomMod, {}));
+              if (motoMod) rows2.push(row('MOTO surcharge', null, motoMod, {}));
+              listEl.innerHTML = rows2.join('');
+            }
+            // ── Legacy stub: the elements below were removed from the markup. The
+            // remaining lines are no-ops because getElementById returns null. ──
             const companyEl = document.getElementById('sd-br-company');
             if (companyEl) companyEl.textContent = (companyBase/100).toFixed(2) + '%';
             const structureEl = document.getElementById('sd-br-structure');
@@ -3573,10 +3497,10 @@
             </div>
 
             <!-- ── Prototype demo switcher: pricing structure (dev-only chip row) ── -->
-            <div class="px-4 pt-4" style="background:#eeece6">
+            <div id="proto-ips-row" class="px-4 pt-4" style="background:#eeece6">
               <div class="flex items-center justify-between mb-1.5">
                 <span class="text-[10px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c]">Prototype &middot; Pricing structure</span>
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style="opacity:0.6"><path d="M3 3l3 3M3 9l3-3M9 3l-3 3M9 9l-3-3" stroke="#16140e8c" stroke-width="1" stroke-linecap="round"/></svg>
+                <button onclick="document.getElementById('proto-ips-row').style.display='none'" aria-label="Hide prototype switcher" style="background:transparent;border:none;padding:4px;margin:-4px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0.6;transition:opacity 150ms" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.6"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 3l3 3M3 9l3-3M9 3l-3 3M9 9l-3-3" stroke="#16140e8c" stroke-width="1" stroke-linecap="round"/></svg></button>
               </div>
               <div class="flex gap-1.5 pb-3">
                 <button id="proto-ips-single"  onclick="aspnSetInheritedMode('single')"  class="proto-ips-chip px-3 py-1 rounded-full text-[11px] font-medium transition-all" style="border:none;cursor:pointer;font-family:inherit">Single rate</button>
@@ -6964,7 +6888,7 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-const ORDER=['01','members','02','03','04','04i','05','05b','05c','06','07','08','09'];
+const ORDER=['01','members','02','03','04','04i','05','05c','06','07','08','09'];
 let cur='01', hist=['01'];
 function go(t){
   if(!t||t===cur)return;
@@ -7142,7 +7066,11 @@ const COMPANY_VARIANTS = {
       { key:'islington', name: 'Islington — London', meta: 'All-year · Est. £180k/yr', rate: '1.80%',
         freq: 'Everyday', acct: 'teya', prod: { pbl: true, ecom: true, moto: false },
         terminals: [{ type:'Teya Pro', qty:3, plan:'monthly' }, { type:'Teya Tap', qty:1 }],
-        perf: { estAnnualK: 180, actualAnnualK: 220, monthlyTpvK: [14,15.5,16.2,17,18.5,20,19,17.8,17,18.2,19.3,27.5] } }
+        perf: { estAnnualK: 180, actualAnnualK: 220, monthlyTpvK: [14,15.5,16.2,17,18.5,20,19,17.8,17,18.2,19.3,27.5] } },
+      { key:'hackney',   name: 'Hackney — London',   meta: 'All-year · Est. £95k/yr',  rate: '1.75%',
+        freq: 'Weekday', acct: 'teya', prod: { pbl: false, ecom: false, moto: false },
+        terminals: [{ type:'Teya Go', qty:2, plan:'monthly' }, { type:'Teya Tap', qty:1 }],
+        perf: { estAnnualK: 95, actualAnnualK: 102, monthlyTpvK: [7,7.4,7.8,8.2,8.6,9,8.7,8.3,8.1,8.5,8.8,9.6] } }
     ],
     pricing:    { base: '1.80% blended', contract: '12-month fixed', quoteVer: 'v1 · 4 Nov 2024' },
     // GreenLeaf is on 12-month contract with Gold bundle
@@ -11373,8 +11301,6 @@ function resetInnerNav() {
     chipSelect('ct', 0);  // Flexible
     chipSelect('sa', 0);  // Teya BA (−20 bps, recommended default)
     chipSelect('sf', 1);  // Everyday
-    // BA plan tier defaults to Silver (recommended default, no rate impact)
-    if (typeof selectBaTierOn05b === 'function') selectBaTierOn05b('silver');
     if (typeof clearMca === 'function') clearMca();
     if (typeof cancelMcaInterest === 'function') cancelMcaInterest();
     // Hide the reset link (nothing to reset now)
@@ -11643,34 +11569,12 @@ function resetInnerNav() {
     recalcAll();
   }
 
-  // ─── Navigation between offer / BA-plan / card-machines screens ───
-  // 05 → Continue: skip BA-plan screen if settlement is external.
+  // ─── Navigation between offer and card-machines screens ───
   function s05Continue() {
-    go(curSettlement === 'teya' ? '05b' : '05c');
+    go('05c');
   }
-  // 05c → Back: return to BA-plan screen if Teya BA, else straight back to offer.
   function s05cBack() {
-    go(curSettlement === 'teya' ? '05b' : '05');
-  }
-  // Tier selection on the BA-plan screen (no rate impact — upsell only).
-  // Selected state is communicated via: stronger border, higher opacity, and
-  // a slightly deeper shadow — no radio, per UX best practice for card-level
-  // selection patterns. aria-checked is kept in sync for screen readers.
-  function selectBaTierOn05b(tier) {
-    curBaTier = tier;
-    const cards = document.querySelectorAll('#ba-tier-cards-05b .ba-tier-card');
-    cards.forEach(c => {
-      const isSel = c.dataset.tier === tier;
-      c.classList.toggle('selected', isSel);
-      c.setAttribute('aria-checked', isSel ? 'true' : 'false');
-      c.style.boxShadow = isSel
-        ? '0 0 0 1.5px #090806ec,0 4px 14px rgba(0,0,0,0.07)'
-        : '0 0 0 1px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.05)';
-      c.style.opacity = isSel ? '1' : '0.7';
-    });
-    if (typeof checkAddonsModified === 'function') checkAddonsModified();
-    // Cashback value depends on the tier — refresh the savings chips.
-    if (typeof recalcAll === 'function') recalcAll();
+    go('05');
   }
 
   // Legacy wrappers (used by included features)
@@ -11995,7 +11899,7 @@ function resetInnerNav() {
   function getIncludedFeatures() {
     const feats = [];
     // Rate-impacting add-ons only: contract, settlement account, settlement frequency.
-    // BA plan tier is an upsell on s-05b and is not shown here (no rate impact).
+    // BA plan tier has no rate impact and is not shown here.
     const contractLabel = CONTRACT_LABEL_MAP[curContract] || 'Flexible contract';
     const settlementLabel = SETTLEMENT_LABEL_MAP[curSettlement] || 'Teya BA settlement';
     const settleLabel = SETTLE_LABEL_MAP[curSettle] || 'Everyday settlement';
@@ -12168,15 +12072,11 @@ function resetInnerNav() {
       }
     }
 
-    // Footer CTA flips live on the floor gate + reflects the next screen:
-    //   above floor + Teya BA    → "Business account →" (goes to 05b)
-    //   above floor + External   → "Card machines →"    (goes to 05c)
-    //   below floor              → "Request approval →"
+    // Footer CTA: above floor → "Card machines →"; below floor → "Request approval →".
     const footerCta = $('s05-primary-cta');
     if (footerCta) {
       if (aboveFloor) {
-        const nextLabel = curSettlement === 'teya' ? 'Business account' : 'Card machines';
-        footerCta.textContent = nextLabel + ' \u2192';
+        footerCta.textContent = 'Card machines \u2192';
         footerCta.style.background = '#e1e51a';
         footerCta.style.color = '#29320c';
       } else {
