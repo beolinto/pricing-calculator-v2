@@ -475,35 +475,68 @@
 <div id="nd-search-overlay" class="popup-overlay" onclick="ndCloseStoreSearch()">
   <div class="popup-sheet" onclick="event.stopPropagation()" style="max-height:80%;overflow-y:auto">
     <div class="popup-handle"></div>
-    <div style="padding:0 20px 4px">
-      <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0 0 4px">Add a store</p>
-      <p style="font-size:13px;color:#16140e8c;margin:0 0 14px">Search by trading name or address</p>
-    </div>
-    <div style="padding:0 16px 12px">
-      <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border-2 border-[#090806ec] shadow-[0_0_0_3px_rgba(117,107,87,0.1)]">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg>
-        <input type="text" value="Mario's Deli" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="Search..."/>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:0 20px 4px">
+      <div style="flex:1;min-width:0">
+        <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0 0 4px">Add a store</p>
+        <p id="nd-search-subtitle" style="font-size:13px;color:#16140e8c;margin:0 0 14px">Search by trading name or address</p>
       </div>
+      <button id="nd-online-action" onclick="ndSetSearchType('online')" style="display:inline-block;font-size:13px;font-weight:500;color:#5e564a;background:transparent;border:none;padding:6px 4px;cursor:pointer;font-family:inherit;flex-shrink:0;margin-top:6px;white-space:nowrap;line-height:1;transition:color 150ms" onmouseover="this.style.color='#090806ec'" onmouseout="this.style.color='#5e564a'"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="display:inline-block;vertical-align:-2px;margin-right:5px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 8h13M8 1.5c2 1.7 3 4 3 6.5s-1 4.8-3 6.5M8 1.5c-2 1.7-3 4-3 6.5s1 4.8 3 6.5" stroke="currentColor" stroke-width="1.2"/></svg>Online store</button>
     </div>
-    <div style="padding:0 16px 16px">
-      <div class="bg-white rounded-2xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]">
-        <div onclick="ndAddStore('Waterloo','56 Waterloo Rd, London SE1 8SS',['Café/Restaurant','Takeaway/Fast Food'],'£22.50')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
-          <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Waterloo</p><p class="text-[12px] text-[#16140e8c]">56 Waterloo Rd, London SE1 8SS</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £22.50</p></div>
-          <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <div onclick="ndAddStore('Camden','42-48 Camden High St, London NW1 0JH',['Café/Restaurant','Bar/Pub','Takeaway/Fast Food'],'£18.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
-          <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Camden</p><p class="text-[12px] text-[#16140e8c]">42-48 Camden High St, London NW1 0JH</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £18.00</p></div>
-          <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <div onclick="ndAddStore('Canary Wharf','One Canada Square, London E14 5AB',['Café/Restaurant','Retail — Grocery'],'£26.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer active:bg-[#5f4f300d]">
-          <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Canary Wharf</p><p class="text-[12px] text-[#16140e8c]">One Canada Square, London E14 5AB</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £26.00</p></div>
-          <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <!-- Physical store content (default flow) -->
+    <div id="nd-search-physical">
+      <div style="padding:0 16px 12px">
+        <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border-2 border-[#090806ec] shadow-[0_0_0_3px_rgba(117,107,87,0.1)]">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <input type="text" value="Mario's Deli" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="Search address or business name"/>
         </div>
       </div>
-      <div class="mt-3 text-center"><button class="text-[13px] text-[#090806ec] underline underline-offset-2">Enter address manually</button></div>
+      <div style="padding:0 16px 4px">
+        <div class="bg-white rounded-2xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]">
+          <div onclick="ndAddStore('Waterloo','56 Waterloo Rd, London SE1 8SS',['Café/Restaurant','Takeaway/Fast Food'],'£22.50')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
+            <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Waterloo</p><p class="text-[12px] text-[#16140e8c]">56 Waterloo Rd, London SE1 8SS</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £22.50</p></div>
+            <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div onclick="ndAddStore('Camden','42-48 Camden High St, London NW1 0JH',['Café/Restaurant','Bar/Pub','Takeaway/Fast Food'],'£18.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
+            <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Camden</p><p class="text-[12px] text-[#16140e8c]">42-48 Camden High St, London NW1 0JH</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £18.00</p></div>
+            <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div onclick="ndAddStore('Canary Wharf','One Canada Square, London E14 5AB',['Café/Restaurant','Retail — Grocery'],'£26.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer active:bg-[#5f4f300d]">
+            <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Canary Wharf</p><p class="text-[12px] text-[#16140e8c]">One Canada Square, London E14 5AB</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £26.00</p></div>
+            <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="mt-3 text-center"><button class="text-[13px] text-[#090806ec] underline underline-offset-2">Enter address manually</button></div>
+      </div>
+      <div style="padding:0 16px 16px"></div>
+    </div>
+
+    <!-- Online store content -->
+    <div id="nd-search-online" style="display:none">
+      <div style="padding:0 16px 10px">
+        <button onclick="ndSetSearchType('physical')" style="display:flex;align-items:center;gap:4px;font-size:13px;color:#090806ec;background:none;border:none;cursor:pointer;font-family:inherit;padding:0">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Add a physical store instead</span>
+        </button>
+      </div>
+      <div style="padding:8px 16px 10px">
+        <label style="font-size:11px;color:#16140e8c;font-weight:500;display:block;margin-bottom:6px">Store name</label>
+        <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border border-[#8f867633]">
+          <input type="text" id="nd-online-name" value="Mario's Deli — Online" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="e.g. Mario's Deli — Online"/>
+        </div>
+      </div>
+      <div style="padding:0 16px 10px">
+        <label style="font-size:11px;color:#16140e8c;font-weight:500;display:block;margin-bottom:6px">Store URL</label>
+        <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border-2 border-[#090806ec] shadow-[0_0_0_3px_rgba(117,107,87,0.1)]">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M1.5 8h13M8 1.5c2 1.7 3 4 3 6.5s-1 4.8-3 6.5M8 1.5c-2 1.7-3 4-3 6.5s1 4.8 3 6.5" stroke="#16140e8c" stroke-width="1.1"/></svg>
+          <input type="text" id="nd-online-url" value="mariosdeli.co.uk" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="e.g. mystore.co.uk"/>
+        </div>
+      </div>
+      <div style="padding:0 16px 16px">
+        <button onclick="ndAddOnlineStore()" class="w-full bg-[#0b0b0a] text-white font-semibold text-[15px] rounded-[24px] py-3.5 active:scale-[0.96] transition-transform">Add ecommerce store</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2041,7 +2074,7 @@
 </div>
 <div class="ss">
   <div class="ai px-4 pt-5 mb-3" style="animation-delay:0ms">
-    <p class="text-[14px] text-[#16140e8c]">Switch on the products each store will accept. Surcharges apply per transaction.</p>
+    <p class="text-[14px] text-[#16140e8c]">Some products come included for the store type. MOTO is optional — turn it on for stores that key in card details.</p>
   </div>
   <!-- Per store section label -->
   <div class="ai px-4 mb-2" style="animation-delay:40ms">
@@ -2059,24 +2092,29 @@
 </div>
 <script>
   // ── Screen 06 (Product Usage) — tabbed per-store pattern ──
-  // Store tabs match the pattern used on the add-store offer screen: a
-  // segmented control that switches between stores, with a single product
-  // card below rendering the active store's toggles. Scales to N stores
-  // without making the screen vertically long.
+  // Per the e-commerce PM review (see: meeting 2026-05): each store is either physical
+  // or online — never both. Pay by Link is always available (info-only row, surcharge
+  // shown for transparency). E-commerce is hidden on physical stores and info-only on
+  // online stores (with an optional monthly subscription toggle for region-specific
+  // pricing). MOTO remains a toggle since it requires explicit activation.
   const ONB_STORES = [
-    { key: 'regent', name: 'Regent Street', location: 'London' },
-    { key: 'george', name: 'George Street', location: 'Edinburgh' }
+    { key: 'regent', name: 'Regent Street',           location: 'London',           type: 'physical' },
+    { key: 'george', name: 'George Street',           location: 'Edinburgh',        type: 'physical' },
+    { key: 'online', name: "Mario's Deli — Online",   location: 'mariosdeli.co.uk', type: 'online'   }
   ];
   const onbStoreProducts = {
-    regent: { pbl: false, ecom: false, moto: false },
-    george: { pbl: false, ecom: false, moto: false }
+    regent: { moto: false, ecomMonthly: false },
+    george: { moto: false, ecomMonthly: false },
+    online: { moto: false, ecomMonthly: false }
   };
   let onbActiveStore = 'regent';
   const ONB_PROD_META = {
     pbl:  { label: 'Pay by Link',         subtitle: 'Send payment links via SMS/email',      surcharge: '+0.30% per transaction',   icon: '<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' },
-    ecom: { label: 'E-commerce',          subtitle: 'Online payments via website checkout', surcharge: '&pound;29/mo subscription', icon: '<rect x="2" y="3" width="20" height="18" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M2 9h20" stroke="#090806ec" stroke-width="1.5"/><rect x="5" y="13" width="6" height="4" rx="1" stroke="#090806ec" stroke-width="1.3"/>' },
+    ecom: { label: 'E-commerce',          subtitle: 'Online payments via website checkout', surcharge: '+0.40% per transaction',   icon: '<rect x="2" y="3" width="20" height="18" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M2 9h20" stroke="#090806ec" stroke-width="1.5"/><rect x="5" y="13" width="6" height="4" rx="1" stroke="#090806ec" stroke-width="1.3"/>' },
     moto: { label: 'MOTO (Manual Entry)', subtitle: 'Key in card details over the phone',   surcharge: '+0.50% per transaction',   icon: '<rect x="2" y="4" width="20" height="16" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M8 20h8" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/><path d="M12 16v4" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/><rect x="6" y="8" width="5" height="3" rx="0.5" fill="#090806ec" opacity="0.15"/>' }
   };
+
+  function s06ActiveStoreObj(){ return ONB_STORES.find(s => s.key === onbActiveStore) || ONB_STORES[0]; }
 
   function s06RenderTabs(){
     const box = document.getElementById('s06-store-tabs');
@@ -2088,18 +2126,85 @@
         const color  = active ? '#090806ec' : '#5e564a';
         const weight = active ? '600' : '500';
         const shadow = active ? '0 1px 2px rgba(0,0,0,0.08)' : 'none';
-        return '<button onclick="s06SwitchStore(\'' + s.key + '\')" style="flex:1;padding:8px 6px;font-size:12px;font-weight:' + weight + ';background:' + bg + ';color:' + color + ';border:none;border-radius:999px;box-shadow:' + shadow + ';cursor:pointer;font-family:inherit">' + s.name + '</button>';
+        const typeIcon = s.type === 'online'
+          ? '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="margin-right:4px;flex-shrink:0;display:inline-block;vertical-align:-1px"><circle cx="8" cy="8" r="6.5" stroke="' + color + '" stroke-width="1.3"/><path d="M1.5 8h13M8 1.5c2 1.7 3 4 3 6.5s-1 4.8-3 6.5M8 1.5c-2 1.7-3 4-3 6.5s1 4.8 3 6.5" stroke="' + color + '" stroke-width="1.1"/></svg>'
+          : '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="margin-right:4px;flex-shrink:0;display:inline-block;vertical-align:-1px"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="' + color + '" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        const tabLabel = s.type === 'online' ? s.location : s.name;
+        return '<button onclick="s06SwitchStore(\'' + s.key + '\')" title="' + tabLabel + '" style="flex:1;min-width:0;padding:8px 6px;font-size:12px;font-weight:' + weight + ';background:' + bg + ';color:' + color + ';border:none;border-radius:999px;box-shadow:' + shadow + ';cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;overflow:hidden">' + typeIcon + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">' + tabLabel + '</span></button>';
       }).join('') + '</div>';
   }
 
-  function s06RenderRow(storeKey, prodKey, isLast){
+  // Info-only row — product is included by default, surcharge shown for transparency.
+  // Used for: Pay by Link (all stores), E-commerce (online stores).
+  function s06RenderInfoRow(prodKey, isLast){
+    const meta = ONB_PROD_META[prodKey];
+    const border = isLast ? '' : 'border-b border-[#756b571a]';
+    return '<div class="' + border + '">' +
+      '<div class="flex items-center gap-3 px-4 py-4">' +
+        '<div style="width:40px;height:40px;border-radius:12px;background:#f6f5f3;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none">' + meta.icon + '</svg>' +
+        '</div>' +
+        '<div class="flex-1">' +
+          '<p class="text-[14px] font-semibold text-[#090806ec]">' + meta.label + '</p>' +
+          '<p class="text-[12px] text-[#16140e8c]">' + meta.subtitle + '</p>' +
+        '</div>' +
+        '<span style="font-size:10px;font-weight:500;color:#46520f;background:#e1e51a33;padding:3px 10px;border-radius:10px;flex-shrink:0;letter-spacing:0.3px">Included</span>' +
+      '</div>' +
+      '<div style="padding:0 16px 14px 68px">' +
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;background:#f6f5f3;border-radius:12px;padding:10px 14px">' +
+          '<span style="font-size:12px;color:#16140e8c">Surcharge</span>' +
+          '<span style="font-size:13px;font-weight:600;color:#090806ec">' + meta.surcharge + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // E-commerce row for online stores — info row + optional monthly subscription sub-toggle (region-specific).
+  function s06RenderEcomRow(storeKey, isLast){
+    const meta = ONB_PROD_META.ecom;
+    const border = isLast ? '' : 'border-b border-[#756b571a]';
+    const subOn = !!onbStoreProducts[storeKey].ecomMonthly;
+    const trackBg = subOn ? '#090806ec' : '#e5e2dc';
+    const thumbX  = subOn ? '18px' : '0';
+    return '<div class="' + border + '">' +
+      '<div class="flex items-center gap-3 px-4 py-4">' +
+        '<div style="width:40px;height:40px;border-radius:12px;background:#f6f5f3;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none">' + meta.icon + '</svg>' +
+        '</div>' +
+        '<div class="flex-1">' +
+          '<p class="text-[14px] font-semibold text-[#090806ec]">' + meta.label + '</p>' +
+          '<p class="text-[12px] text-[#16140e8c]">' + meta.subtitle + '</p>' +
+        '</div>' +
+        '<span style="font-size:10px;font-weight:500;color:#46520f;background:#e1e51a33;padding:3px 10px;border-radius:10px;flex-shrink:0;letter-spacing:0.3px">Included</span>' +
+      '</div>' +
+      '<div style="padding:0 16px 14px 68px">' +
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;background:#f6f5f3;border-radius:12px;padding:10px 14px;margin-bottom:10px">' +
+          '<span style="font-size:12px;color:#16140e8c">Surcharge</span>' +
+          '<span style="font-size:13px;font-weight:600;color:#090806ec">' + meta.surcharge + '</span>' +
+        '</div>' +
+        // Optional monthly subscription — region-specific (e.g. Iceland charges, UK doesn't by default)
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+          '<div style="flex:1;min-width:0">' +
+            '<p style="font-size:12px;font-weight:500;color:#090806ec;margin:0">Monthly subscription</p>' +
+            '<p style="font-size:11px;color:#16140e8c;margin:1px 0 0">Optional — &pound;29/mo (region-specific)</p>' +
+          '</div>' +
+          '<label onclick="event.stopPropagation();s06ToggleEcomMonthly(\'' + storeKey + '\')" style="position:relative;width:40px;height:24px;flex-shrink:0;cursor:pointer;display:inline-block">' +
+            '<span style="position:absolute;inset:0;border-radius:12px;background:' + trackBg + ';transition:background 200ms"></span>' +
+            '<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.15);transition:transform 200ms;transform:translateX(' + thumbX + ')"></span>' +
+          '</label>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Toggle row — for products that need explicit activation (MOTO).
+  function s06RenderToggleRow(storeKey, prodKey, isLast){
     const state  = onbStoreProducts[storeKey];
     const meta   = ONB_PROD_META[prodKey];
     const on     = !!state[prodKey];
     const border = isLast ? '' : 'border-b border-[#756b571a]';
     const trackBg = on ? '#090806ec' : '#e5e2dc';
     const thumbX  = on ? '18px' : '0';
-    // MOTO expands taller because it also shows the "Statement on file" confirmation line.
     const expandMax = on ? (prodKey === 'moto' ? '90px' : '60px') : '0';
     const expandOp  = on ? '1' : '0';
 
@@ -2123,7 +2228,6 @@
             '<span style="font-size:12px;color:#16140e8c">Surcharge</span>' +
             '<span style="font-size:13px;font-weight:600;color:#090806ec">' + meta.surcharge + '</span>' +
           '</div>' +
-          // MOTO requires a statement for eligibility — confirm it's on file when the toggle is on.
           (prodKey === 'moto' ?
             '<div style="display:flex;align-items:center;gap:6px;margin-top:8px;padding:0 4px">' +
               '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
@@ -2138,8 +2242,19 @@
   function s06RenderCard(){
     const box = document.getElementById('s06-product-card');
     if (!box) return;
-    const key = onbActiveStore;
-    const rows = s06RenderRow(key, 'pbl', false) + s06RenderRow(key, 'ecom', false) + s06RenderRow(key, 'moto', true);
+    const store = s06ActiveStoreObj();
+    const key = store.key;
+    let rows;
+    if (store.type === 'online') {
+      // Online store: PBL info + Ecom info (with optional monthly sub) + MOTO toggle
+      rows = s06RenderInfoRow('pbl', false) +
+             s06RenderEcomRow(key, false) +
+             s06RenderToggleRow(key, 'moto', true);
+    } else {
+      // Physical store: PBL info + MOTO toggle (no ecom)
+      rows = s06RenderInfoRow('pbl', false) +
+             s06RenderToggleRow(key, 'moto', true);
+    }
     box.innerHTML = '<div class="bg-white rounded-3xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]">' + rows + '</div>';
   }
 
@@ -2153,6 +2268,11 @@
 
   function s06Toggle(storeKey, prodKey){
     onbStoreProducts[storeKey][prodKey] = !onbStoreProducts[storeKey][prodKey];
+    s06RenderCard();
+  }
+
+  function s06ToggleEcomMonthly(storeKey){
+    onbStoreProducts[storeKey].ecomMonthly = !onbStoreProducts[storeKey].ecomMonthly;
     s06RenderCard();
   }
 
@@ -3291,35 +3411,68 @@
 <div id="asn-search-overlay" onclick="asnCloseStoreSearch()" class="absolute inset-0 bg-black/40 rounded-[36px] z-20" style="display:none;opacity:0;transition:opacity 200ms"></div>
 <div id="asn-search-sheet" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[24px] z-30" onclick="event.stopPropagation()" style="transform:translateY(100%);transition:transform 300ms cubic-bezier(0.2,0,0,1);max-height:80%;overflow-y:auto">
   <div class="pt-3 pb-1 flex justify-center"><div class="w-10 h-1 rounded-full bg-[#8f867633]"></div></div>
-  <div style="padding:0 20px 4px">
-    <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0 0 4px">Add a store</p>
-    <p style="font-size:13px;color:#16140e8c;margin:0 0 14px">Search by trading name or address</p>
-  </div>
-  <div style="padding:0 16px 12px">
-    <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border-2 border-[#090806ec] shadow-[0_0_0_3px_rgba(117,107,87,0.1)]">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg>
-      <input type="text" value="Mario's Deli" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="Search..."/>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:0 20px 4px">
+    <div style="flex:1;min-width:0">
+      <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0 0 4px">Add a store</p>
+      <p id="asn-search-subtitle" style="font-size:13px;color:#16140e8c;margin:0 0 14px">Search by trading name or address</p>
     </div>
+    <button id="asn-online-action" onclick="asnSetSearchType('online')" style="display:inline-block;font-size:13px;font-weight:500;color:#5e564a;background:transparent;border:none;padding:6px 4px;cursor:pointer;font-family:inherit;flex-shrink:0;margin-top:6px;white-space:nowrap;line-height:1;transition:color 150ms" onmouseover="this.style.color='#090806ec'" onmouseout="this.style.color='#5e564a'"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="display:inline-block;vertical-align:-2px;margin-right:5px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 8h13M8 1.5c2 1.7 3 4 3 6.5s-1 4.8-3 6.5M8 1.5c-2 1.7-3 4-3 6.5s1 4.8 3 6.5" stroke="currentColor" stroke-width="1.2"/></svg>Online store</button>
   </div>
-  <div style="padding:0 16px 16px">
-    <div class="bg-white rounded-2xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]">
-      <div onclick="asnAddStore('Waterloo','56 Waterloo Rd, London SE1 8SS',['Café/Restaurant','Takeaway/Fast Food'],'£22.50')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
-        <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Waterloo</p><p class="text-[12px] text-[#16140e8c]">56 Waterloo Rd, London SE1 8SS</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £22.50</p></div>
-        <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </div>
-      <div onclick="asnAddStore('Camden','42-48 Camden High St, London NW1 0JH',['Café/Restaurant','Bar/Pub','Takeaway/Fast Food'],'£18.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
-        <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Camden</p><p class="text-[12px] text-[#16140e8c]">42-48 Camden High St, London NW1 0JH</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £18.00</p></div>
-        <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </div>
-      <div onclick="asnAddStore('Canary Wharf','One Canada Square, London E14 5AB',['Café/Restaurant','Retail — Grocery'],'£26.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer active:bg-[#5f4f300d]">
-        <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Canary Wharf</p><p class="text-[12px] text-[#16140e8c]">One Canada Square, London E14 5AB</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £26.00</p></div>
-        <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <!-- Physical store content (default flow) -->
+  <div id="asn-search-physical">
+    <div style="padding:0 16px 12px">
+      <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border-2 border-[#090806ec] shadow-[0_0_0_3px_rgba(117,107,87,0.1)]">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input type="text" value="Mario's Deli" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="Search address or business name"/>
       </div>
     </div>
-    <div class="mt-3 text-center"><button class="text-[13px] text-[#090806ec] underline underline-offset-2">Enter address manually</button></div>
+    <div style="padding:0 16px 4px">
+      <div class="bg-white rounded-2xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]">
+        <div onclick="asnAddStore('Waterloo','56 Waterloo Rd, London SE1 8SS',['Café/Restaurant','Takeaway/Fast Food'],'£22.50')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
+          <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Waterloo</p><p class="text-[12px] text-[#16140e8c]">56 Waterloo Rd, London SE1 8SS</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £22.50</p></div>
+          <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div onclick="asnAddStore('Camden','42-48 Camden High St, London NW1 0JH',['Café/Restaurant','Bar/Pub','Takeaway/Fast Food'],'£18.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
+          <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Camden</p><p class="text-[12px] text-[#16140e8c]">42-48 Camden High St, London NW1 0JH</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £18.00</p></div>
+          <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div onclick="asnAddStore('Canary Wharf','One Canada Square, London E14 5AB',['Café/Restaurant','Retail — Grocery'],'£26.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer active:bg-[#5f4f300d]">
+          <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Canary Wharf</p><p class="text-[12px] text-[#16140e8c]">One Canada Square, London E14 5AB</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £26.00</p></div>
+          <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="mt-3 text-center"><button class="text-[13px] text-[#090806ec] underline underline-offset-2">Enter address manually</button></div>
+    </div>
+    <div style="padding:0 16px 16px"></div>
+  </div>
+
+  <!-- Online store content -->
+  <div id="asn-search-online" style="display:none">
+    <div style="padding:0 16px 10px">
+      <button onclick="asnSetSearchType('physical')" style="display:flex;align-items:center;gap:4px;font-size:13px;color:#090806ec;background:none;border:none;cursor:pointer;font-family:inherit;padding:0">
+        <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Add a physical store instead</span>
+      </button>
+    </div>
+    <div style="padding:8px 16px 10px">
+      <label style="font-size:11px;color:#16140e8c;font-weight:500;display:block;margin-bottom:6px">Store name</label>
+      <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border border-[#8f867633]">
+        <input type="text" id="asn-online-name" value="Mario's Deli — Online" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="e.g. Mario's Deli — Online"/>
+      </div>
+    </div>
+    <div style="padding:0 16px 10px">
+      <label style="font-size:11px;color:#16140e8c;font-weight:500;display:block;margin-bottom:6px">Store URL</label>
+      <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border-2 border-[#090806ec] shadow-[0_0_0_3px_rgba(117,107,87,0.1)]">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M1.5 8h13M8 1.5c2 1.7 3 4 3 6.5s-1 4.8-3 6.5M8 1.5c-2 1.7-3 4-3 6.5s1 4.8 3 6.5" stroke="#16140e8c" stroke-width="1.1"/></svg>
+        <input type="text" id="asn-online-url" value="mariosdeli.co.uk" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="e.g. mystore.co.uk"/>
+      </div>
+    </div>
+    <div style="padding:0 16px 16px">
+      <button onclick="asnAddOnlineStore()" class="w-full bg-[#0b0b0a] text-white font-semibold text-[15px] rounded-[24px] py-3.5 active:scale-[0.96] transition-transform">Add ecommerce store</button>
+    </div>
   </div>
 </div>
         </div>
@@ -4370,10 +4523,11 @@
         //   - Everything else at baseline
         const asStores = {
           // Existing stores: `prod` fields reflect products already in use (carried forward into 04c-product-usage).
-          regent:   { name: 'Regent Street', isNew: false, freq: 'Everyday', acct: 'teya', prod: { pbl: true,  ecom: false, moto: false } },
-          george:   { name: 'George Street', isNew: false, freq: 'Weekday',  acct: 'teya', prod: { pbl: false, ecom: true,  moto: true  } },
-          // New store — nothing configured yet.
-          waterloo: { name: 'Waterloo',      isNew: true,  freq: 'Everyday', acct: 'teya', prod: { pbl: false, ecom: false, moto: false } }
+          regent:   { name: 'Regent Street', type: 'physical', isNew: false, freq: 'Everyday', acct: 'teya', prod: { pbl: true,  ecom: false, moto: false, ecomMonthly: false } },
+          george:   { name: 'George Street', type: 'physical', isNew: false, freq: 'Weekday',  acct: 'teya', prod: { pbl: false, ecom: true,  moto: true,  ecomMonthly: false } },
+          // New stores — nothing configured yet. One physical, one online to demo store-type-aware product flow.
+          waterloo: { name: 'Waterloo',      type: 'physical', isNew: true,  freq: 'Everyday', acct: 'teya', prod: { pbl: false, ecom: false, moto: false, ecomMonthly: false } },
+          online:   { name: "Mario's Deli — Online", type: 'online',   isNew: true,  freq: 'Everyday', acct: 'teya', url: 'mariosdeli.co.uk', prod: { pbl: false, ecom: false, moto: false, ecomMonthly: false } }
         };
         // Snapshot of existing stores' settings at flow start — used to show
         // "Current: X" indicators so the agent always knows what the store had
@@ -6317,7 +6471,7 @@
 
             <!-- Intro -->
             <div class="animate-in px-4 pt-5 mb-3" style="animation-delay:0ms">
-              <p class="text-[14px] text-[#16140e8c]">Switch on the products each store will accept. Surcharges apply per transaction.</p>
+              <p class="text-[14px] text-[#16140e8c]">Some products come included for the store type. MOTO is optional — turn it on for stores that key in card details.</p>
             </div>
 
             <!-- Per store section label -->
@@ -6344,16 +6498,16 @@
         </div>
         <script>
           // ── Add-store Product Usage screen (iscreen-04c-product-usage) ──
-          // Tabbed per-store pattern — each store gets its own tab; a single
-          // product card below reflects the active store's toggles. Existing
-          // stores carry forward their `prod` state from asStores (products
-          // they already use); new stores start with everything off.
-          const APU_STORE_KEYS = ['waterloo','regent','george'];
+          // Per the e-commerce PM review: each store is either physical or online — never
+          // both. PBL is always available (info-only row). E-commerce is hidden for
+          // physical stores and info-only for online stores (with optional monthly sub).
+          // MOTO remains a toggle since it requires explicit activation.
+          const APU_STORE_KEYS = ['waterloo','online','regent','george'];
           let apuActiveStore = 'waterloo';
           const APU_PROD_META = {
-            pbl:  { label: 'Pay by Link',         subtitle: 'Send payment links via SMS/email',      surcharge: '+0.30% per transaction',   icon: '<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' },
-            ecom: { label: 'E-commerce',          subtitle: 'Online payments via website checkout', surcharge: '&pound;29/mo subscription', icon: '<rect x="2" y="3" width="20" height="18" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M2 9h20" stroke="#090806ec" stroke-width="1.5"/><rect x="5" y="13" width="6" height="4" rx="1" stroke="#090806ec" stroke-width="1.3"/>' },
-            moto: { label: 'MOTO (Manual Entry)', subtitle: 'Key in card details over the phone',   surcharge: '+0.50% per transaction',   icon: '<rect x="2" y="4" width="20" height="16" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M8 20h8" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/><path d="M12 16v4" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/><rect x="6" y="8" width="5" height="3" rx="0.5" fill="#090806ec" opacity="0.15"/>' }
+            pbl:  { label: 'Pay by Link',         subtitle: 'Send payment links via SMS/email',      surcharge: '+0.30% per transaction', icon: '<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' },
+            ecom: { label: 'E-commerce',          subtitle: 'Online payments via website checkout', surcharge: '+0.40% per transaction', icon: '<rect x="2" y="3" width="20" height="18" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M2 9h20" stroke="#090806ec" stroke-width="1.5"/><rect x="5" y="13" width="6" height="4" rx="1" stroke="#090806ec" stroke-width="1.3"/>' },
+            moto: { label: 'MOTO (Manual Entry)', subtitle: 'Key in card details over the phone',   surcharge: '+0.50% per transaction', icon: '<rect x="2" y="4" width="20" height="16" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M8 20h8" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/><path d="M12 16v4" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/><rect x="6" y="8" width="5" height="3" rx="0.5" fill="#090806ec" opacity="0.15"/>' }
           };
 
           function iApuRenderTabs(){
@@ -6367,19 +6521,85 @@
                 const color  = active ? '#090806ec' : '#5e564a';
                 const weight = active ? '600' : '500';
                 const shadow = active ? '0 1px 2px rgba(0,0,0,0.08)' : 'none';
-                const newBadge = s.isNew ? ' <span style="font-size:9px;font-weight:700;background:#e1e51a;color:#29320c;padding:1px 5px;border-radius:4px;letter-spacing:0.3px;margin-left:4px">NEW</span>' : '';
-                return '<button onclick="iApuSwitchStore(\'' + key + '\')" style="flex:1;padding:8px 6px;font-size:12px;font-weight:' + weight + ';background:' + bg + ';color:' + color + ';border:none;border-radius:999px;box-shadow:' + shadow + ';cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center">' + s.name + newBadge + '</button>';
+                const newBadge = s.isNew ? ' <span style="font-size:9px;font-weight:700;background:#e1e51a;color:#29320c;padding:1px 5px;border-radius:4px;letter-spacing:0.3px;margin-left:4px;flex-shrink:0">NEW</span>' : '';
+                const typeIcon = s.type === 'online'
+                  ? '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="margin-right:4px;flex-shrink:0;display:inline-block;vertical-align:-1px"><circle cx="8" cy="8" r="6.5" stroke="' + color + '" stroke-width="1.3"/><path d="M1.5 8h13M8 1.5c2 1.7 3 4 3 6.5s-1 4.8-3 6.5M8 1.5c-2 1.7-3 4-3 6.5s1 4.8 3 6.5" stroke="' + color + '" stroke-width="1.1"/></svg>'
+                  : '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="margin-right:4px;flex-shrink:0;display:inline-block;vertical-align:-1px"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="' + color + '" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                const tabLabel = s.type === 'online' ? (s.url || s.name) : s.name;
+                return '<button onclick="iApuSwitchStore(\'' + key + '\')" title="' + tabLabel + '" style="flex:1;min-width:0;padding:8px 4px;font-size:11px;font-weight:' + weight + ';background:' + bg + ';color:' + color + ';border:none;border-radius:999px;box-shadow:' + shadow + ';cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;overflow:hidden">' + typeIcon + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">' + tabLabel + '</span>' + newBadge + '</button>';
               }).join('') + '</div>';
           }
 
-          function iApuRenderRow(storeKey, prodKey, isLast){
+          // Info-only row — product included by default; surcharge shown for transparency.
+          function iApuRenderInfoRow(prodKey, isLast){
+            const meta = APU_PROD_META[prodKey];
+            const border = isLast ? '' : 'border-b border-[#756b571a]';
+            return '<div class="' + border + '">' +
+              '<div class="flex items-center gap-3 px-4 py-4">' +
+                '<div style="width:40px;height:40px;border-radius:12px;background:#f6f5f3;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+                  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none">' + meta.icon + '</svg>' +
+                '</div>' +
+                '<div class="flex-1">' +
+                  '<p class="text-[14px] font-semibold text-[#090806ec]">' + meta.label + '</p>' +
+                  '<p class="text-[12px] text-[#16140e8c]">' + meta.subtitle + '</p>' +
+                '</div>' +
+                '<span style="font-size:10px;font-weight:500;color:#46520f;background:#e1e51a33;padding:3px 10px;border-radius:10px;flex-shrink:0;letter-spacing:0.3px">Included</span>' +
+              '</div>' +
+              '<div style="padding:0 16px 14px 68px">' +
+                '<div style="display:flex;align-items:baseline;justify-content:space-between;background:#f6f5f3;border-radius:12px;padding:10px 14px">' +
+                  '<span style="font-size:12px;color:#16140e8c">Surcharge</span>' +
+                  '<span style="font-size:13px;font-weight:600;color:#090806ec">' + meta.surcharge + '</span>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          }
+
+          // E-commerce row for online stores — info row + optional monthly subscription sub-toggle.
+          function iApuRenderEcomRow(storeKey, isLast){
+            const s = asStores[storeKey];
+            const meta = APU_PROD_META.ecom;
+            const border = isLast ? '' : 'border-b border-[#756b571a]';
+            const subOn = !!(s.prod && s.prod.ecomMonthly);
+            const trackBg = subOn ? '#090806ec' : '#e5e2dc';
+            const thumbX  = subOn ? '18px' : '0';
+            return '<div class="' + border + '">' +
+              '<div class="flex items-center gap-3 px-4 py-4">' +
+                '<div style="width:40px;height:40px;border-radius:12px;background:#f6f5f3;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+                  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none">' + meta.icon + '</svg>' +
+                '</div>' +
+                '<div class="flex-1">' +
+                  '<p class="text-[14px] font-semibold text-[#090806ec]">' + meta.label + '</p>' +
+                  '<p class="text-[12px] text-[#16140e8c]">' + meta.subtitle + '</p>' +
+                '</div>' +
+                '<span style="font-size:10px;font-weight:500;color:#46520f;background:#e1e51a33;padding:3px 10px;border-radius:10px;flex-shrink:0;letter-spacing:0.3px">Included</span>' +
+              '</div>' +
+              '<div style="padding:0 16px 14px 68px">' +
+                '<div style="display:flex;align-items:baseline;justify-content:space-between;background:#f6f5f3;border-radius:12px;padding:10px 14px;margin-bottom:10px">' +
+                  '<span style="font-size:12px;color:#16140e8c">Surcharge</span>' +
+                  '<span style="font-size:13px;font-weight:600;color:#090806ec">' + meta.surcharge + '</span>' +
+                '</div>' +
+                '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+                  '<div style="flex:1;min-width:0">' +
+                    '<p style="font-size:12px;font-weight:500;color:#090806ec;margin:0">Monthly subscription</p>' +
+                    '<p style="font-size:11px;color:#16140e8c;margin:1px 0 0">Optional &mdash; &pound;29/mo (region-specific)</p>' +
+                  '</div>' +
+                  '<label onclick="event.stopPropagation();iApuToggleEcomMonthly(\'' + storeKey + '\')" style="position:relative;width:40px;height:24px;flex-shrink:0;cursor:pointer;display:inline-block">' +
+                    '<span style="position:absolute;inset:0;border-radius:12px;background:' + trackBg + ';transition:background 200ms"></span>' +
+                    '<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.15);transition:transform 200ms;transform:translateX(' + thumbX + ')"></span>' +
+                  '</label>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          }
+
+          // Toggle row — for products needing explicit activation (MOTO).
+          function iApuRenderToggleRow(storeKey, prodKey, isLast){
             const s      = asStores[storeKey];
             const meta   = APU_PROD_META[prodKey];
             const on     = !!(s.prod && s.prod[prodKey]);
             const border = isLast ? '' : 'border-b border-[#756b571a]';
             const trackBg = on ? '#090806ec' : '#e5e2dc';
             const thumbX  = on ? '18px' : '0';
-            // MOTO expands taller because it also shows the "Store statement uploaded" confirmation line.
             const expandMax = on ? (prodKey === 'moto' ? '90px' : '60px') : '0';
             const expandOp  = on ? '1' : '0';
 
@@ -6418,7 +6638,16 @@
             const box = document.getElementById('apu-product-card');
             if (!box) return;
             const key = apuActiveStore;
-            const rows = iApuRenderRow(key, 'pbl', false) + iApuRenderRow(key, 'ecom', false) + iApuRenderRow(key, 'moto', true);
+            const s   = asStores[key];
+            let rows;
+            if (s && s.type === 'online') {
+              rows = iApuRenderInfoRow('pbl', false) +
+                     iApuRenderEcomRow(key, false) +
+                     iApuRenderToggleRow(key, 'moto', true);
+            } else {
+              rows = iApuRenderInfoRow('pbl', false) +
+                     iApuRenderToggleRow(key, 'moto', true);
+            }
             box.innerHTML = '<div class="bg-white rounded-3xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]">' + rows + '</div>';
           }
 
@@ -6432,8 +6661,15 @@
 
           function iApuToggle(storeKey, prodKey){
             const s = asStores[storeKey];
-            if (!s.prod) s.prod = { pbl:false, ecom:false, moto:false };
+            if (!s.prod) s.prod = { pbl:false, ecom:false, moto:false, ecomMonthly:false };
             s.prod[prodKey] = !s.prod[prodKey];
+            iApuRenderCard();
+          }
+
+          function iApuToggleEcomMonthly(storeKey){
+            const s = asStores[storeKey];
+            if (!s.prod) s.prod = { pbl:false, ecom:false, moto:false, ecomMonthly:false };
+            s.prod.ecomMonthly = !s.prod.ecomMonthly;
             iApuRenderCard();
           }
 
@@ -7347,8 +7583,8 @@ function ndRenderStores(allExpanded) {
         '<div onclick="ndToggleStore(' + i + ')" class="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-[#5f4f300d]">' +
           '<div class="size-8 rounded-full bg-[#e1e51a33] flex items-center justify-center shrink-0 text-[12px] font-semibold text-[#6d770d]">' + (i + 1) + '</div>' +
           '<div class="flex-1 min-w-0">' +
-            '<p class="text-[15px] font-medium text-[#090806ec]">Mario\'s Deli — ' + store.name + '</p>' +
-            '<p class="text-[12px] text-[#16140e8c]">' + store.address + '</p>' +
+            '<p class="text-[15px] font-medium text-[#090806ec] truncate">' + (store._storeType === 'online' ? store.name : ('Mario\'s Deli — ' + store.name)) + '</p>' +
+            '<p class="text-[12px] text-[#16140e8c] truncate">' + (store._storeType === 'online' ? (store._url || '') : store.address) + '</p>' +
           '</div>' +
           '<svg id="nd-chev-' + i + '" class="chev' + (shouldOpen ? ' open' : '') + ' shrink-0" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="#16140e8c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
         '</div>' +
@@ -7372,7 +7608,7 @@ function ndRenderStores(allExpanded) {
             // ── Seasonality section ──
             '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
               '<label class="text-[13px] block mb-1" style="font-size:13px !important;color:rgba(22,20,14,0.55) !important">' +
-                (store._seasonMode === 'onetime' ? 'One-time event' : 'Seasonality') +
+                'Seasonality' +
               '</label>' +
               (store._seasonMode === 'onetime'
                 ? '<p class="text-[11px] text-[#16140e8c] mb-3">Use for merchants operating on fixed dates shorter than a month (e.g. fireworks stand, Christmas market).</p>'
@@ -7767,6 +8003,8 @@ function ndRemoveStatement(idx) {
 function ndOpenStoreSearch() {
   const overlay = document.getElementById('nd-search-overlay');
   if (overlay) overlay.classList.add('open');
+  // Reset to physical search type each time the sheet opens
+  if (typeof ndSetSearchType === 'function') ndSetSearchType('physical');
 }
 function ndCloseStoreSearch() {
   const overlay = document.getElementById('nd-search-overlay');
@@ -7817,14 +8055,15 @@ function ndAddStore(name, address, googleActivities, googleAtv) {
       name: name, address: address,
       activity: suggestions[0] || '', tpv: '', atv: googleAtv || '',
       _manual: true,
+      _storeType: 'physical',
       _googleActivities: suggestions,
       _googleAtv: googleAtv || '',
       _googleTxProfile: googleTxProfile,
       _txProfile: {...googleTxProfile},
       _txProfileOpen: false,
-      // Online payments — disabled by default for Google-added stores (no statement data to pre-fill)
-      _acceptsOnline: false,
-      _ecomPct: null,
+      // Online payments — slider always shown; physical stores default to 100% in-person
+      _acceptsOnline: true,
+      _ecomPct: 0,
       // Per-store add-on overrides for Mode A (default to company's current usage)
       _storeSa: 'teya',
       _storeSf: 'ed',
@@ -7836,6 +8075,61 @@ function ndAddStore(name, address, googleActivities, googleAtv) {
     ndLastAddedIdx = ndStores.length - 1;
     ndRenderStores(false);
   }
+}
+
+// Track which view the search sheet is showing — physical search (default) or
+// online URL entry (rare path, reached via the secondary "Add an online store" link).
+let ndSearchType = 'physical';
+function ndSetSearchType(t) {
+  ndSearchType = t;
+  const phys = document.getElementById('nd-search-physical');
+  const onl  = document.getElementById('nd-search-online');
+  const sub  = document.getElementById('nd-search-subtitle');
+  const action = document.getElementById('nd-online-action');
+  if (!phys || !onl) return;
+  const onPhys = (t === 'physical');
+  phys.style.display = onPhys ? '' : 'none';
+  onl.style.display  = onPhys ? 'none' : '';
+  if (sub) sub.textContent = onPhys ? 'Search by trading name or address' : 'Add an ecommerce store by URL';
+  if (action) action.style.display = onPhys ? '' : 'none';
+}
+
+// Push an ecommerce-only store into ndStores. Address inherits from company.
+function ndAddOnlineStore() {
+  const nameEl = document.getElementById('nd-online-name');
+  const urlEl  = document.getElementById('nd-online-url');
+  const name = (nameEl && nameEl.value.trim()) || "Mario's Deli — Online";
+  const url  = (urlEl && urlEl.value.trim()) || 'mariosdeli.co.uk';
+  // Use the same Google tx profile defaults as a starting point. Domestic share leans
+  // higher for ecommerce in this prototype but it stays editable in the store accordion.
+  const googleTxProfile = { visaMc: 75, debitCredit: 40, consumerBiz: 80, domestic: 55, intra: 30, inter: 15 };
+  ndCloseStoreSearch();
+  ndStores.push({
+    name: name,
+    address: 'Same as company address',
+    _url: url,
+    activity: '', tpv: '', atv: '',
+    _manual: true,
+    _storeType: 'online',
+    _googleActivities: [],
+    _googleAtv: '',
+    _googleTxProfile: googleTxProfile,
+    _txProfile: {...googleTxProfile},
+    _txProfileOpen: false,
+    // Online payments — ecommerce stores default to 100% online
+    _acceptsOnline: true,
+    _ecomPct: 100,
+    _storeSa: 'teya',
+    _storeSf: 'ed',
+    // Per-store product usage — ecom comes enabled by default; MOTO opt-in
+    _storePbl: false,
+    _storeEcom: true,
+    _storeMoto: false
+  });
+  ndLastAddedIdx = ndStores.length - 1;
+  // Reset the search type so the next "add store" opens to physical by default
+  ndSearchType = 'physical';
+  ndRenderStores(false);
 }
 function ndRemoveStore(idx) {
   ndStores.splice(idx, 1);
@@ -7963,83 +8257,55 @@ function ndSeasonContent(idx, store) {
 }
 
 // ── Transaction profile section ──
-// ── Online payments section ──
-// Asks if the store accepts online payments. If yes, collects an In-person / E-commerce split.
-// Statement-derived stores arrive pre-filled; Google-added stores start disabled (agent toggles on).
+// ── Payment mix section ──
+// Physical stores: shows the in-person / online slider (online portion = Pay by Link / MOTO).
+// Online stores: skipped entirely — store type already declares 100% online.
 function ndOnlinePaymentsSection(idx, store) {
-  const on = !!store._acceptsOnline;
-  const ecom = store._ecomPct;
-  const hasSplit = on && typeof ecom === 'number';
-  const inperson = hasSplit ? (100 - ecom) : null;
+  // Online stores are 100% online by definition — no slider needed.
+  if (store._storeType === 'online') return '';
+
+  const ecom = (typeof store._ecomPct === 'number') ? store._ecomPct : 0;
+  const inperson = 100 - ecom;
   const stmtIcon = '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="1.5" stroke="#16140e8c" stroke-width="1.2"/><path d="M5 4.5h6M5 7h6M5 9.5h4" stroke="#16140e8c" stroke-width="1" stroke-linecap="round"/></svg>';
   const showStmtNote = store._fromStatement && typeof store._stmtEcomPct === 'number';
 
-  // Header row: label + segmented No / Yes chips
-  const chipBase = 'px-3 py-1 rounded-full text-[12px] font-medium transition-all whitespace-nowrap';
-  const chipActive = 'bg-[#e1e51a33] text-[#6d770d] shadow-[0_0_0_1px_rgba(109,119,13,0.3)]';
-  const chipInactive = 'bg-transparent text-[#090806ec] shadow-[0_0_0_1px_rgba(117,107,87,0.2)] active:scale-[0.96]';
   let html = '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
-    '<div class="flex items-center justify-between gap-3">' +
-      '<div class="min-w-0">' +
-        '<label class="text-[13px] block" style="color:rgba(22,20,14,0.55)">Accepts online payments</label>' +
-        '<p class="text-[11px] text-[#16140e8c] mt-0.5">e.g. Pay by Link, MOTO, e-commerce</p>' +
-      '</div>' +
-      '<div class="flex gap-1.5 flex-shrink-0">' +
-        '<button onclick="ndSetAcceptsOnline(' + idx + ',false)" class="' + chipBase + ' ' + (on ? chipInactive : chipActive) + '">No</button>' +
-        '<button onclick="ndSetAcceptsOnline(' + idx + ',true)" class="' + chipBase + ' ' + (on ? chipActive : chipInactive) + '">Yes</button>' +
-      '</div>' +
+    '<div class="min-w-0">' +
+      '<label class="text-[13px] block" style="color:rgba(22,20,14,0.55)">Payment mix</label>' +
+      '<p class="text-[11px] text-[#16140e8c] mt-0.5">Share of in-person vs online payments (Pay by Link or MOTO only)</p>' +
     '</div>';
 
-  if (on) {
-    // Optional "Pre-filled from statement" note when source exists
-    if (showStmtNote && store._stmtEcomPct === store._ecomPct) {
-      html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">Pre-filled from statement</span></div>';
-    } else if (showStmtNote) {
-      html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">From statement: In-person ' + (100 - store._stmtEcomPct) + '% · Online ' + store._stmtEcomPct + '%</span></div>';
-    }
-
-    // Split bar (filled when values set, neutral gray when blank)
-    const inP = hasSplit ? inperson : 0;
-    const ecP = hasSplit ? ecom : 0;
-    html += '<div class="mt-3">' +
-      // Split-bar visualisation (stays gray when blank)
-      (hasSplit
-        ? '<div class="flex h-2 rounded-full overflow-hidden mb-2">' +
-            '<div style="width:' + inP + '%" class="bg-[#C0C42D] transition-all"></div>' +
-            '<div style="width:' + ecP + '%" class="bg-[#F1F3B6] transition-all"></div>' +
-          '</div>'
-        : '<div class="h-2 rounded-full mb-2 bg-[#e8e5df]"></div>'
-      ) +
-      // Paired inputs: In-person | E-commerce
-      '<div class="grid grid-cols-2 gap-2">' +
-        '<div>' +
-          '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#C0C42D]"></span>In-person</p>' +
-          '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
-            '<input inputmode="numeric" placeholder="—" value="' + (hasSplit ? inperson : '') + '" onfocus="this.select()" onchange="ndUpdateEcomSplit(' + idx + ',this.value,\'inperson\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
-            '<span class="text-[12px] text-[#16140e8c]">%</span>' +
-          '</div>' +
-        '</div>' +
-        '<div>' +
-          '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#F1F3B6]"></span>Online</p>' +
-          '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
-            '<input inputmode="numeric" placeholder="—" value="' + (hasSplit ? ecom : '') + '" onfocus="this.select()" onchange="ndUpdateEcomSplit(' + idx + ',this.value,\'ecom\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
-            '<span class="text-[12px] text-[#16140e8c]">%</span>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
+  if (showStmtNote && store._stmtEcomPct === store._ecomPct) {
+    html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">Pre-filled from statement</span></div>';
+  } else if (showStmtNote) {
+    html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">From statement: In-person ' + (100 - store._stmtEcomPct) + '% · Online ' + store._stmtEcomPct + '%</span></div>';
   }
+
+  html += '<div class="mt-3">' +
+    '<div class="flex h-2 rounded-full overflow-hidden mb-2">' +
+      '<div style="width:' + inperson + '%" class="bg-[#C0C42D] transition-all"></div>' +
+      '<div style="width:' + ecom + '%" class="bg-[#F1F3B6] transition-all"></div>' +
+    '</div>' +
+    '<div class="grid grid-cols-2 gap-2">' +
+      '<div>' +
+        '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#C0C42D]"></span>In-person</p>' +
+        '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
+          '<input inputmode="numeric" value="' + inperson + '" onfocus="this.select()" onchange="ndUpdateEcomSplit(' + idx + ',this.value,\'inperson\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
+          '<span class="text-[12px] text-[#16140e8c]">%</span>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#F1F3B6]"></span>Online</p>' +
+        '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
+          '<input inputmode="numeric" value="' + ecom + '" onfocus="this.select()" onchange="ndUpdateEcomSplit(' + idx + ',this.value,\'ecom\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
+          '<span class="text-[12px] text-[#16140e8c]">%</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
 
   html += '</div>';
   return html;
-}
-
-// Set online-payments acceptance explicitly (keeps _ecomPct if already set, so agent can flip No/Yes without losing data)
-function ndSetAcceptsOnline(idx, on) {
-  const s = ndStores[idx];
-  s._acceptsOnline = !!on;
-  ndLastAddedIdx = idx;   // keep this store expanded across the re-render
-  ndRenderStores(false);
 }
 
 // Editing one side auto-updates the other (always summing to 100)
@@ -9112,8 +9378,8 @@ function asnRenderStores(allExpanded) {
         '<div onclick="asnToggleStore(' + i + ')" class="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-[#5f4f300d]">' +
           '<div class="size-8 rounded-full bg-[#e1e51a33] flex items-center justify-center shrink-0 text-[12px] font-semibold text-[#6d770d]">' + (i + 1) + '</div>' +
           '<div class="flex-1 min-w-0">' +
-            '<p class="text-[15px] font-medium text-[#090806ec]">Mario\'s Deli — ' + store.name + '</p>' +
-            '<p class="text-[12px] text-[#16140e8c]">' + store.address + '</p>' +
+            '<p class="text-[15px] font-medium text-[#090806ec] truncate">' + (store._storeType === 'online' ? store.name : ('Mario\'s Deli — ' + store.name)) + '</p>' +
+            '<p class="text-[12px] text-[#16140e8c] truncate">' + (store._storeType === 'online' ? (store._url || '') : store.address) + '</p>' +
           '</div>' +
           '<svg id="asn-chev-' + i + '" class="chev' + (shouldOpen ? ' open' : '') + ' shrink-0" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="#16140e8c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
         '</div>' +
@@ -9137,7 +9403,7 @@ function asnRenderStores(allExpanded) {
             // ── Seasonality section ──
             '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
               '<label class="text-[13px] block mb-1" style="font-size:13px !important;color:rgba(22,20,14,0.55) !important">' +
-                (store._seasonMode === 'onetime' ? 'One-time event' : 'Seasonality') +
+                'Seasonality' +
               '</label>' +
               (store._seasonMode === 'onetime'
                 ? '<p class="text-[11px] text-[#16140e8c] mb-3">Use for merchants operating on fixed dates shorter than a month (e.g. fireworks stand, Christmas market).</p>'
@@ -9563,6 +9829,8 @@ function asnOpenStoreSearch() {
     overlay.style.display = 'block';
     requestAnimationFrame(() => { overlay.style.opacity = '1'; sheet.style.transform = 'translateY(0)'; });
   }
+  // Reset to physical search type each time the sheet opens
+  if (typeof asnSetSearchType === 'function') asnSetSearchType('physical');
 }
 function asnCloseStoreSearch() {
   const overlay = document.getElementById('asn-search-overlay');
@@ -9640,14 +9908,15 @@ function asnAddStore(name, address, googleActivities, googleAtv) {
       name: name, address: address,
       activity: suggestions[0] || '', tpv: '', atv: googleAtv || '',
       _manual: true,
+      _storeType: 'physical',
       _googleActivities: suggestions,
       _googleAtv: googleAtv || '',
       _googleTxProfile: googleTxProfile,
       _txProfile: {...googleTxProfile},
       _txProfileOpen: false,
-      // Online payments — disabled by default for Google-added stores (no statement data to pre-fill)
-      _acceptsOnline: false,
-      _ecomPct: null,
+      // Online payments — slider always shown; physical stores default to 100% in-person
+      _acceptsOnline: true,
+      _ecomPct: 0,
       // Per-store add-on overrides for Mode A (default to company's current usage)
       _storeSa: 'teya',
       _storeSf: 'ed',
@@ -9660,6 +9929,57 @@ function asnAddStore(name, address, googleActivities, googleAtv) {
     asnRenderStores(false);
   }
 }
+
+// Track which view the asn-search sheet is showing — physical search (default) or
+// online URL entry (rare path, reached via the secondary "Add an online store" link).
+let asnSearchType = 'physical';
+function asnSetSearchType(t) {
+  asnSearchType = t;
+  const phys = document.getElementById('asn-search-physical');
+  const onl  = document.getElementById('asn-search-online');
+  const sub  = document.getElementById('asn-search-subtitle');
+  const action = document.getElementById('asn-online-action');
+  if (!phys || !onl) return;
+  const onPhys = (t === 'physical');
+  phys.style.display = onPhys ? '' : 'none';
+  onl.style.display  = onPhys ? 'none' : '';
+  if (sub) sub.textContent = onPhys ? 'Search by trading name or address' : 'Add an ecommerce store by URL';
+  if (action) action.style.display = onPhys ? '' : 'none';
+}
+
+// Push an ecommerce-only store into asnStores. Address inherits from company.
+function asnAddOnlineStore() {
+  const nameEl = document.getElementById('asn-online-name');
+  const urlEl  = document.getElementById('asn-online-url');
+  const name = (nameEl && nameEl.value.trim()) || "Mario's Deli — Online";
+  const url  = (urlEl && urlEl.value.trim()) || 'mariosdeli.co.uk';
+  const googleTxProfile = { visaMc: 75, debitCredit: 40, consumerBiz: 80, domestic: 55, intra: 30, inter: 15 };
+  asnCloseStoreSearch();
+  asnStores.push({
+    name: name,
+    address: 'Same as company address',
+    _url: url,
+    activity: '', tpv: '', atv: '',
+    _manual: true,
+    _storeType: 'online',
+    _googleActivities: [],
+    _googleAtv: '',
+    _googleTxProfile: googleTxProfile,
+    _txProfile: {...googleTxProfile},
+    _txProfileOpen: false,
+    _acceptsOnline: true,
+    _ecomPct: 100,
+    _storeSa: 'teya',
+    _storeSf: 'ed',
+    _storePbl: false,
+    _storeEcom: true,
+    _storeMoto: false
+  });
+  asnLastAddedIdx = asnStores.length - 1;
+  asnSearchType = 'physical';
+  asnRenderStores(false);
+}
+
 function asnRemoveStore(idx) {
   asnStores.splice(idx, 1);
   asnRenderStores(false);
@@ -9783,75 +10103,55 @@ function asnSeasonContent(idx, store) {
 }
 
 // ── Transaction profile section ──
-// ── Online payments section (add-store / upsell flow) ──
+// ── Payment mix section (add-store / upsell flow) ──
+// Physical stores: shows the in-person / online slider (online portion = Pay by Link / MOTO).
+// Online stores: skipped entirely — store type already declares 100% online.
 function asnOnlinePaymentsSection(idx, store) {
-  const on = !!store._acceptsOnline;
-  const ecom = store._ecomPct;
-  const hasSplit = on && typeof ecom === 'number';
-  const inperson = hasSplit ? (100 - ecom) : null;
+  // Online stores are 100% online by definition — no slider needed.
+  if (store._storeType === 'online') return '';
+
+  const ecom = (typeof store._ecomPct === 'number') ? store._ecomPct : 0;
+  const inperson = 100 - ecom;
   const stmtIcon = '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="1.5" stroke="#16140e8c" stroke-width="1.2"/><path d="M5 4.5h6M5 7h6M5 9.5h4" stroke="#16140e8c" stroke-width="1" stroke-linecap="round"/></svg>';
   const showStmtNote = store._fromStatement && typeof store._stmtEcomPct === 'number';
 
-  const chipBase = 'px-3 py-1 rounded-full text-[12px] font-medium transition-all whitespace-nowrap';
-  const chipActive = 'bg-[#e1e51a33] text-[#6d770d] shadow-[0_0_0_1px_rgba(109,119,13,0.3)]';
-  const chipInactive = 'bg-transparent text-[#090806ec] shadow-[0_0_0_1px_rgba(117,107,87,0.2)] active:scale-[0.96]';
   let html = '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
-    '<div class="flex items-center justify-between gap-3">' +
-      '<div class="min-w-0">' +
-        '<label class="text-[13px] block" style="color:rgba(22,20,14,0.55)">Accepts online payments</label>' +
-        '<p class="text-[11px] text-[#16140e8c] mt-0.5">e.g. Pay by Link, MOTO, e-commerce</p>' +
-      '</div>' +
-      '<div class="flex gap-1.5 flex-shrink-0">' +
-        '<button onclick="asnSetAcceptsOnline(' + idx + ',false)" class="' + chipBase + ' ' + (on ? chipInactive : chipActive) + '">No</button>' +
-        '<button onclick="asnSetAcceptsOnline(' + idx + ',true)" class="' + chipBase + ' ' + (on ? chipActive : chipInactive) + '">Yes</button>' +
-      '</div>' +
+    '<div class="min-w-0">' +
+      '<label class="text-[13px] block" style="color:rgba(22,20,14,0.55)">Payment mix</label>' +
+      '<p class="text-[11px] text-[#16140e8c] mt-0.5">Share of in-person vs online payments (Pay by Link or MOTO only)</p>' +
     '</div>';
 
-  if (on) {
-    if (showStmtNote && store._stmtEcomPct === store._ecomPct) {
-      html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">Pre-filled from statement</span></div>';
-    } else if (showStmtNote) {
-      html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">From statement: In-person ' + (100 - store._stmtEcomPct) + '% · Online ' + store._stmtEcomPct + '%</span></div>';
-    }
-
-    const inP = hasSplit ? inperson : 0;
-    const ecP = hasSplit ? ecom : 0;
-    html += '<div class="mt-3">' +
-      (hasSplit
-        ? '<div class="flex h-2 rounded-full overflow-hidden mb-2">' +
-            '<div style="width:' + inP + '%" class="bg-[#C0C42D] transition-all"></div>' +
-            '<div style="width:' + ecP + '%" class="bg-[#F1F3B6] transition-all"></div>' +
-          '</div>'
-        : '<div class="h-2 rounded-full mb-2 bg-[#e8e5df]"></div>'
-      ) +
-      '<div class="grid grid-cols-2 gap-2">' +
-        '<div>' +
-          '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#C0C42D]"></span>In-person</p>' +
-          '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
-            '<input inputmode="numeric" placeholder="—" value="' + (hasSplit ? inperson : '') + '" onfocus="this.select()" onchange="asnUpdateEcomSplit(' + idx + ',this.value,\'inperson\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
-            '<span class="text-[12px] text-[#16140e8c]">%</span>' +
-          '</div>' +
-        '</div>' +
-        '<div>' +
-          '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#F1F3B6]"></span>Online</p>' +
-          '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
-            '<input inputmode="numeric" placeholder="—" value="' + (hasSplit ? ecom : '') + '" onfocus="this.select()" onchange="asnUpdateEcomSplit(' + idx + ',this.value,\'ecom\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
-            '<span class="text-[12px] text-[#16140e8c]">%</span>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
+  if (showStmtNote && store._stmtEcomPct === store._ecomPct) {
+    html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">Pre-filled from statement</span></div>';
+  } else if (showStmtNote) {
+    html += '<div class="flex items-center gap-1 mt-1.5"><span class="flex items-center">' + stmtIcon + '</span><span class="text-[11px] text-[#16140e8c]">From statement: In-person ' + (100 - store._stmtEcomPct) + '% · Online ' + store._stmtEcomPct + '%</span></div>';
   }
+
+  html += '<div class="mt-3">' +
+    '<div class="flex h-2 rounded-full overflow-hidden mb-2">' +
+      '<div style="width:' + inperson + '%" class="bg-[#C0C42D] transition-all"></div>' +
+      '<div style="width:' + ecom + '%" class="bg-[#F1F3B6] transition-all"></div>' +
+    '</div>' +
+    '<div class="grid grid-cols-2 gap-2">' +
+      '<div>' +
+        '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#C0C42D]"></span>In-person</p>' +
+        '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
+          '<input inputmode="numeric" value="' + inperson + '" onfocus="this.select()" onchange="asnUpdateEcomSplit(' + idx + ',this.value,\'inperson\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
+          '<span class="text-[12px] text-[#16140e8c]">%</span>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<p class="text-[11px] text-[#16140e8c] mb-1 flex items-center gap-1.5"><span class="inline-block size-2 rounded-sm bg-[#F1F3B6]"></span>Online</p>' +
+        '<div class="bg-[#f6f5f3] rounded-lg h-9 flex items-center justify-center gap-0.5">' +
+          '<input inputmode="numeric" value="' + ecom + '" onfocus="this.select()" onchange="asnUpdateEcomSplit(' + idx + ',this.value,\'ecom\')" class="w-12 bg-transparent text-center text-[14px] text-[#090806ec] outline-none tabular-nums"/>' +
+          '<span class="text-[12px] text-[#16140e8c]">%</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
 
   html += '</div>';
   return html;
-}
-
-function asnSetAcceptsOnline(idx, on) {
-  const s = asnStores[idx];
-  s._acceptsOnline = !!on;
-  asnLastAddedIdx = idx;   // keep this store expanded across the re-render
-  asnRenderStores(false);
 }
 
 function asnUpdateEcomSplit(idx, value, which) {
