@@ -172,6 +172,23 @@
     .side-menu-item.active-item{background:#090806ec08;}
     .side-menu-item-disabled{display:flex;align-items:center;gap:14px;padding:14px 20px;opacity:0.38;border-radius:16px;margin:0 8px;}
 
+    /* ── Deal confidence (Phase 2) — uses s-05-bar palette ── */
+    .conf-bar-track{position:relative;height:6px;background:#e8e5df;border-radius:3px;overflow:hidden;}
+    .conf-bar-fill{height:100%;border-radius:3px;transition:width 300ms ease,background 300ms ease;}
+    /* Compact confidence strip on s-05 / iscreen surfaces */
+    .conf-strip{display:flex;align-items:center;gap:8px;background:#f6f5f3;padding:6px 16px;border-bottom:1px solid #756b571a;cursor:pointer;flex-shrink:0;}
+    .conf-strip:active{background:#eee9df;}
+    .conf-strip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:#a3c947;transition:background 200ms;}
+    .conf-strip-text{font-size:10px;color:#16140e8c;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .conf-strip-text .conf-level{color:#090806ec;font-weight:600;}
+    .conf-strip-text .conf-strip-sep{color:#16140e4d;}
+    .conf-strip-edit{font-size:10px;color:#16140e8c;font-weight:500;flex-shrink:0;white-space:nowrap;}
+    /* Per-store source badge — appears on each store card on s-02 */
+    .store-source-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 7px;border-radius:8px;flex-shrink:0;white-space:nowrap;letter-spacing:0.1px;}
+    .store-source-badge.high  {background:#7ccf001a;color:#497d00;}
+    .store-source-badge.medium{background:#a3c9471a;color:#5a7a26;}
+    .store-source-badge.low   {background:#c0392b1a;color:#c0392b;}
+
   </style>
 </head>
 <body class="bg-[#e8e6e1] min-h-screen flex flex-col items-center justify-center p-8 gap-4">
@@ -413,38 +430,42 @@
     <span class="text-[16px] font-semibold text-[#090806ec]">New deal</span>
   </div>
 </div>
-<!-- ── STATEMENTS section ── -->
-<div class="ai pt-4 px-4 mb-3" style="animation-delay:0ms">
-  <p class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-2 px-1">Statements</p>
-  <!-- Upload button (always visible, always on top) -->
-  <div id="nd-stmt-upload">
-    <div onclick="ndUploadStatement()" class="bg-white rounded-2xl px-4 py-3 flex items-center gap-3 shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] cursor-pointer active:scale-[0.98] transition-transform">
-      <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13V4M10 4L7 7M10 4l3 3" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-      <div class="flex-1"><p id="nd-stmt-upload-label" class="text-[14px] font-medium text-[#090806ec]">Upload file</p><p class="text-[12px] text-[#16140e8c]">PDF, image, or photo of a statement</p></div>
+<!-- ── DATA CONFIDENCE bar (Phase 2) — sticky header, mirrors s-05 NSR bar pattern.
+     Stays visible while the stores list scrolls. Hidden until first input lands. ── -->
+<div id="nd-confidence" class="agent-only" style="position:sticky;top:56px;z-index:9;background:#f6f5f3;padding:8px 16px 10px;border-bottom:1px solid #756b571a;display:none">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:5px">
+    <div style="display:flex;align-items:baseline;gap:8px;min-width:0;flex:1">
+      <span style="font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#16140e8c;flex-shrink:0">Data confidence</span>
+      <span id="nd-conf-level" style="font-size:13px;font-weight:600;color:#5a7a26">Medium</span>
     </div>
+    <span id="nd-conf-pct" style="font-size:13px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums;flex-shrink:0">60%</span>
   </div>
-  <!-- Confirmed statement banners rendered below upload -->
-  <div id="nd-stmt-banners" class="space-y-2 mt-2"></div>
-  <p id="nd-stmt-hint" class="text-[12px] text-[#16140e8c] text-center mt-2">Upload a statement to auto-identify stores and pre-fill details</p>
+  <div id="nd-conf-track" class="conf-bar-track">
+    <div id="nd-conf-bar" class="conf-bar-fill" style="width:60%;background:#a3c947"></div>
+  </div>
+  <p id="nd-conf-hint" style="font-size:11px;color:#497d00;margin-top:6px;line-height:1.3">&uarr; Upload Camden's statement to reduce pricing risk</p>
 </div>
 
-<!-- ── STORES section (unified: list + details per store) ── -->
-<div class="ai px-4 mb-4" style="animation-delay:60ms">
-  <p class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-2 px-1">Stores</p>
-  <div id="nd-stores-container" class="space-y-2">
-    <!-- Dynamic store islands inserted here by JS -->
+<!-- ── STORES IN THIS DEAL section (unified: statement upload + store list + manual add) ── -->
+<div class="ai pt-4 px-4 mb-4" style="animation-delay:0ms">
+  <p class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-2 px-1">Stores in this deal</p>
+
+  <!-- Statements area — iOS grouped-list pattern: action card on top, files card
+       below, both white with small gap between. Files card collapses when empty. -->
+  <div id="nd-stmt-upload" onclick="ndUploadStatement()" class="bg-white rounded-2xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] px-4 py-3 flex items-center gap-3 cursor-pointer active:bg-[#5f4f300d] transition-colors">
+    <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13V4M10 4L7 7M10 4l3 3" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+    <div class="flex-1"><p id="nd-stmt-upload-label" class="text-[14px] font-medium text-[#090806ec]">Upload statement</p><p class="text-[12px] text-[#16140e8c]">We&rsquo;ll detect stores and attach automatically</p></div>
   </div>
-  <!-- Empty state: inviting card matching upload file style -->
-  <div id="nd-stores-empty">
-    <div onclick="ndOpenStoreSearch()" class="bg-white rounded-2xl px-4 py-3 flex items-center gap-3 shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] cursor-pointer active:scale-[0.98] transition-transform">
-      <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 8h14M3 8v8a1 1 0 001 1h12a1 1 0 001-1V8M3 8l2-4h10l2 4" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v4M8 13h4" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-      <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Add your first store</p><p class="text-[12px] text-[#16140e8c]">Search by name or address</p></div>
-    </div>
-  </div>
-  <!-- With stores: subtle add link at the bottom -->
-  <div id="nd-add-store-row" onclick="ndOpenStoreSearch()" class="hidden mt-3 flex items-center justify-center gap-1.5 cursor-pointer active:opacity-60 transition-opacity py-1">
+  <!-- Processed statements list — separate white card below the action. Hidden when empty (no content = no card). -->
+  <div id="nd-stmt-banners" class="bg-white rounded-2xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] mt-2 empty:hidden divide-y divide-[#756b571a] overflow-hidden"></div>
+
+  <!-- Stores list (cards rendered by JS) — 20pt gap above to read as new section per iOS grouped-list pattern. `empty:hidden` collapses when no stores so the gap doesn't apply. -->
+  <div id="nd-stores-container" class="space-y-2 mt-4 empty:hidden empty:mt-0"></div>
+
+  <!-- Add store manually — always visible, secondary to the statement upload above -->
+  <div id="nd-add-store-row" onclick="ndOpenStoreSearch()" class="mt-3 flex items-center justify-center gap-1.5 cursor-pointer active:opacity-60 transition-opacity py-2">
     <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#16140e8c" stroke-width="1.6" stroke-linecap="round"/></svg>
-    <span class="text-[13px] font-medium text-[#16140e8c]">Add another store</span>
+    <span class="text-[13px] font-medium text-[#16140e8c]">Add store via Google search</span>
   </div>
 </div>
 <!-- end scroll -->
@@ -475,12 +496,14 @@
 <div id="nd-search-overlay" class="popup-overlay" onclick="ndCloseStoreSearch()">
   <div class="popup-sheet" onclick="event.stopPropagation()" style="max-height:80%;overflow-y:auto">
     <div class="popup-handle"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:0 20px 4px">
-      <div style="flex:1;min-width:0">
-        <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0 0 4px">Add a store</p>
-        <p id="nd-search-subtitle" style="font-size:13px;color:#16140e8c;margin:0 0 14px">Search by trading name or address</p>
-      </div>
-      <button id="nd-online-action" onclick="ndSetSearchType('online')" style="display:inline-block;font-size:13px;font-weight:500;color:#5e564a;background:transparent;border:none;padding:6px 4px;cursor:pointer;font-family:inherit;flex-shrink:0;margin-top:6px;white-space:nowrap;line-height:1;transition:color 150ms" onmouseover="this.style.color='#090806ec'" onmouseout="this.style.color='#5e564a'"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="display:inline-block;vertical-align:-2px;margin-right:5px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 8h13M8 1.5c2 1.7 3 4 3 6.5s-1 4.8-3 6.5M8 1.5c-2 1.7-3 4-3 6.5s1 4.8 3 6.5" stroke="currentColor" stroke-width="1.2"/></svg>Online store</button>
+    <div style="padding:0 20px 12px">
+      <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0 0 4px">Add a store</p>
+      <p id="nd-search-subtitle" style="font-size:13px;color:#16140e8c;margin:0">Search by trading name or address</p>
+    </div>
+    <!-- Segmented toggle — Physical / E-commerce -->
+    <div style="margin:0 16px 14px;background:#f0eee9;border-radius:9999px;padding:3px;display:flex;gap:3px">
+      <button id="nd-tab-physical" onclick="ndSetSearchType('physical')" style="flex:1;padding:8px 12px;border-radius:9999px;background:white;color:#090806ec;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;box-shadow:0 1px 2px rgba(0,0,0,0.08);transition:all 150ms">Physical store</button>
+      <button id="nd-tab-ecom" onclick="ndSetSearchType('online')" style="flex:1;padding:8px 12px;border-radius:9999px;background:transparent;color:#16140e8c;font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:inherit;transition:all 150ms">E-commerce store</button>
     </div>
     <!-- Physical store content (default flow) -->
     <div id="nd-search-physical">
@@ -516,12 +539,6 @@
     <!-- Online store content -->
     <div id="nd-search-online" style="display:none">
       <div style="padding:0 16px 10px">
-        <button onclick="ndSetSearchType('physical')" style="display:flex;align-items:center;gap:4px;font-size:13px;color:#090806ec;background:none;border:none;cursor:pointer;font-family:inherit;padding:0">
-          <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Add a physical store instead</span>
-        </button>
-      </div>
-      <div style="padding:8px 16px 10px">
         <label style="font-size:11px;color:#16140e8c;font-weight:500;display:block;margin-bottom:6px">Store name</label>
         <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border border-[#8f867633]">
           <input type="text" id="nd-online-name" value="Mario's Deli — Online" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="e.g. Mario's Deli — Online"/>
@@ -885,7 +902,7 @@
     <div class="bg-white rounded-3xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]">
       <div class="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[#756b571a]"><span class="text-[16px] font-semibold text-[#090806ec]">Offers</span><button onclick="go('05')" class="text-[13px] text-[#090806ec] underline">Create ›</button></div>
       <div class="px-4 py-3 border-b border-[#756b571a]">
-        <div class="flex items-start justify-between mb-2"><div><p class="text-[14px] font-semibold text-[#090806ec]">Offer #1</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Company-level · 2 stores · 02/03/2026</p></div><span class="text-[11px] font-semibold text-[#497d00] bg-[#7ccf001a] px-2 py-0.5 rounded-full shrink-0">Created</span></div>
+        <div class="flex items-start justify-between mb-2"><div><p class="text-[14px] font-semibold text-[#090806ec]" id="off-card-title">Offer v1</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Company-level · 2 stores · 02/03/2026</p></div><span id="off-status-chip" class="text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0" style="color:#8a6800;background:#FFF7E0">Quote v1</span></div>
         <div class="bg-[#f6f5f3] rounded-2xl p-3 mb-3">
           <div class="grid grid-cols-2 gap-x-3 gap-y-2">
             <div><p class="text-[11px] text-[#16140e8c] mb-0.5">Rate</p><p class="text-[13px] font-semibold text-[#090806ec] tabular-nums">1.45% blended</p></div>
@@ -900,10 +917,7 @@
           <div class="flex items-center gap-2"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="#497d00" stroke-width="1.5" stroke-linecap="round"/></svg><span class="text-[13px] text-[#090806ec]">George Street — £38k/mo · 1.45%</span></div>
         </div>
       </div>
-      <div class="px-4 py-3 border-b border-[#756b571a]">
-        <button onclick="go('08');startOnboarding()" class="w-full bg-[#0b0b0a] text-white font-semibold text-[14px] rounded-[24px] py-3 flex items-center justify-center gap-2 active:scale-[0.96] transition-transform"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 100 8A4 4 0 008 2zM2 14c0-2 2.7-3.5 6-3.5s6 1.5 6 3.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><path d="M13 9l2 2-2 2" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Onboard merchant</button>
-      </div>
-      <div class="px-4 py-3"><button onclick="go('05')" class="w-full bg-[#f6f5f3] border border-[#756b571a] text-[#090806ec] font-medium text-[14px] rounded-[24px] py-3 flex items-center justify-center gap-2 active:scale-[0.96] transition-transform"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg>Create new offer</button></div>
+      <div id="off-card-ctas"><!-- populated by renderOfferCardOnS04() based on window._offerStatus --></div>
     </div>
   </div>
 </div>
@@ -1014,8 +1028,10 @@
 <!-- ═══ SCREEN 05: CREATE OFFER ═══ -->
 <style>
   #s-05.client-mode .agent-only { display:none !important; }
-  #s-05 .client-only, #s-05c .client-only { display:none; }
+  #s-05 .client-only, #s-05c .client-only { display:none !important; }
   #s-05.client-mode .client-only, #s-05c.client-mode .client-only { display:block !important; }
+  /* When the client-only target is itself a chip-row, restore its flex layout */
+  #s-05.client-mode .client-only.chip-row, #s-05c.client-mode .client-only.chip-row { display:flex !important; }
   #s-05 .agent-only, #s-05c .agent-only { }
   #s-05.client-mode .agent-only, #s-05c.client-mode .agent-only { display:none !important; }
   /* Add-store flow: same agent/client pattern on offer + terminals + review inner screens */
@@ -1060,6 +1076,13 @@
   /* Hide the header preview summary when the accordion is open — body already shows the active state */
   #s-05 .accordion-preview, #iscreen-03-offer-selection .accordion-preview { transition:opacity 180ms ease; }
   #s-05 .addon-card[data-open="true"] .accordion-preview, #iscreen-03-offer-selection .addon-card[data-open="true"] .accordion-preview { opacity:0; pointer-events:none; }
+  /* Empty-state promo card: hide accordion-header/body when data-empty=true, show .addon-empty instead. */
+  #s-05 .addon-empty { display:none; }
+  #s-05 .addon-card[data-empty="true"] > .addon-empty { display:flex; }
+  #s-05 .addon-card[data-empty="true"] > .accordion-header,
+  #s-05 .addon-card[data-empty="true"] > .accordion-body { display:none; }
+  /* Visually flag empty cards as "to be filled" — transparent background, dashed border. */
+  #s-05 .addon-card[data-empty="true"] { background:transparent; box-shadow:none; border:1.5px dashed #8f867680; }
   #s-05 .addon-badge { font-size:10px; font-weight:600; padding:2px 6px; border-radius:10px; white-space:nowrap; display:inline-block; margin-left:6px; }
   #s-05 .addon-badge.green { background:#7ccf001a; color:#497d00; }
   #s-05 .addon-badge.amber { background:#f0a50022; color:#b8860b; }
@@ -1147,19 +1170,19 @@
       </div>
     </div>
 
-    <!-- ═══ Take Rate Health Bar (agent only, sticky) ═══ -->
-    <div id="take-rate-bar" class="agent-only" style="flex-shrink:0;background:#f6f5f3;padding:12px 16px;border-bottom:1px solid #756b571a">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+    <!-- ═══ Health Bar (agent only, sticky) — compact: dropped Floor/Suggested labels (wall on bar visualizes them) ═══ -->
+    <div id="take-rate-bar" class="agent-only" style="flex-shrink:0;background:#f6f5f3;padding:8px 16px;border-bottom:1px solid #756b571a">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
         <div style="display:flex;align-items:baseline;gap:6px">
-          <span style="font-size:11px;color:#16140e8c">Take rate</span>
-          <span id="tr-rate" style="font-size:17px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">1.86%</span>
+          <span style="font-size:11px;color:#16140e8c">NSR / mo</span>
+          <span id="tr-commission" style="font-size:17px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">&pound;836</span>
         </div>
         <div style="display:flex;align-items:baseline;gap:6px">
           <span style="font-size:11px;color:#16140e8c">Est. commission</span>
-          <span id="tr-commission" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;836/mo</span>
+          <span id="tr-rate" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;836/mo</span>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:8px">
         <div class="health-bar-track">
           <div id="tr-bar" class="health-bar-fill" style="width:58%;background:#7ccf00"></div>
           <!-- V3: permanent floor wall on the bar at the Floor position -->
@@ -1169,10 +1192,18 @@
         </div>
         <span id="tr-label" style="font-size:11px;font-weight:600"></span>
       </div>
-      <div style="display:flex;justify-content:space-between">
-        <span id="tr-floor-label" style="font-size:10px;color:#16140e8c;transition:color 200ms,font-weight 200ms">Floor: 1.20%</span>
-        <span style="font-size:10px;color:#16140e8c">Suggested: 1.60%</span>
+      <!-- Compact floor / target labels — extra top margin so labels sit away from the bar -->
+      <div style="display:flex;justify-content:space-between;margin-top:8px;line-height:1">
+        <span id="tr-floor-label" style="font-size:10px;color:#16140e8c;transition:color 200ms,font-weight 200ms">Floor &pound;540</span>
+        <span id="tr-target-label" style="font-size:10px;color:#16140e8c">Target &pound;720</span>
       </div>
+    </div>
+
+    <!-- ═══ Reliability strip (Phase 2) — mirror of s-02 panel; tap returns to deal info ═══ -->
+    <div id="s05-conf-strip" class="conf-strip agent-only" onclick="go('02')" style="display:none">
+      <span class="conf-strip-dot"></span>
+      <span class="conf-strip-text"><span class="conf-pct" style="font-weight:600;color:#090806ec">60%</span> data confidence<span class="conf-strip-sep"> &middot; </span><span class="conf-strip-source">1 of 2 stores &middot; Statement</span></span>
+      <span class="conf-strip-edit">Add statement &rsaquo;</span>
     </div>
 
     <!-- ══════════ SCROLL BODY ══════════ -->
@@ -1426,7 +1457,22 @@
             </button>
             <div class="accordion-body">
               <div class="accordion-body-inner">
-                <div class="chip-row" id="ct-chips">
+                <!-- Agent mode: selected-tier card + Change link → bottom sheet (BA pattern) -->
+                <div class="agent-only">
+                  <p style="font-size:12px;color:#16140e8c;margin:0 0 10px;line-height:1.5">Longer commitments unlock lower rates.</p>
+                  <div id="ct-current-card" style="background:#f6f5f3;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:1px solid #8f867633">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                      <div style="min-width:0">
+                        <p id="ct-current-name" style="font-size:14px;font-weight:600;color:#090806ec;margin:0">Flexible</p>
+                        <p id="ct-current-desc" style="font-size:11px;color:#16140e8c;margin:2px 0 0">No commitment &middot; end anytime</p>
+                      </div>
+                      <div id="ct-current-badge" style="display:flex;align-items:center;flex-shrink:0"></div>
+                    </div>
+                  </div>
+                  <button onclick="openContractSheet()" style="font-size:12px;color:#16140e8c;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline">Change</button>
+                </div>
+                <!-- Merchant mode: compact chip-row, bps only -->
+                <div class="client-only chip-row" id="ct-chips">
                   <button class="chip active" data-idx="0" onclick="chipSelect('ct',0)">Flexible</button>
                   <button class="chip" data-idx="1" onclick="chipSelect('ct',1)">12-month <span class="chip-mod green">−5</span></button>
                   <button class="chip" data-idx="2" onclick="chipSelect('ct',2)">24-month <span class="chip-mod green">−10</span></button>
@@ -1467,12 +1513,121 @@
             </button>
             <div class="accordion-body">
               <div class="accordion-body-inner">
-                <div class="chip-row" id="sf-chips">
+                <!-- Agent mode: selected-tier card + Change link → bottom sheet (BA pattern) -->
+                <div class="agent-only">
+                  <p style="font-size:12px;color:#16140e8c;margin:0 0 10px;line-height:1.5">How often the merchant gets paid out.</p>
+                  <div id="sf-current-card" style="background:#f6f5f3;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:1px solid #8f867633">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                      <div style="min-width:0">
+                        <p id="sf-current-name" style="font-size:14px;font-weight:600;color:#090806ec;margin:0">Everyday</p>
+                        <p id="sf-current-desc" style="font-size:11px;color:#16140e8c;margin:2px 0 0">Funds settle every day &middot; default</p>
+                      </div>
+                      <div id="sf-current-badge" style="display:flex;align-items:center;flex-shrink:0"></div>
+                    </div>
+                  </div>
+                  <button onclick="openSettleSheet()" style="font-size:12px;color:#16140e8c;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline">Change</button>
+                </div>
+                <!-- Merchant mode: compact chip-row, bps only -->
+                <div class="client-only chip-row" id="sf-chips">
                   <button class="chip" data-idx="4" onclick="chipSelect('sf',4)">15-day <span class="chip-mod green">−15</span></button>
                   <button class="chip" data-idx="3" onclick="chipSelect('sf',3)">3-day <span class="chip-mod green">−10</span></button>
                   <button class="chip" data-idx="0" onclick="chipSelect('sf',0)">Weekday <span class="chip-mod green">−5</span></button>
                   <button class="chip active" data-idx="1" onclick="chipSelect('sf',1)">Everyday</button>
                   <button class="chip" data-idx="2" onclick="chipSelect('sf',2)">Instant <span class="chip-mod amber">+20</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── DCC revenue share accordion (Phase 4.5) ──
+                 Lever: % of Teya's net DCC margin shared back to the customer.
+                 Doesn't change the merchant rate — moves money on a separate stream.
+                 Tier badges show £/mo to customer (merchant-side) + Teya-net £NSR (agent-only). ── -->
+          <div class="addon-card" data-open="false" data-empty="true" id="dcc-card">
+            <!-- Empty-state promo: title + persuasive copy + yellow Add button. Replaces accordion-header when nothing is configured. -->
+            <div class="addon-empty" id="dcc-empty" style="padding:14px 16px;align-items:center;gap:12px">
+              <div style="flex:1;min-width:0">
+                <p class="addon-label" style="margin:0">DCC revenue share</p>
+                <p style="font-size:11px;color:#16140e8c;margin:3px 0 0;line-height:1.4"><span style="font-weight:600;color:#46520f">Est. £<span id="dcc-empty-amount">108</span>/mo on the table</span> from foreign-card DCC. Sharing back is a useful negotiation lever.</p>
+              </div>
+              <button onclick="openDccSheet()" style="background:white;color:#090806ec;border:1.5px solid #756b571a;border-radius:10px;padding:6px 14px 6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;transition:transform 120ms,background 150ms" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" onmouseleave="this.style.transform=''" onmouseenter="this.style.background='#f6f5f3'" onmouseout="this.style.background='white'">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="#090806ec" stroke-width="1.6" stroke-linecap="round"/></svg>
+                Add
+              </button>
+            </div>
+            <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
+              <p class="addon-label">DCC revenue share</p>
+              <span class="accordion-preview">
+                <span class="accordion-preview-value" id="dcc-preview-val">20% share</span>
+                <span class="accordion-preview-mod" id="dcc-preview-mod"></span>
+              </span>
+              <svg class="accordion-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                <!-- Selected-tier card + Change link → bottom sheet (BA pattern). Shared between modes.
+                     Description paragraph + tourist hint are agent-only context. -->
+                <p class="agent-only" style="font-size:12px;color:#16140e8c;margin:0 0 10px;line-height:1.5">Share a slice of Dynamic Currency Conversion margin with the customer.</p>
+                <div id="dcc-current-card" style="background:#f6f5f3;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:1px solid #8f867633">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <div style="min-width:0">
+                      <p id="dcc-current-name" style="font-size:14px;font-weight:600;color:#090806ec;margin:0">No share</p>
+                      <p id="dcc-current-desc" style="font-size:11px;color:#16140e8c;margin:2px 0 0">Teya keeps all DCC revenue · default</p>
+                    </div>
+                    <div id="dcc-current-badge" style="display:flex;align-items:center;flex-shrink:0"></div>
+                  </div>
+                </div>
+                <div id="dcc-tourist-hint" class="agent-only" style="display:none;background:#7ccf001a;border-radius:10px;padding:8px 10px;margin-bottom:10px">
+                  <p style="font-size:11px;color:#46520f;margin:0;line-height:1.45"><span style="font-weight:600">Est. <span id="dcc-hint-amount">£108</span>/mo on the table</span> from foreign-card DCC. Sharing back is a useful negotiation lever.</p>
+                </div>
+                <button onclick="openDccSheet()" style="font-size:12px;color:#16140e8c;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline">Change</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Card machines accordion ──
+                 Folds the former s-05c screen. Accordion body shows a summary
+                 card + Change link (BA pattern). Full terminal list lives in
+                 the bottom sheet (#cm-sheet-overlay), with cards mounted at
+                 runtime from #s-05c (see _mountCardMachinesAccordion). All
+                 IDs / handlers (setTermPlan, nudgeTermPrice, setTermQty,
+                 updateTermSummary) keep working unchanged. ── -->
+          <div class="addon-card" data-open="false" data-empty="true" id="cm-card">
+            <!-- Empty-state promo: title + offer-specific discount copy + outlined Add button. -->
+            <div class="addon-empty" id="cm-empty" style="padding:14px 16px;align-items:center;gap:12px">
+              <div style="flex:1;min-width:0">
+                <p class="addon-label" style="margin:0">Card machines</p>
+                <p id="cm-empty-copy" style="font-size:11px;color:#16140e8c;margin:3px 0 0;line-height:1.4"><span style="font-weight:600;color:#46520f">3 months free on Teya Pro</span> with this offer.</p>
+              </div>
+              <button onclick="openCmSheet()" style="background:white;color:#090806ec;border:1.5px solid #756b571a;border-radius:10px;padding:6px 14px 6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;transition:transform 120ms,background 150ms" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" onmouseleave="this.style.transform=''" onmouseenter="this.style.background='#f6f5f3'" onmouseout="this.style.background='white'">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="#090806ec" stroke-width="1.6" stroke-linecap="round"/></svg>
+                Add
+              </button>
+            </div>
+            <button class="accordion-header" onclick="toggleAccordion(this)" aria-expanded="false">
+              <p class="addon-label">Card machines</p>
+              <span class="accordion-preview">
+                <span class="accordion-preview-value" id="cm-preview-val">Teya Tap only</span>
+                <span class="accordion-preview-mod" id="cm-preview-mod"></span>
+              </span>
+              <svg class="accordion-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                <!-- Agent mode: summary card + Change link → bottom sheet (BA pattern) -->
+                <div class="agent-only">
+                  <p style="font-size:12px;color:#16140e8c;margin:0 0 10px;line-height:1.5">Order terminals and assign to stores. Teya Tap is included free on every store.</p>
+                  <div id="cm-summary-card" style="background:#f6f5f3;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:1px solid #8f867633">
+                    <!-- Populated by renderCmSummaryCard -->
+                  </div>
+                  <button onclick="openCmSheet()" style="font-size:12px;color:#16140e8c;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline">Change</button>
+                </div>
+                <!-- Merchant mode: static summary -->
+                <div class="client-only">
+                  <div id="cm-summary-client" style="background:#f6f5f3;border-radius:14px;padding:12px 14px;border:1px solid #8f867633">
+                    <p style="font-size:13px;font-weight:600;color:#090806ec;margin:0">Teya Tap on every store</p>
+                    <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Included free</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1517,6 +1672,10 @@
           <div id="ck-mca" style="display:none;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #756b571a">
             <span style="font-size:12px;color:#16140e8c" id="ck-mca-label">MCA £10k (after approval)</span>
             <span id="ck-mca-val" style="font-size:12px;font-weight:600;color:#497d00;font-variant-numeric:tabular-nums">−25 bps</span>
+          </div>
+          <div id="ck-dcc" style="display:none;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #756b571a">
+            <span style="font-size:12px;color:#16140e8c" id="ck-dcc-label">DCC share (20% to customer)</span>
+            <span id="ck-dcc-val" style="font-size:12px;font-weight:600;color:#497d00;font-variant-numeric:tabular-nums">+£22/mo</span>
           </div>
           <!-- ── Multi-rate: 6 final rates (shown AFTER adjustments so the agent reads top-down: "these adjustments → these rates") ── -->
           <div id="ck-multi-mode" style="display:none">
@@ -1673,7 +1832,10 @@
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:12px;font-weight:600;color:#497d00">−10 bps</span>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#497d00">−10 bps</span>
+                <span class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">+£50 NSR</span>
+              </div>
               <div id="ba-radio-0" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
             </div>
           </div>
@@ -1696,7 +1858,10 @@
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:12px;font-weight:600;color:#16140e8c">0 bps</span>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#16140e8c">Included</span>
+                <span class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">+£80 NSR</span>
+              </div>
               <div id="ba-radio-1" style="width:18px;height:18px;border-radius:50%;border:2px solid #090806ec;display:flex;align-items:center;justify-content:center;transition:all 150ms"><div style="width:10px;height:10px;border-radius:50%;background:#090806ec"></div></div>
             </div>
           </div>
@@ -1719,7 +1884,10 @@
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:12px;font-weight:600;color:#bb4d00">+5 bps</span>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#bb4d00">+5 bps</span>
+                <span class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">+£130 NSR</span>
+              </div>
               <div id="ba-radio-2" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
             </div>
           </div>
@@ -1740,7 +1908,10 @@
               <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">External bank account</p>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:12px;font-weight:600;color:#bb4d00">+20 bps</span>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#bb4d00">+20 bps</span>
+                <span class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">+£20 NSR</span>
+              </div>
               <div id="ba-radio-3" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
             </div>
           </div>
@@ -1748,6 +1919,292 @@
 
         <!-- Confirm -->
         <button onclick="confirmBaSelection()" style="width:100%;background:#090806ec;color:white;font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:32px;padding:16px;cursor:pointer">Confirm selection</button>
+      </div>
+    </div>
+
+    <!-- ═══ Contract Length Bottom Sheet (agent-only) ═══ -->
+    <div id="contract-sheet-overlay" style="display:none;position:absolute;inset:0;z-index:100">
+      <div onclick="closeContractSheet()" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);transition:opacity 200ms"></div>
+      <div id="contract-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#f6f5f3;border-radius:20px 20px 0 0;padding:20px 16px 32px;transform:translateY(100%);transition:transform 300ms cubic-bezier(0.32,0.72,0,1);max-height:85%;overflow-y:auto">
+        <div style="width:36px;height:4px;border-radius:2px;background:#756b574d;margin:0 auto 16px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0">Choose contract length</p>
+          <button onclick="closeContractSheet()" style="width:28px;height:28px;border-radius:50%;background:#f6f5f3;border:1px solid #756b571a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+        <p style="font-size:12px;color:#16140e8c;margin:0 0 16px">Longer commitments unlock lower rates.</p>
+
+        <!-- Flexible -->
+        <div id="ct-opt-0" onclick="selectContractOpt(0)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #090806ec;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">Flexible</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">No commitment · end anytime</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:#16140e8c">Included</span>
+              <div id="ct-radio-0" style="width:18px;height:18px;border-radius:50%;border:2px solid #090806ec;display:flex;align-items:center;justify-content:center;transition:all 150ms"><div style="width:10px;height:10px;border-radius:50%;background:#090806ec"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12-month -->
+        <div id="ct-opt-1" onclick="selectContractOpt(1)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">12-month</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">1-year commitment</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#497d00">−5 bps</span>
+                <span style="font-size:10px;color:#5e564a;font-weight:500">+£20 NSR</span>
+              </div>
+              <div id="ct-radio-1" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 24-month -->
+        <div id="ct-opt-2" onclick="selectContractOpt(2)" style="background:white;border-radius:16px;padding:14px;margin-bottom:16px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">24-month</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">2-year commitment</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#497d00">−10 bps</span>
+                <span style="font-size:10px;color:#5e564a;font-weight:500">+£40 NSR</span>
+              </div>
+              <div id="ct-radio-2" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm -->
+        <button onclick="confirmContractSelection()" style="width:100%;background:#090806ec;color:white;font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:32px;padding:16px;cursor:pointer">Confirm selection</button>
+      </div>
+    </div>
+
+    <!-- ═══ Settlement Frequency Bottom Sheet (agent-only) ═══ -->
+    <div id="settle-sheet-overlay" style="display:none;position:absolute;inset:0;z-index:100">
+      <div onclick="closeSettleSheet()" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);transition:opacity 200ms"></div>
+      <div id="settle-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#f6f5f3;border-radius:20px 20px 0 0;padding:20px 16px 32px;transform:translateY(100%);transition:transform 300ms cubic-bezier(0.32,0.72,0,1);max-height:85%;overflow-y:auto">
+        <div style="width:36px;height:4px;border-radius:2px;background:#756b574d;margin:0 auto 16px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0">Choose settlement frequency</p>
+          <button onclick="closeSettleSheet()" style="width:28px;height:28px;border-radius:50%;background:#f6f5f3;border:1px solid #756b571a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+        <p style="font-size:12px;color:#16140e8c;margin:0 0 16px">How often the merchant gets paid out.</p>
+
+        <!-- 15-day -->
+        <div id="sf-opt-4" onclick="selectSettleOpt(4)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">15-day</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Funds settle on day 15</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#497d00">−15 bps</span>
+                <span style="font-size:10px;color:#5e564a;font-weight:500">+£40 NSR</span>
+              </div>
+              <div id="sf-radio-4" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3-day -->
+        <div id="sf-opt-3" onclick="selectSettleOpt(3)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">3-day</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Funds settle on day 3</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#497d00">−10 bps</span>
+                <span style="font-size:10px;color:#5e564a;font-weight:500">+£25 NSR</span>
+              </div>
+              <div id="sf-radio-3" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekday -->
+        <div id="sf-opt-0" onclick="selectSettleOpt(0)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">Weekday</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Funds settle next weekday</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#497d00">−5 bps</span>
+                <span style="font-size:10px;color:#5e564a;font-weight:500">+£15 NSR</span>
+              </div>
+              <div id="sf-radio-0" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Everyday (default) -->
+        <div id="sf-opt-1" onclick="selectSettleOpt(1)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #090806ec;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">Everyday</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Funds settle every day · default</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:#16140e8c">Included</span>
+              <div id="sf-radio-1" style="width:18px;height:18px;border-radius:50%;border:2px solid #090806ec;display:flex;align-items:center;justify-content:center;transition:all 150ms"><div style="width:10px;height:10px;border-radius:50%;background:#090806ec"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instant -->
+        <div id="sf-opt-2" onclick="selectSettleOpt(2)" style="background:white;border-radius:16px;padding:14px;margin-bottom:16px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">Instant</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Funds settle instantly · 24/7</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#bb4d00">+20 bps</span>
+                <span style="font-size:10px;color:#5e564a;font-weight:500">+£50 NSR</span>
+              </div>
+              <div id="sf-radio-2" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm -->
+        <button onclick="confirmSettleSelection()" style="width:100%;background:#090806ec;color:white;font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:32px;padding:16px;cursor:pointer">Confirm selection</button>
+      </div>
+    </div>
+
+    <!-- ═══ DCC Revenue Share Bottom Sheet (agent-only) ═══ -->
+    <div id="dcc-sheet-overlay" style="display:none;position:absolute;inset:0;z-index:100">
+      <div onclick="closeDccSheet()" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);transition:opacity 200ms"></div>
+      <div id="dcc-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#f6f5f3;border-radius:20px 20px 0 0;padding:20px 16px 32px;transform:translateY(100%);transition:transform 300ms cubic-bezier(0.32,0.72,0,1);max-height:88%;overflow-y:auto">
+        <div style="width:36px;height:4px;border-radius:2px;background:#756b574d;margin:0 auto 16px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0">DCC revenue share</p>
+          <button onclick="closeDccSheet()" style="width:28px;height:28px;border-radius:50%;background:#f6f5f3;border:1px solid #756b571a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+        <p style="font-size:12px;color:#16140e8c;margin:0 0 14px">How much of Teya's net DCC margin gets passed back to the customer.</p>
+
+        <!-- Estimated DCC revenue panel — agent-only (commercial assumptions, internal-facing) -->
+        <div class="agent-only" style="background:white;border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid #756b571a">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+            <span style="font-size:11px;font-weight:600;color:#16140e8c;text-transform:uppercase;letter-spacing:0.8px">Est. monthly DCC margin</span>
+            <span id="dcc-gross-amt" style="font-size:15px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">£108</span>
+          </div>
+          <p style="font-size:11px;color:#16140e8c;margin:0;line-height:1.45">Assumes <span id="dcc-foreign-pct">20%</span> foreign-card TPV · <span id="dcc-optin-pct">30%</span> opt-in at terminal · <span id="dcc-spread-pct">4%</span> gross spread.</p>
+        </div>
+
+        <!-- Tier options -->
+        <div id="dcc-opt-0" onclick="selectDccOpt(0)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #090806ec;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">No share</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Teya keeps all DCC revenue · default</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span style="font-size:12px;font-weight:600;color:#16140e8c">£0 to customer</span>
+                <span class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">Teya keeps £108</span>
+              </div>
+              <div id="dcc-radio-0" style="width:18px;height:18px;border-radius:50%;border:2px solid #090806ec;display:flex;align-items:center;justify-content:center;transition:all 150ms"><div style="width:10px;height:10px;border-radius:50%;background:#090806ec"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dcc-opt-1" onclick="selectDccOpt(1)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">10% share</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Modest kickback · low Teya impact</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span id="dcc-cust-1" style="font-size:12px;font-weight:600;color:#497d00">+£11 to customer</span>
+                <span id="dcc-net-1" class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">Teya keeps £97</span>
+              </div>
+              <div id="dcc-radio-1" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dcc-opt-2" onclick="selectDccOpt(2)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">20% share</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Standard for tourism-led merchants</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span id="dcc-cust-2" style="font-size:12px;font-weight:600;color:#497d00">+£22 to customer</span>
+                <span id="dcc-net-2" class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">Teya keeps £86</span>
+              </div>
+              <div id="dcc-radio-2" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dcc-opt-3" onclick="selectDccOpt(3)" style="background:white;border-radius:16px;padding:14px;margin-bottom:8px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">30% share</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Aggressive · use to win competitive deals</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span id="dcc-cust-3" style="font-size:12px;font-weight:600;color:#497d00">+£32 to customer</span>
+                <span id="dcc-net-3" class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">Teya keeps £76</span>
+              </div>
+              <div id="dcc-radio-3" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom share row — agent enters a percentage; selecting auto-snaps to whatever they typed -->
+        <div id="dcc-opt-4" onclick="selectDccOpt(4)" style="background:white;border-radius:16px;padding:14px;margin-bottom:14px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <div style="flex:1;min-width:0">
+              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">Custom</p>
+              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Enter any share percentage</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <input type="text" id="dcc-custom-pct" value="15%" onclick="event.stopPropagation();this.select();selectDccOpt(4)" onfocus="this.select();selectDccOpt(4)" onchange="setDccCustom(this.value)" oninput="setDccCustom(this.value)" style="font-size:14px;font-weight:700;color:#090806ec;text-align:center;background:transparent;border:1.5px solid #756b571a;border-radius:8px;padding:6px 8px;width:64px;font-family:inherit;font-variant-numeric:tabular-nums;outline:none;transition:border-color 150ms;caret-color:#e1e51a">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
+                <span id="dcc-cust-4" style="font-size:12px;font-weight:600;color:#497d00">+£16 to customer</span>
+                <span id="dcc-net-4" class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">Teya keeps £92</span>
+              </div>
+              <div id="dcc-radio-4" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="confirmDccSelection()" style="width:100%;background:#090806ec;color:white;font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:32px;padding:16px;cursor:pointer">Confirm selection</button>
+      </div>
+    </div>
+
+    <!-- ═══ Card Machines Bottom Sheet ═══ -->
+    <div id="cm-sheet-overlay" style="display:none;position:absolute;inset:0;z-index:100">
+      <div onclick="closeCmSheet()" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);transition:opacity 200ms"></div>
+      <div id="cm-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#f6f5f3;border-radius:20px 20px 0 0;padding:20px 16px 24px;transform:translateY(100%);transition:transform 300ms cubic-bezier(0.32,0.72,0,1);max-height:92%;overflow-y:auto">
+        <div style="width:36px;height:4px;border-radius:2px;background:#756b574d;margin:0 auto 16px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0">Card machines</p>
+          <button onclick="closeCmSheet()" style="width:28px;height:28px;border-radius:50%;background:#f6f5f3;border:1px solid #756b571a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+        <p style="font-size:12px;color:#16140e8c;margin:0 0 14px">Pick terminals and assign to stores. Teya Tap is included free on every store.</p>
+        <div id="cm-sheet-body">
+          <!-- Terminal cards mounted here at runtime by _mountCardMachinesAccordion -->
+        </div>
+        <button onclick="closeCmSheet()" style="width:100%;background:#090806ec;color:white;font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:32px;padding:16px;cursor:pointer;margin-top:12px">Done</button>
       </div>
     </div>
 </div>
@@ -1777,12 +2234,12 @@
   <div id="take-rate-bar-05c" class="agent-only" style="background:#f6f5f3;padding:12px 16px;border-bottom:1px solid #756b571a">
   <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
     <div style="display:flex;align-items:baseline;gap:6px">
-      <span style="font-size:11px;color:#16140e8c">Take rate</span>
-      <span id="tr-rate-05c" style="font-size:17px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">1.86%</span>
+      <span style="font-size:11px;color:#16140e8c">NSR / mo</span>
+      <span id="tr-commission-05c" style="font-size:17px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">&pound;837</span>
     </div>
     <div style="display:flex;align-items:baseline;gap:6px">
       <span style="font-size:11px;color:#16140e8c">Est. commission</span>
-      <span id="tr-commission-05c" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;837/mo</span>
+      <span id="tr-rate-05c" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;837/mo</span>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
@@ -1794,8 +2251,8 @@
     <span id="tr-label-05c" style="font-size:11px;font-weight:600"></span>
   </div>
   <div style="display:flex;justify-content:space-between">
-    <span style="font-size:10px;color:#16140e8c">Floor: 1.20%</span>
-    <span style="font-size:10px;color:#16140e8c">Suggested: 1.60%</span>
+    <span id="tr-floor-label-05c" style="font-size:10px;color:#16140e8c;transition:color 200ms,font-weight 200ms">Floor: &pound;540/mo</span>
+    <span id="tr-target-label-05c" style="font-size:10px;color:#16140e8c">Suggested: &pound;720/mo</span>
   </div>
 </div>
 </div><!-- end pinned header -->
@@ -2044,18 +2501,6 @@
     </div>
   </div>
 
-  <!-- ═══ ORDER SUMMARY ═══ -->
-  <div style="background:#e1e51a1a;border-radius:16px;padding:14px 16px;margin-top:6px">
-    <p style="font-size:10px;font-weight:600;color:#16140e8c;letter-spacing:0.8px;text-transform:uppercase;margin:0 0 8px">Order summary</p>
-    <div id="term-order-summary" style="display:flex;flex-direction:column;gap:4px">
-      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#16140e8c">Teya Tap · all stores</span><span style="color:#497d00;font-weight:600">Free</span></div>
-    </div>
-    <div style="border-top:1px solid #756b571a;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between">
-      <span style="font-size:13px;font-weight:600;color:#090806ec">Total hardware</span>
-      <span id="term-total" style="font-size:13px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">Free</span>
-    </div>
-  </div>
-
 </div>
 </div>
 <div class="cta"><button onclick="go('06')" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Product usage</button></div>
@@ -2067,7 +2512,7 @@
   <div class="flex items-center justify-between px-6 pt-4 bg-[#f6f5f3]" style="height:50px"><span class="text-[15px] font-semibold text-[#090806ec]">9:41</span><div class="flex items-center gap-1.5"><svg width="17" height="12" viewBox="0 0 17 12" fill="#090806ec"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#090806ec" stroke-opacity="0.35"/><rect x="1.5" y="1.5" width="16" height="9" rx="2.5" fill="#090806ec"/><path d="M23 4v4a2 2 0 000-4z" fill="#090806ec" fill-opacity="0.4"/></svg></div></div>
   <div class="bg-[#f6f5f3] border-b border-[#756b571a]">
     <div class="relative flex items-center justify-center px-4" style="height:56px">
-      <button onclick="go('05c')" class="absolute left-4 flex items-center gap-1 text-[#090806ec] active:opacity-60"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[16px] font-medium">Back</span></button>
+      <button onclick="go('05')" class="absolute left-4 flex items-center gap-1 text-[#090806ec] active:opacity-60"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[16px] font-medium">Back</span></button>
       <span class="text-[16px] font-semibold text-[#090806ec]">Product usage</span>
     </div>
   </div>
@@ -2089,6 +2534,24 @@
   </div>
 </div>
 <div class="cta"><button onclick="go('07')" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Review and confirm</button></div>
+
+<!-- ── MOTO eligibility confirmation overlay — fires from the "Add statements ›" CTA inside an
+     ineligible MOTO row. Warns the agent that uploading new statements will refresh the deal's
+     pricing data and require the offer to be recreated. ── -->
+<div id="s06-moto-confirm-ov" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:flex-end;justify-content:center" onclick="s06CloseMotoConfirm()">
+  <div style="background:white;width:100%;border-radius:20px 20px 0 0;padding:18px 20px 26px" onclick="event.stopPropagation()">
+    <div style="width:36px;height:4px;border-radius:2px;background:#756b574d;margin:0 auto 14px"></div>
+    <div style="display:flex;justify-content:center;margin-bottom:10px">
+      <div style="width:48px;height:48px;border-radius:14px;background:#FFF7E0;display:flex;align-items:center;justify-content:center">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 1l9 17H2L11 1z" stroke="#bb4d00" stroke-width="1.7" stroke-linejoin="round"/><path d="M11 8v5M11 15v.5" stroke="#bb4d00" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <h2 style="font-size:17px;font-weight:600;color:#090806ec;margin:0 0 8px;text-align:center">Add more statements?</h2>
+    <p style="font-size:13px;color:#16140e8c;margin:0 0 20px;text-align:center;line-height:1.5">By uploading new statements you'll need to <strong style="color:#090806ec">recreate the current offer</strong>. This is useful for both the merchant and Teya, since we'll be able to recalculate a more accurate pricing.</p>
+    <button onclick="s06ConfirmAddStatements()" style="width:100%;background:#0b0b0a;color:white;font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:32px;padding:14px;cursor:pointer;margin-bottom:6px">Continue to upload</button>
+    <button onclick="s06CloseMotoConfirm()" style="width:100%;background:transparent;color:#090806ec;font-family:inherit;font-size:14px;font-weight:500;border:none;padding:10px;cursor:pointer">Cancel</button>
+  </div>
+</div>
 </div>
 <script>
   // ── Screen 06 (Product Usage) — tabbed per-store pattern ──
@@ -2103,9 +2566,9 @@
     { key: 'online', name: "Mario's Deli — Online",   location: 'mariosdeli.co.uk', type: 'online'   }
   ];
   const onbStoreProducts = {
-    regent: { moto: false, ecomMonthly: false },
-    george: { moto: false, ecomMonthly: false },
-    online: { moto: false, ecomMonthly: false }
+    regent: { moto: false, ecomMonthly: false, ecomMonthlyAmount: 29 },
+    george: { moto: false, ecomMonthly: false, ecomMonthlyAmount: 29 },
+    online: { moto: false, ecomMonthly: false, ecomMonthlyAmount: 29 }
   };
   let onbActiveStore = 'regent';
   const ONB_PROD_META = {
@@ -2113,6 +2576,24 @@
     ecom: { label: 'E-commerce',          subtitle: 'Online payments via website checkout', surcharge: '+0.40% per transaction',   icon: '<rect x="2" y="3" width="20" height="18" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M2 9h20" stroke="#090806ec" stroke-width="1.5"/><rect x="5" y="13" width="6" height="4" rx="1" stroke="#090806ec" stroke-width="1.3"/>' },
     moto: { label: 'MOTO (Manual Entry)', subtitle: 'Key in card details over the phone',   surcharge: '+0.50% per transaction',   icon: '<rect x="2" y="4" width="20" height="16" rx="3" stroke="#090806ec" stroke-width="1.5"/><path d="M8 20h8" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/><path d="M12 16v4" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/><rect x="6" y="8" width="5" height="3" rx="0.5" fill="#090806ec" opacity="0.15"/>' }
   };
+
+  // MOTO policy: a new merchant needs 6+ months of acquirer transaction history per
+  // store before Modo can be enabled (hard CDD gate for chargeback review).
+  // Source: "Modo merchant onboarding flow and document upload strategy" — Apr 29 2026.
+  const ONB_MOTO_MIN_MONTHS = 6;
+
+  // Map an s-06 store key (e.g. "regent") to its statement count in ndStores by first-word match.
+  // Returns 0 when the deal hasn't reached s-02 yet or the store has no statements attached.
+  function _s06StmtMonths(storeKey){
+    if (typeof ndStores === 'undefined' || !Array.isArray(ndStores)) return 0;
+    const onb = ONB_STORES.find(s => s.key === storeKey);
+    if (!onb) return 0;
+    const firstWord = String(onb.name || '').split(/\s+/)[0];
+    if (!firstWord) return 0;
+    const match = ndStores.find(s => s && s.name && s.name.indexOf(firstWord) === 0);
+    return (match && Array.isArray(match._statements)) ? match._statements.length : 0;
+  }
+  function _s06MotoEligible(storeKey){ return _s06StmtMonths(storeKey) >= ONB_MOTO_MIN_MONTHS; }
 
   function s06ActiveStoreObj(){ return ONB_STORES.find(s => s.key === onbActiveStore) || ONB_STORES[0]; }
 
@@ -2159,13 +2640,27 @@
     '</div>';
   }
 
-  // E-commerce row for online stores — info row + optional monthly subscription sub-toggle (region-specific).
+  // E-commerce row for online stores — info row + optional monthly subscription
+  // (region-specific). Uses the +Add / × Remove pattern shared with DCC empty-state.
   function s06RenderEcomRow(storeKey, isLast){
     const meta = ONB_PROD_META.ecom;
     const border = isLast ? '' : 'border-b border-[#756b571a]';
     const subOn = !!onbStoreProducts[storeKey].ecomMonthly;
-    const trackBg = subOn ? '#090806ec' : '#e5e2dc';
-    const thumbX  = subOn ? '18px' : '0';
+    const subAmt = onbStoreProducts[storeKey].ecomMonthlyAmount || 29;
+    // Right-rail affordance: "+ Add" pill when off; editable amount + "× Remove" when on.
+    const subAffordance = subOn
+      ? '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
+          '<span style="font-size:13px;color:#16140e8c">£</span>' +
+          '<input type="text" id="s06-ecom-amt-' + storeKey + '" value="' + subAmt + '" onclick="event.stopPropagation();this.select()" onchange="s06SetEcomMonthlyAmount(\'' + storeKey + '\', this.value)" oninput="s06SetEcomMonthlyAmount(\'' + storeKey + '\', this.value)" style="font-size:13px;font-weight:700;color:#090806ec;text-align:center;background:white;border:1.5px solid #756b571a;border-radius:7px;padding:3px 6px;width:44px;font-family:inherit;font-variant-numeric:tabular-nums;outline:none;caret-color:#e1e51a">' +
+          '<span style="font-size:12px;color:#16140e8c">/mo</span>' +
+          '<button onclick="event.stopPropagation();s06ToggleEcomMonthly(\'' + storeKey + '\')" aria-label="Remove monthly subscription" style="background:transparent;border:none;padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#16140e8c;border-radius:50%;margin-left:2px" onmouseenter="this.style.color=\'#090806ec\'" onmouseleave="this.style.color=\'#16140e8c\'">' +
+            '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
+          '</button>' +
+        '</div>'
+      : '<button onclick="event.stopPropagation();s06ToggleEcomMonthly(\'' + storeKey + '\')" style="background:white;color:#090806ec;border:1.5px solid #756b571a;border-radius:10px;padding:6px 14px 6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;transition:background 150ms" onmouseenter="this.style.background=\'#f6f5f3\'" onmouseleave="this.style.background=\'white\'">' +
+          '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="#090806ec" stroke-width="1.6" stroke-linecap="round"/></svg>' +
+          'Add' +
+        '</button>';
     return '<div class="' + border + '">' +
       '<div class="flex items-center gap-3 px-4 py-4">' +
         '<div style="width:40px;height:40px;border-radius:12px;background:#f6f5f3;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
@@ -2183,15 +2678,12 @@
           '<span style="font-size:13px;font-weight:600;color:#090806ec">' + meta.surcharge + '</span>' +
         '</div>' +
         // Optional monthly subscription — region-specific (e.g. Iceland charges, UK doesn't by default)
-        '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">' +
           '<div style="flex:1;min-width:0">' +
             '<p style="font-size:12px;font-weight:500;color:#090806ec;margin:0">Monthly subscription</p>' +
-            '<p style="font-size:11px;color:#16140e8c;margin:1px 0 0">Optional — &pound;29/mo (region-specific)</p>' +
+            '<p style="font-size:11px;color:#16140e8c;margin:1px 0 0">Region-specific</p>' +
           '</div>' +
-          '<label onclick="event.stopPropagation();s06ToggleEcomMonthly(\'' + storeKey + '\')" style="position:relative;width:40px;height:24px;flex-shrink:0;cursor:pointer;display:inline-block">' +
-            '<span style="position:absolute;inset:0;border-radius:12px;background:' + trackBg + ';transition:background 200ms"></span>' +
-            '<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.15);transition:transform 200ms;transform:translateX(' + thumbX + ')"></span>' +
-          '</label>' +
+          subAffordance +
         '</div>' +
       '</div>' +
     '</div>';
@@ -2203,10 +2695,59 @@
     const meta   = ONB_PROD_META[prodKey];
     const on     = !!state[prodKey];
     const border = isLast ? '' : 'border-b border-[#756b571a]';
-    const trackBg = on ? '#090806ec' : '#e5e2dc';
+
+    // MOTO eligibility — 6+ months of statement history required per store (Modo policy).
+    const isMoto = prodKey === 'moto';
+    const motoMonths = isMoto ? _s06StmtMonths(storeKey) : 0;
+    const motoEligible = !isMoto || motoMonths >= ONB_MOTO_MIN_MONTHS;
+    // Toggle always reflects intent (on/off) in standard black/grey. Eligibility is
+    // communicated through the warning panel beneath the toggle, not by recolouring the toggle.
     const thumbX  = on ? '18px' : '0';
-    const expandMax = on ? (prodKey === 'moto' ? '90px' : '60px') : '0';
-    const expandOp  = on ? '1' : '0';
+    const trackBg = on ? '#090806ec' : '#e5e2dc';
+    const isMotoIneligibleRequest = isMoto && on && !motoEligible;
+
+    // Expand whenever the toggle is on — surfaces either the surcharge card (eligible) or the
+    // amber warning panel (ineligible). MOTO needs more vertical room to fit the action button.
+    const showExpansion = on;
+    const expandMax = !showExpansion ? '0' : (isMoto ? (isMotoIneligibleRequest ? '160px' : '90px') : '60px');
+    const expandOp  = showExpansion ? '1' : '0';
+
+    // Body content varies by state:
+    //   • MOTO ineligible → amber warning panel with current count + "Add statements" link
+    //   • MOTO eligible + on → surcharge card + green "verified" confirmation
+    //   • Any other on → surcharge card only
+    let body;
+    if (isMoto && !motoEligible) {
+      // Caution-subtle background per Lemonade DS tokens (bg-caution-subtle = #fe9a001a).
+      // Action uses the secondary (filled black) small button variant — clear affordance
+      // against the amber tint, recognisably a button rather than a text link.
+      body =
+        '<div style="background:#fe9a001a;border-radius:12px;padding:12px 14px">' +
+          '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px">' +
+            '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-top:1px;flex-shrink:0"><path d="M7 1l6.5 11.5h-13L7 1z" stroke="#bb4d00" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 5.5v3M7 10.5v.5" stroke="#bb4d00" stroke-width="1.4" stroke-linecap="round"/></svg>' +
+            '<div style="flex:1;min-width:0">' +
+              '<p style="font-size:13px;font-weight:600;color:#bb4d00;margin:0;line-height:1.35">Needs 6+ months of statement history</p>' +
+              '<p style="font-size:12px;color:#16140e8c;margin:2px 0 0;font-variant-numeric:tabular-nums">' + motoMonths + ' of 6 uploaded for this store.</p>' +
+            '</div>' +
+          '</div>' +
+          '<button onclick="event.stopPropagation();s06OpenMotoConfirm()" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;background:white;color:#090806ec;font-family:inherit;font-size:13px;font-weight:600;border:1.5px solid #756b571a;border-radius:10px;padding:7px 14px;cursor:pointer;transition:transform 120ms,background 150ms" onmousedown="this.style.transform=\'scale(0.96)\'" onmouseup="this.style.transform=\'\'" onmouseleave="this.style.transform=\'\';this.style.background=\'white\'" onmouseenter="this.style.background=\'#f6f5f3\'">' +
+            'Add statements' +
+            '<svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1l4 4-4 4" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</button>' +
+        '</div>';
+    } else {
+      body =
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;background:#f6f5f3;border-radius:12px;padding:10px 14px">' +
+          '<span style="font-size:12px;color:#16140e8c">Surcharge</span>' +
+          '<span style="font-size:13px;font-weight:600;color:#090806ec">' + meta.surcharge + '</span>' +
+        '</div>' +
+        (isMoto ?
+          '<div style="display:flex;align-items:center;gap:6px;margin-top:8px;padding:0 4px">' +
+            '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '<span style="font-size:11px;color:#497d00;font-weight:500">' + motoMonths + ' months of statements · MOTO eligible</span>' +
+          '</div>'
+        : '');
+    }
 
     return '<div class="' + border + '">' +
       '<div class="flex items-center gap-3 px-4 py-4">' +
@@ -2224,16 +2765,7 @@
       '</div>' +
       '<div style="max-height:' + expandMax + ';overflow:hidden;transition:max-height 300ms ease,opacity 200ms;opacity:' + expandOp + '">' +
         '<div style="padding:0 16px 14px 68px">' +
-          '<div style="display:flex;align-items:baseline;justify-content:space-between;background:#f6f5f3;border-radius:12px;padding:10px 14px">' +
-            '<span style="font-size:12px;color:#16140e8c">Surcharge</span>' +
-            '<span style="font-size:13px;font-weight:600;color:#090806ec">' + meta.surcharge + '</span>' +
-          '</div>' +
-          (prodKey === 'moto' ?
-            '<div style="display:flex;align-items:center;gap:6px;margin-top:8px;padding:0 4px">' +
-              '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#497d00" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-              '<span style="font-size:11px;color:#497d00;font-weight:500">Store statement uploaded</span>' +
-            '</div>'
-          : '') +
+          body +
         '</div>' +
       '</div>' +
     '</div>';
@@ -2267,13 +2799,42 @@
   }
 
   function s06Toggle(storeKey, prodKey){
+    // Always flip state. For MOTO when ineligible, the render keeps the toggle visually off
+    // (effectivelyOn = on && eligible) but surfaces the warning panel as long as state.moto
+    // is true — so the first tap reveals the gate, a second tap dismisses it.
     onbStoreProducts[storeKey][prodKey] = !onbStoreProducts[storeKey][prodKey];
     s06RenderCard();
+  }
+
+  // MOTO eligibility confirmation overlay handlers — fired from the "Add statements ›" link
+  // inside an ineligible MOTO row. Agent must acknowledge that adding statements invalidates
+  // the current offer before being redirected to s-02.
+  function s06OpenMotoConfirm(){
+    var ov = document.getElementById('s06-moto-confirm-ov');
+    if (ov) ov.style.display = 'flex';
+  }
+  function s06CloseMotoConfirm(){
+    var ov = document.getElementById('s06-moto-confirm-ov');
+    if (ov) ov.style.display = 'none';
+  }
+  function s06ConfirmAddStatements(){
+    s06CloseMotoConfirm();
+    if (typeof go === 'function') go('02');
   }
 
   function s06ToggleEcomMonthly(storeKey){
     onbStoreProducts[storeKey].ecomMonthly = !onbStoreProducts[storeKey].ecomMonthly;
     s06RenderCard();
+  }
+
+  // Update the monthly subscription amount for a store. Parses out non-digits, clamps to 0–999.
+  // Does NOT re-render the whole card — that would blur the input mid-keystroke. The input's
+  // own value already reflects what the user typed; we just persist it to state.
+  function s06SetEcomMonthlyAmount(storeKey, val){
+    var pounds = parseInt(String(val||'').replace(/[^0-9]/g, ''), 10);
+    if (isNaN(pounds)) pounds = 0;
+    pounds = Math.max(0, Math.min(999, pounds));
+    onbStoreProducts[storeKey].ecomMonthlyAmount = pounds;
   }
 
   (function s06Init(){
@@ -2302,6 +2863,7 @@
     <div class="flex justify-between px-4 py-3 border-b border-[#756b571a]"><span class="text-[13px] text-[#16140e8c]">Banking bundle</span><span class="text-[13px] font-semibold text-[#090806ec]">Teya BA Light · 0 bps</span></div>
     <div class="flex justify-between px-4 py-3 border-b border-[#756b571a]"><span class="text-[13px] text-[#16140e8c]">Contract</span><span class="text-[13px] font-semibold text-[#090806ec]">Flexible</span></div>
     <div class="flex justify-between px-4 py-3 border-b border-[#756b571a]"><span class="text-[13px] text-[#16140e8c]">Settlement</span><span class="text-[13px] font-semibold text-[#090806ec]">Everyday (Teya BA)</span></div>
+    <div id="rv-dcc-row" class="flex justify-between px-4 py-3 border-b border-[#756b571a]" style="display:none"><span class="text-[13px] text-[#16140e8c]">DCC share</span><span id="rv-dcc-val" class="text-[13px] font-semibold text-[#090806ec]">No share</span></div>
     <div class="flex justify-between px-4 py-3 border-b border-[#756b571a]"><span class="text-[13px] text-[#16140e8c]">Card machines</span><span class="text-[13px] font-semibold text-[#090806ec]">Teya Tap + 1x Go (Regent St)</span></div>
     <div class="flex justify-between px-4 py-3"><span class="text-[13px] text-[#16140e8c]">Total monthly TPV</span><span class="text-[13px] font-semibold text-[#090806ec] tabular-nums">£83,000</span></div>
   </div>
@@ -2313,16 +2875,20 @@
     <div class="flex items-center gap-3 px-4 py-3"><div class="size-8 rounded-lg bg-[#e1e51a33] flex items-center justify-center text-[11px] font-semibold text-[#6d770d]">GS</div><div class="flex-1"><p class="text-[13px] font-medium text-[#090806ec]">George Street</p><p class="text-[11px] text-[#16140e8c]">£38k/mo · Everyday · Tap only</p></div><span class="text-[13px] font-semibold text-[#090806ec] tabular-nums">1.45%</span></div>
   </div>
 </div>
-<!-- confirmed overlay -->
+<!-- confirmed overlay — contents parameterised by showConf(intent) -->
 <div id="conf-ov" style="display:none" class="absolute inset-0 bg-[#f6f5f3] rounded-[36px] z-30 flex flex-col items-center justify-center px-8 text-center">
-  <div class="size-20 rounded-full bg-[#e1e51a33] flex items-center justify-center mb-6"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M7 18l7 7 15-15" stroke="#6d770d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  <h2 class="text-[24px] font-semibold text-[#090806ec] mb-2">Offer created</h2>
-  <p class="text-[15px] text-[#16140e8c] mb-2">Offer #1 has been created for Mario's Deli.</p>
-  <p class="text-[13px] text-[#16140e8c] mb-8">Ready to review and share with the merchant.</p>
+  <div id="conf-icon" class="size-20 rounded-full bg-[#e1e51a33] flex items-center justify-center mb-6"><svg id="conf-icon-svg" width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M7 18l7 7 15-15" stroke="#6d770d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <h2 id="conf-title" class="text-[24px] font-semibold text-[#090806ec] mb-2">Quote saved</h2>
+  <p id="conf-body1" class="text-[15px] text-[#16140e8c] mb-2">Quote v1 has been saved for Mario's Deli.</p>
+  <p id="conf-body2" class="text-[13px] text-[#16140e8c] mb-8">You can edit it or send it later.</p>
   <button onclick="goToOffers()" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Back to deal</button>
 </div>
 </div>
-<div class="cta"><button onclick="showConf()" class="w-full bg-[#0b0b0a] text-white font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Create offer</button></div>
+<div class="cta" style="display:flex;flex-direction:column;gap:8px">
+  <p id="s07-approval-hint" class="agent-only" style="display:none;font-size:11px;color:#c0392b;text-align:center;margin:0 0 2px;line-height:1.4">Below floor — needs internal approval before sending to merchant</p>
+  <button id="s07-primary-cta" onclick="s07Primary()" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Send for signature →</button>
+  <button onclick="s07SaveQuote()" class="w-full bg-white border border-[#756b571a] text-[#090806ec] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Save quote</button>
+</div>
 </div>
 
 <!-- ═══ SCREEN 08: ONBOARDING LOADING ═══ -->
@@ -3792,22 +4358,22 @@
             </div>
           </div>
 
-          <!-- Take rate health bar (sticky) — agent-only: "was X" caption -->
+          <!-- health bar (sticky) — agent-only: "was X" caption -->
           <div class="agent-only" style="flex-shrink:0;background:#f6f5f3;padding:12px 16px;border-bottom:1px solid #756b571a">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
               <div style="display:flex;flex-direction:column;gap:1px">
                 <div style="display:flex;align-items:baseline;gap:6px">
-                  <span style="font-size:11px;color:#16140e8c">Take rate</span>
-                  <span id="as-take-rate" style="font-size:17px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">1.65%</span>
+                  <span style="font-size:11px;color:#16140e8c">NSR / mo</span>
+                  <span id="as-est-commission" style="font-size:17px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">&pound;310</span>
                 </div>
-                <span id="as-take-rate-was" style="font-size:10px;color:#16140e8c;font-variant-numeric:tabular-nums">was 1.45%</span>
+                <span id="as-est-commission-was" style="font-size:10px;color:#16140e8c;font-variant-numeric:tabular-nums">was &pound;218/mo</span>
               </div>
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
                 <div style="display:flex;align-items:baseline;gap:6px">
                   <span style="font-size:11px;color:#16140e8c">Est. commission</span>
-                  <span id="as-est-commission" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;310/mo</span>
+                  <span id="as-take-rate" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;310/mo</span>
                 </div>
-                <span id="as-est-commission-was" style="font-size:10px;color:#16140e8c;font-variant-numeric:tabular-nums">was &pound;218/mo</span>
+                <span id="as-take-rate-was" style="font-size:10px;color:#16140e8c;font-variant-numeric:tabular-nums">was &pound;218/mo</span>
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
@@ -3821,8 +4387,8 @@
               <span id="as-approval-pill" style="display:none;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#fff;background:#c0392b;padding:3px 8px;border-radius:10px;letter-spacing:0.2px;white-space:nowrap"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M4.5 0.5L8.5 8H0.5L4.5 0.5z" fill="white"/></svg><span id="as-approval-pill-text">Needs approval</span></span>
             </div>
             <div style="display:flex;justify-content:space-between">
-              <span id="as-floor-label" style="font-size:10px;color:#16140e8c;transition:color 200ms,font-weight 200ms">Floor: 1.20%</span>
-              <span style="font-size:10px;color:#16140e8c">Suggested: 1.60%</span>
+              <span id="as-floor-label" style="font-size:10px;color:#16140e8c;transition:color 200ms,font-weight 200ms">Floor: &pound;180/mo</span>
+              <span id="as-target-label" style="font-size:10px;color:#16140e8c">Suggested: &pound;240/mo</span>
             </div>
           </div>
 
@@ -5255,9 +5821,16 @@
 
           // ── 3. Sticky header ──
           const trEl = scope.querySelector('#as-take-rate');
-          if (trEl) trEl.textContent = (takeRateBps / 100).toFixed(2) + '%';
+          if (trEl) trEl.textContent = '\u00a3' + commission + '/mo';
           const commEl = scope.querySelector('#as-est-commission');
-          if (commEl) commEl.innerHTML = '\u00a3' + commission + '/mo';
+          if (commEl) commEl.innerHTML = '\u00a3' + commission;
+          // Floor/suggested per-mo derived from current bps thresholds + baseline
+          const asFloorMo  = Math.round(AS_BASELINE_COMMISSION * (AS_FLOOR_BPS  / AS_BASELINE_RATE));
+          const asTargetMo = Math.round(AS_BASELINE_COMMISSION * (AS_TARGET_BPS / AS_BASELINE_RATE));
+          const asFloorEl  = scope.querySelector('#as-floor-label');
+          const asTargetEl = scope.querySelector('#as-target-label');
+          if (asFloorEl)  asFloorEl.textContent  = 'Floor: \u00a3' + asFloorMo  + '/mo';
+          if (asTargetEl) asTargetEl.textContent = 'Suggested: \u00a3' + asTargetMo + '/mo';
 
           // ── 4. Carry-forward card — contract, bundle, existing stores' settlement ──
           const cfContractVal = scope.querySelector('#as-cf-contract-val');
@@ -5824,22 +6397,22 @@
             </div>
           </div>
 
-          <!-- Sticky take-rate bar — agent-only (internal negotiation data: floor, suggested, approval) -->
+          <!-- Sticky bar — agent-only (internal negotiation data: floor, suggested, approval) -->
           <div class="agent-only" style="flex-shrink:0;background:#f6f5f3;padding:12px 16px;border-bottom:1px solid #756b571a">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
               <div style="display:flex;flex-direction:column;gap:1px">
                 <div style="display:flex;align-items:baseline;gap:6px">
-                  <span style="font-size:11px;color:#16140e8c">Take rate</span>
-                  <span id="ast-take-rate" style="font-size:17px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">1.65%</span>
+                  <span style="font-size:11px;color:#16140e8c">NSR / mo</span>
+                  <span id="ast-est-commission" style="font-size:17px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">&pound;310</span>
                 </div>
-                <span id="ast-take-rate-was" style="font-size:10px;color:#16140e8c;font-variant-numeric:tabular-nums">was 1.45%</span>
+                <span id="ast-est-commission-was" style="font-size:10px;color:#16140e8c;font-variant-numeric:tabular-nums">was &pound;218/mo</span>
               </div>
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
                 <div style="display:flex;align-items:baseline;gap:6px">
                   <span style="font-size:11px;color:#16140e8c">Est. commission</span>
-                  <span id="ast-est-commission" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;310/mo</span>
+                  <span id="ast-take-rate" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums">&pound;310/mo</span>
                 </div>
-                <span id="ast-est-commission-was" style="font-size:10px;color:#16140e8c;font-variant-numeric:tabular-nums">was &pound;218/mo</span>
+                <span id="ast-take-rate-was" style="font-size:10px;color:#16140e8c;font-variant-numeric:tabular-nums">was &pound;218/mo</span>
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
@@ -5851,8 +6424,8 @@
               <span id="ast-approval-pill" style="display:none;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#fff;background:#c0392b;padding:3px 8px;border-radius:10px;letter-spacing:0.2px;white-space:nowrap"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M4.5 0.5L8.5 8H0.5L4.5 0.5z" fill="white"/></svg><span id="ast-approval-pill-text">Needs approval</span></span>
             </div>
             <div style="display:flex;justify-content:space-between">
-              <span id="ast-floor-label" style="font-size:10px;color:#16140e8c;transition:color 200ms,font-weight 200ms">Floor: 1.20%</span>
-              <span style="font-size:10px;color:#16140e8c">Suggested: 1.60%</span>
+              <span id="ast-floor-label" style="font-size:10px;color:#16140e8c;transition:color 200ms,font-weight 200ms">Floor: &pound;180/mo</span>
+              <span id="ast-target-label" style="font-size:10px;color:#16140e8c">Suggested: &pound;240/mo</span>
             </div>
           </div>
 
@@ -6361,8 +6934,15 @@
           const baselineRate = 145, baselineComm = 218;
           const commission = Math.round(baselineComm * (takeRateBps / baselineRate));
 
-          const trEl   = scope.querySelector('#ast-take-rate');     if (trEl)   trEl.textContent   = (takeRateBps / 100).toFixed(2) + '%';
-          const commEl = scope.querySelector('#ast-est-commission');if (commEl) commEl.innerHTML   = '\u00a3' + commission + '/mo';
+          const trEl   = scope.querySelector('#ast-take-rate');     if (trEl)   trEl.textContent   = '\u00a3' + commission + '/mo';
+          const commEl = scope.querySelector('#ast-est-commission');if (commEl) commEl.innerHTML   = '\u00a3' + commission;
+          // Floor/suggested per-mo derived from current bps thresholds + baseline
+          const astFloorMo  = Math.round(baselineComm * (FLOOR  / baselineRate));
+          const astTargetMo = Math.round(baselineComm * (TARGET / baselineRate));
+          const astFloorEl  = scope.querySelector('#ast-floor-label');
+          const astTargetEl = scope.querySelector('#ast-target-label');
+          if (astFloorEl)  astFloorEl.textContent  = 'Floor: \u00a3' + astFloorMo  + '/mo';
+          if (astTargetEl) astTargetEl.textContent = 'Suggested: \u00a3' + astTargetMo + '/mo';
           const maxTR = TARGET * 2;
           const pct   = Math.max(0, Math.min(100, (takeRateBps / maxTR) * 100));
           const bar   = scope.querySelector('#ast-bar-fill');
@@ -7142,6 +7722,8 @@ function go(t){
   hist.push(t);cur=t;
   // Sync health bar when entering card machines screen
   if(t==='05c' && typeof syncHealthBar05c==='function') syncHealthBar05c();
+  // Phase 5 — refresh s-07 dual CTA / helper line based on current aboveFloor
+  if(t==='07' && typeof refreshS07Cta==='function') refreshS07Cta();
 }
 function goBack(){if(hist.length>1){hist.pop();const p=hist[hist.length-1];hist.pop();go(p);}}
 // ─── Product usage toggles ──
@@ -7481,6 +8063,205 @@ function hydrateCompanyOverview(slug) {
 // ─── NEW DEAL: CONSOLIDATED SCREEN (s-02) ──────────────────────────────────────
 let ndStores = []; // array of {name, address, activity, tpv, atv}
 
+// ─── DEAL CONFIDENCE (Phase 2) ────────────────────────────────────────────────
+// Confidence reflects how reliable the inputs are that produced the deal.
+// Tiers (per store, deal-level = weakest):
+//   high        — statement-backed
+//   medium-high — Google lookup, ATV from Google
+//   medium-low  — Google lookup, ATV manually entered (or empty)
+//   low         — manual entry, no Google data
+// Bar colour palette matches the s-05 bar (green / lime / red).
+// Real risk weights come later from Honor + Nico — this is the visible surface.
+const dealConfidence = { tier: 'low', label: 'Low', source: '', pct: 20, color: '#c0392b' };
+
+function ndClassifyStore(s){
+  // Per-store reliability score (0-100). Statement-backed scores 80-100 (multi-month
+  // boost). No-statement cases are deliberately capped below 50% to motivate the
+  // agent to upload a statement — "below half" is the visual signal that the data
+  // is not yet trustworthy enough for confident pricing.
+  const stmtCount = (s._statements || []).length || (s._fromStatement ? 1 : 0);
+  if (stmtCount >= 3)  return { tier: 'high',        source: 'Statement-backed (3+ months)', score: 100 };
+  if (stmtCount === 2) return { tier: 'high',        source: 'Statement-backed (2 months)',  score:  90 };
+  if (stmtCount === 1) return { tier: 'high',        source: 'Statement-backed',             score:  80 };
+  if (s._manual && s._googleAtv && s.atv && s.atv === s._googleAtv)
+                       return { tier: 'medium-high', source: 'Google lookup · ATV from Google', score: 40 };
+  if (s._manual && (s._googleActivities && s._googleActivities.length > 0))
+                       return { tier: 'medium-low',  source: 'Google lookup · ATV manual',      score: 25 };
+  return                      { tier: 'low',         source: 'Manual entry',                    score: 10 };
+}
+
+function ndUpdateConfidence(){
+  const card = document.getElementById('nd-confidence');
+  if (!card) return;
+
+  const hasStores = (typeof ndStores         !== 'undefined') && ndStores.length > 0;
+  const hasStmt   = (typeof ndConfirmedStmts !== 'undefined') && ndConfirmedStmts.length > 0;
+
+  // Hide until first input lands
+  if (!hasStores && !hasStmt) { card.style.display = 'none'; syncConfMirrors(); return; }
+  card.style.display = '';
+
+  // Per-tier numeric scores (used for TPV-weighted blend) and ordering
+  const TIER_SCORE = { 'high': 100, 'medium-high': 70, 'medium-low': 45, 'low': 20 };
+  const ORDER      = { 'high': 4,   'medium-high': 3,  'medium-low': 2,  'low': 1 };
+
+  let tier, label, color, score, source, hint, action;
+  let showBar = true; // empty state hides the bar + %
+
+  // Text colour for the level word in the s-02 card header. Low tier resolves
+  // dynamically based on score: amber (#bb4d00) for 20-44, red (#c0392b) for <20.
+  const TEXT_COLOR = { 'high': '#497d00', 'medium': '#5a7a26', 'low': '#c0392b', 'empty': '#16140e8c' };
+
+  if (!hasStores){
+    // Statement uploaded but no stores imported yet — empty-state guidance
+    tier = 'empty'; label = 'Statement uploaded'; color = '#16140e8c'; score = 0;
+    source = 'No stores yet';
+    hint   = '↑ Add stores to begin pricing';
+    action = 'Details';
+    showBar = false;
+  } else {
+    // Classify each store + parse its TPV (currency-stripped). Per-store score
+    // now comes directly from the classifier (accounts for statement count).
+    const stores = ndStores.map(s => {
+      const c = ndClassifyStore(s);
+      const raw = (s.tpv || '').toString().replace(/[^0-9.]/g, '');
+      return { name: s.name, tier: c.tier, source: c.source, score: c.score, tpv: parseFloat(raw) || 0,
+               stmtCount: (s._statements || []).length || (s._fromStatement ? 1 : 0) };
+    });
+    const totalTpv = stores.reduce((sum, c) => sum + c.tpv, 0);
+
+    // TPV-weighted blend; if no TPVs entered yet, fall back to weakest store
+    if (totalTpv > 0){
+      score = stores.reduce((sum, c) => sum + (c.score * c.tpv), 0) / totalTpv;
+    } else {
+      const weakest = stores.reduce((w, c) => c.score < w.score ? c : w, stores[0]);
+      score = weakest.score;
+    }
+
+    // Bucket the score into colour bands. Below 45% can never be green —
+    // amber for the 20-44 range, red for very low (<20).
+    if      (score >= 80) { tier = 'high';   label = 'High';   color = '#7ccf00'; }
+    else if (score >= 45) { tier = 'medium'; label = 'Medium'; color = '#a3c947'; }
+    else if (score >= 20) { tier = 'low';    label = 'Low';    color = '#fe9a00'; }
+    else                  { tier = 'low';    label = 'Low';    color = '#c0392b'; }
+
+    // Source description — always scope-aware so the count never misleads.
+    // Format: "[N store(s)] · [source]" or "X of N stores · [source]" for mixed.
+    const counts = { stmt: 0, google: 0, manual: 0 };
+    stores.forEach(s => {
+      if (s.tier === 'high') counts.stmt++;
+      else if (s.tier === 'low') counts.manual++;
+      else counts.google++;
+    });
+    const N = stores.length;
+    const storesLabel = N === 1 ? '1 store' : N + ' stores';
+
+    if (counts.stmt === N){
+      source = storesLabel + ' · Statement';
+    } else if (counts.stmt > 0){
+      source = counts.stmt + ' of ' + N + ' stores · Statement';
+    } else if (counts.google === N){
+      source = storesLabel + ' · Google lookup';
+    } else if (counts.manual === N){
+      source = storesLabel + ' · Manual entry';
+    } else {
+      // No statements, mix of Google + manual
+      source = counts.google + ' Google · ' + counts.manual + ' manual';
+    }
+
+    // Action hint — verb-led, names the action and its impact on pricing risk.
+    // Header line names the metric (pricing confidence); hint names the risk
+    // impact, so the card carries both concepts at once.
+    const weak = stores.filter(s => s.tier !== 'high');
+    // Stores that are statement-backed but haven't reached the 3+ months bonus yet
+    const stmtNotMaxed = stores.filter(s => s.tier === 'high' && s.stmtCount < 3);
+    if (tier === 'high' && stmtNotMaxed.length === 0){
+      // Every statement-backed store has 3+ months — score is maxed at 100%, nothing more to add
+      hint = '✓ Statement-verified · 100% confidence';
+    } else if (counts.manual === N){
+      // Pure manual — statement may not exist; ask the merchant
+      hint = N === 1 ? '↑ Ask the merchant for a recent statement to reduce risk'
+                     : '↑ Ask for statements from ' + N + ' stores to reduce risk';
+    } else if (weak.length === 1){
+      // Single weak store — uploading its statement definitely reaches High
+      hint = '↑ Upload ' + weak[0].name + "'s statement to reduce pricing risk";
+    } else if (weak.length > 1){
+      // Multiple weak stores — outcome depends on TPV weighting
+      hint = '↑ Upload statements from ' + weak.length + ' stores to reduce risk';
+    } else if (stmtNotMaxed.length === 1){
+      // Single statement-backed store, but not yet at 3+ months — name the
+      // exact months needed and the outcome (100%) so the action's purpose is clear
+      const s = stmtNotMaxed[0];
+      const monthsToFull = 3 - s.stmtCount;
+      const monthsLabel = monthsToFull === 1 ? '1 more month' : monthsToFull + ' more months';
+      hint = '↑ Upload ' + monthsLabel + ' for ' + s.name + ' → 100%';
+    } else if (stmtNotMaxed.length > 1){
+      hint = '↑ Upload more months of statements → 100%';
+    } else {
+      // Defensive fallback — shouldn't be reachable with the current scoring rubric
+      hint = '✓ Statement-backed';
+    }
+
+    // s-05 strip right-side affordance — short verb based on what's missing.
+    // Mirrors the hint priority above: only show passive 'Details' when the
+    // score is fully maxed (100%). Anything below maxed should prompt an action.
+    if (tier === 'high' && stmtNotMaxed.length === 0)  action = 'Details';
+    else if (counts.manual === N)                       action = 'Add evidence';
+    else                                                action = 'Add statement';
+  }
+
+  const pct = Math.round(score);
+
+  // Resolve text colour — low tier splits between amber (≥20) and red (<20)
+  const resolvedTextColor = (tier === 'low' && score >= 20) ? '#bb4d00' : TEXT_COLOR[tier];
+
+  dealConfidence.tier   = tier;
+  dealConfidence.label  = label;
+  dealConfidence.source = source;
+  dealConfidence.color  = color;       // dot colour (matches-bar palette)
+  dealConfidence.textColor = resolvedTextColor;
+  dealConfidence.action = action;      // s-05 strip right-side button verb
+  dealConfidence.pct    = pct;         // 0-100 blended reliability score
+  dealConfidence.showBar = showBar;
+
+  // Render s-02 card
+  const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setText('nd-conf-level', label);
+  setText('nd-conf-source', source);
+  setText('nd-conf-hint', hint);
+  setText('nd-conf-pct', pct + '%');
+  const lvl = document.getElementById('nd-conf-level');
+  if (lvl) lvl.style.color = dealConfidence.textColor;
+  // Bar + % hidden in empty state (no stores yet)
+  const track = document.getElementById('nd-conf-track');
+  const bar   = document.getElementById('nd-conf-bar');
+  const pctEl = document.getElementById('nd-conf-pct');
+  if (track) track.style.display = showBar ? '' : 'none';
+  if (pctEl) pctEl.style.display = showBar ? '' : 'none';
+  if (bar && showBar) { bar.style.width = pct + '%'; bar.style.background = color; }
+
+  syncConfMirrors();
+}
+
+// Mirror confidence state to the compact strip on negotiation surfaces
+function syncConfMirrors(){
+  const strip = document.getElementById('s05-conf-strip');
+  if (!strip) return;
+  const visible = ((typeof ndStores         !== 'undefined') && ndStores.length > 0) ||
+                  ((typeof ndConfirmedStmts !== 'undefined') && ndConfirmedStmts.length > 0);
+  strip.style.display = visible ? '' : 'none';
+  if (!visible) return;
+
+  const setSel = (sel, txt) => { const el = strip.querySelector(sel); if (el) el.textContent = txt; };
+  setSel('.conf-pct', dealConfidence.pct + '%');
+  setSel('.conf-strip-source', dealConfidence.source);
+  const dot = strip.querySelector('.conf-strip-dot');
+  if (dot) dot.style.background = dealConfidence.color;
+  // Right-side action verb shifts based on tier (Add statement / Add evidence / Details)
+  const edit = strip.querySelector('.conf-strip-edit');
+  if (edit) edit.innerHTML = dealConfidence.action + ' ›';
+}
+
 function ndToggleStore(idx) {
   const body = document.getElementById('nd-body-' + idx);
   const chev = document.getElementById('nd-chev-' + idx);
@@ -7495,16 +8276,9 @@ function ndToggleStore(idx) {
 // ── Render stores from ndStores array ──
 function ndRenderStores(allExpanded) {
   const container = document.getElementById('nd-stores-container');
-  const emptyState = document.getElementById('nd-stores-empty');
-  const addRow = document.getElementById('nd-add-store-row');
   container.innerHTML = '';
-  if (ndStores.length === 0) {
-    emptyState.style.display = '';
-    addRow.style.display = 'none';
-  } else {
-    emptyState.style.display = 'none';
-    addRow.style.display = 'flex';
-  }
+  // Phase 2 — recompute deal confidence whenever stores change
+  if (typeof ndUpdateConfidence === 'function') ndUpdateConfidence();
   ndStores.forEach((store, i) => {
     const shouldOpen = allExpanded === true || i === ndLastAddedIdx || store._cardOpen === true;
     const allActivities = ['Café/Restaurant','Bar/Pub','Retail — Fashion','Retail — Grocery','Retail — Electronics','Takeaway/Fast Food','Hotel/Accommodation','Health & Beauty','Professional Services','Entertainment/Leisure','Charity/Non-Profit','Other'];
@@ -7584,12 +8358,39 @@ function ndRenderStores(allExpanded) {
           '<div class="size-8 rounded-full bg-[#e1e51a33] flex items-center justify-center shrink-0 text-[12px] font-semibold text-[#6d770d]">' + (i + 1) + '</div>' +
           '<div class="flex-1 min-w-0">' +
             '<p class="text-[15px] font-medium text-[#090806ec] truncate">' + (store._storeType === 'online' ? store.name : ('Mario\'s Deli — ' + store.name)) + '</p>' +
-            '<p class="text-[12px] text-[#16140e8c] truncate">' + (store._storeType === 'online' ? (store._url || '') : store.address) + '</p>' +
+            '<p class="text-[12px] text-[#16140e8c] truncate mt-0.5">' + (store._storeType === 'online' ? (store._url || '') : store.address) + '</p>' +
           '</div>' +
+          (function(){
+            // Source badge sits in its own column before the chevron — always right-aligned,
+            // never competes with address truncation
+            var c = ndClassifyStore(store);
+            var stmtCount = (store._statements || []).length || (store._fromStatement ? 1 : 0);
+            var v = c.tier === 'high' ? 'high' : (c.tier === 'low' ? 'low' : 'medium');
+            var lbl;
+            if (c.tier === 'high')      lbl = stmtCount >= 3 ? '3+ statements' : (stmtCount === 2 ? '2 statements' : 'Statement');
+            else if (c.tier === 'low')  lbl = 'Manual';
+            else                         lbl = 'Google';
+            return '<span class="store-source-badge agent-only ' + v + ' shrink-0">' + lbl + '</span>';
+          })() +
           '<svg id="nd-chev-' + i + '" class="chev' + (shouldOpen ? ' open' : '') + ' shrink-0" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="#16140e8c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
         '</div>' +
         '<div id="nd-body-' + i + '" class="section-body' + (shouldOpen ? ' open' : '') + '">' +
           '<div class="px-4 pb-3 border-t border-[#756b571a]">' +
+            (function(){
+              var stmts = store._statements || [];
+              if (stmts.length === 0) return '';
+              var chips = stmts.map(function(s){
+                var monthBit = s.month ? ' &middot; ' + s.month : '';
+                return '<span style="display:inline-flex;align-items:center;gap:4px;background:#7ccf001a;color:#497d00;font-size:11px;font-weight:500;padding:3px 8px;border-radius:8px;font-family:inherit">' +
+                  '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 4.5h6M5 7h6M5 9.5h4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>' +
+                  s.file + monthBit +
+                '</span>';
+              }).join('');
+              return '<div class="pt-3 pb-3 border-b border-[#756b571a]">' +
+                       '<p class="text-[11px] text-[#16140e8c] font-medium mb-1.5">' + stmts.length + ' statement' + (stmts.length !== 1 ? 's' : '') + ' attached</p>' +
+                       '<div class="flex flex-wrap gap-1.5">' + chips + '</div>' +
+                     '</div>';
+            })() +
             activityFieldHTML +
             '<div class="mt-4 pt-3 border-t border-[#756b571a]">' +
               '<label class="text-[13px] text-[#16140e8c] block mb-1">Expected ATV</label>' +
@@ -7616,8 +8417,8 @@ function ndRenderStores(allExpanded) {
               ) +
               ndSeasonContent(i, store) +
             '</div>' +
-            // ── Online payments section ──
-            ndOnlinePaymentsSection(i, store) +
+            // ── Online payments section (hidden — function preserved in case it's needed later) ──
+            // ndOnlinePaymentsSection(i, store) +
             // ── Transaction profile section ──
             ndTxProfileSection(i, store) +
           '</div>' +
@@ -7697,14 +8498,16 @@ function ndInitSwipe() {
 // ── Statement upload — supports multiple statements ──
 // Simulated statement data: first upload has 2 stores, second has 1
 const ndStmtSimData = [
+  // First upload defaults to the unmatched/extracted state — represents the most realistic case
+  // where the AI extracted transaction data but couldn't bind it to a specific store yet
+  { file: 'statement_stripe_mar.pdf', month: 'March 2026', stores: [], _extracted: { activity: 'Café/Restaurant', tpv: '£31,500', atv: '£24.00' } },
   { file: 'statement_barclaycard_q4.pdf', month: 'October 2025', stores: [
     { name: 'Regent St', address: 'London W1B 5AH', activity: 'Café/Restaurant', tpv: '£45,000', atv: '£32.50', _txProfile: { visaMc: 73, debitCredit: 21, consumerBiz: 88, domestic: 62, intra: 28, inter: 10 } },
     { name: 'George St', address: 'Edinburgh EH2 2PF', activity: 'Café/Restaurant', tpv: '£38,000', atv: '£28.00', _txProfile: { visaMc: 68, debitCredit: 35, consumerBiz: 82, domestic: 70, intra: 22, inter: 8 } }
   ]},
   { file: 'statement_worldpay_jan.pdf', month: 'January 2026', stores: [
     { name: 'Waterloo', address: '56 Waterloo Rd, London SE1 8SS', activity: 'Café/Restaurant', tpv: '£22,000', atv: '£18.50', _txProfile: { visaMc: 78, debitCredit: 45, consumerBiz: 75, domestic: 55, intra: 30, inter: 15 } }
-  ]},
-  { file: 'statement_stripe_mar.pdf', month: 'March 2026', stores: [], _extracted: { activity: 'Café/Restaurant', tpv: '£31,500', atv: '£24.00' } }
+  ]}
 ];
 let ndConfirmedStmts = []; // array of { file, stores: [...confirmed stores] }
 let ndCurrentStmt = null; // the statement being reviewed in the bottom sheet
@@ -7739,6 +8542,16 @@ function ndRenderStmtSheet() {
   const list = document.getElementById('nd-stmt-stores-list');
   const storeCount = ndCurrentStmtStores.length;
   const isSingle = storeCount === 1;
+
+  // Restore the Confirm button — a prior unmatched-flow render may have rebound
+  // its onclick to ndConfirmUnmatched and disabled it. Always reset before
+  // rendering the matched sheet so Confirm works on subsequent uploads.
+  const confirmBtn = list.parentElement.querySelector('button[onclick*="ndConfirmStmtStores"]');
+  if (confirmBtn) {
+    confirmBtn.onclick = function() { ndConfirmStmtStores(); };
+    confirmBtn.style.opacity = '';
+    confirmBtn.style.pointerEvents = '';
+  }
 
   // Header
   header.innerHTML =
@@ -7960,9 +8773,27 @@ function ndConfirmStmtStores() {
 }
 
 function ndRebuildStoresFromStmts() {
-  const stmtStores = ndConfirmedStmts.flatMap(stmt =>
-    stmt.stores.map(s => ({...s, _fromStatement: true, _stmtFile: stmt.file, _stmtMonth: stmt.month || ''}))
-  );
+  // Dedupe by name+address so multi-month uploads stack on the same store card.
+  // Each surviving store carries a `_statements` array of {file, month} —
+  // this is the evidence trail rendered on the store card and feeds the
+  // multi-statement reliability scoring (1 = 80, 2 = 90, 3+ = 100).
+  const storesByKey = {};
+  ndConfirmedStmts.forEach(stmt => {
+    (stmt.stores || []).forEach(s => {
+      const key = (s.name || '') + '|' + (s.address || '');
+      if (!storesByKey[key]) {
+        storesByKey[key] = {
+          ...s,
+          _fromStatement: true,
+          _stmtFile: stmt.file,            // first statement (back-compat)
+          _stmtMonth: stmt.month || '',
+          _statements: []                  // evidence trail
+        };
+      }
+      storesByKey[key]._statements.push({ file: stmt.file, month: stmt.month || '' });
+    });
+  });
+  const stmtStores = Object.values(storesByKey);
   const manual = ndStores.filter(s => s._manual);
   ndStores = stmtStores.concat(manual);
   ndRenderStores(false);
@@ -7975,22 +8806,27 @@ function ndRenderStmtBanners() {
   container.innerHTML = '';
   ndConfirmedStmts.forEach((stmt, i) => {
     const count = stmt.stores.length;
+    // Banner row lives in its own white card below the upload action.
+    // Parent uses `divide-y` so each row is naturally separated.
     const banner = document.createElement('div');
-    banner.className = 'bg-[#7ccf001a] border border-[#7ccf0033] rounded-2xl px-3 py-2.5 flex items-center gap-3';
+    banner.className = 'flex items-center gap-2 px-4 py-2';
     banner.innerHTML =
-      '<svg class="shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 8l4 4 7-7" stroke="#497d00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-      '<div class="flex-1"><p class="text-[13px] font-medium text-[#090806ec]">' + stmt.file + '</p><p class="text-[11px] text-[#497d00]">' + count + ' store' + (count !== 1 ? 's' : '') + ' identified · Details pre-filled</p></div>' +
-      '<button onclick="ndRemoveStatement(' + i + ')" class="text-[12px] text-[#16140e8c] underline shrink-0">Remove</button>';
+      '<svg class="shrink-0" width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 8l4 4 7-7" stroke="#497d00" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '<span class="flex-1 min-w-0 truncate text-[12px] font-medium text-[#090806ec]">' + stmt.file + '</span>' +
+      '<span class="text-[11px] text-[#497d00] shrink-0">' + count + ' store' + (count !== 1 ? 's' : '') + '</span>' +
+      '<button onclick="ndRemoveStatement(' + i + ')" class="text-[11px] text-[#16140e8c] underline shrink-0">Remove</button>';
     container.appendChild(banner);
   });
-  // Update hint and upload label — upload always visible
+  // Update upload label — hint element was removed in the IA refactor
   if (ndConfirmedStmts.length > 0) {
-    hint.textContent = 'You can upload additional statements for other stores';
-    uploadLabel.textContent = 'Upload another file';
+    if (hint) hint.textContent = 'You can upload additional statements for other stores';
+    uploadLabel.textContent = 'Upload another statement';
   } else {
-    hint.textContent = 'Upload a statement to auto-identify stores and pre-fill details';
-    uploadLabel.textContent = 'Upload file';
+    if (hint) hint.textContent = 'Upload a statement to auto-identify stores and pre-fill details';
+    uploadLabel.textContent = 'Upload statement';
   }
+  // Phase 2 — recompute deal confidence whenever statements change
+  if (typeof ndUpdateConfidence === 'function') ndUpdateConfidence();
 }
 
 function ndRemoveStatement(idx) {
@@ -8085,13 +8921,26 @@ function ndSetSearchType(t) {
   const phys = document.getElementById('nd-search-physical');
   const onl  = document.getElementById('nd-search-online');
   const sub  = document.getElementById('nd-search-subtitle');
-  const action = document.getElementById('nd-online-action');
+  const tabPhys = document.getElementById('nd-tab-physical');
+  const tabEcom = document.getElementById('nd-tab-ecom');
   if (!phys || !onl) return;
   const onPhys = (t === 'physical');
   phys.style.display = onPhys ? '' : 'none';
   onl.style.display  = onPhys ? 'none' : '';
   if (sub) sub.textContent = onPhys ? 'Search by trading name or address' : 'Add an ecommerce store by URL';
-  if (action) action.style.display = onPhys ? '' : 'none';
+  // Drive the segmented-toggle active state — selected tab gets the white pill, inactive is transparent
+  if (tabPhys && tabEcom) {
+    const activeBg = 'white', activeColor = '#090806ec', activeWeight = '600', activeShadow = '0 1px 2px rgba(0,0,0,0.08)';
+    const inactiveBg = 'transparent', inactiveColor = '#16140e8c', inactiveWeight = '500', inactiveShadow = 'none';
+    tabPhys.style.background = onPhys ? activeBg : inactiveBg;
+    tabPhys.style.color      = onPhys ? activeColor : inactiveColor;
+    tabPhys.style.fontWeight = onPhys ? activeWeight : inactiveWeight;
+    tabPhys.style.boxShadow  = onPhys ? activeShadow : inactiveShadow;
+    tabEcom.style.background = onPhys ? inactiveBg : activeBg;
+    tabEcom.style.color      = onPhys ? inactiveColor : activeColor;
+    tabEcom.style.fontWeight = onPhys ? inactiveWeight : activeWeight;
+    tabEcom.style.boxShadow  = onPhys ? inactiveShadow : activeShadow;
+  }
 }
 
 // Push an ecommerce-only store into ndStores. Address inherits from company.
@@ -8224,8 +9073,8 @@ function ndSeasonContent(idx, store) {
         '</div>'
       : '';
 
-    const footer = '<div class="mt-1 text-center">' +
-      '<button onclick="ndSetSeasonMode(' + idx + ',\'onetime\')" class="text-[11px] text-[#16140e8c] active:opacity-60">One-time event instead</button>' +
+    const footer = '<div class="mt-2 text-center">' +
+      '<button onclick="ndSetSeasonMode(' + idx + ',\'onetime\')" class="text-[11px] text-[#16140e8c] active:opacity-60">One-time event instead &rsaquo;</button>' +
     '</div>';
 
     return '<div>' +
@@ -8250,8 +9099,8 @@ function ndSeasonContent(idx, store) {
       '<div class="bg-[#f6f5f3] rounded-xl px-3 h-10 flex items-center"><span class="text-[13px] text-[#16140e8c] mr-1">£</span><input type="text" value="' + (store._onetimeTpv || '') + '" placeholder="0" class="flex-1 bg-transparent text-[14px] text-[#090806ec] outline-none tabular-nums"/></div>' +
       stmtTpvNote +
     '</div>' +
-    '<div class="mt-1 text-center">' +
-      '<button onclick="ndSetSeasonMode(' + idx + ',\'calendar\')" class="text-[11px] text-[#16140e8c] active:opacity-60">&larr; Back to recurring</button>' +
+    '<div class="mt-2 text-center">' +
+      '<button onclick="ndSetSeasonMode(' + idx + ',\'calendar\')" class="text-[11px] text-[#16140e8c] active:opacity-60">&lsaquo; Back to recurring</button>' +
     '</div>' +
   '</div>';
 }
@@ -8479,6 +9328,9 @@ function ndToggleAtvTag(storeIdx) {
     store.atv = suggestedVal;
     tag.className = tag.className.replace(defaultCls, selectedCls);
   }
+  // Phase 2 — ATV change shifts the store's tier (medium-high ↔ medium-low),
+  // which moves the deal-level confidence score
+  if (typeof ndUpdateConfidence === 'function') ndUpdateConfidence();
 }
 
 function ndCheckAtvTag(storeIdx) {
@@ -8495,6 +9347,7 @@ function ndCheckAtvTag(storeIdx) {
   } else {
     tag.className = tag.className.replace(selectedCls, defaultCls);
   }
+  if (typeof ndUpdateConfidence === 'function') ndUpdateConfidence();
 }
 
 function ndSetSeasonMode(storeIdx, mode) {
@@ -8645,33 +9498,222 @@ function dt(tab){
 
 
 
-// ─── SUBMIT / CONFIRM ─────────────────────────────────────────────────────────
-function showConf(){document.getElementById('conf-ov').style.display='flex';}
+// ─── PHASE 5 — Quote vs Deal lifecycle ───────────────────────────────────────
+// Status flow:
+//   quote            — saved as draft (Quote v1), no commitment
+//   pending_approval — sent to internal approval (below-floor offers)
+//   awaiting_sig     — sent to merchant for signature (in-floor, or post-approval)
+//   signed           — merchant signed → becomes a binding Deal
+window._offerStatus = 'none';
+window._quoteVersion = 1;
+window._aboveFloor = true; // overwritten by recalcAll
+
+const OFFER_STATUS_CONFIG = {
+  quote: {
+    chipText: 'Quote v1',
+    chipFg: '#8a6800',
+    chipBg: '#FFF7E0',
+    // Quotes are immutable — no "Edit" action. To revise, agents create a new quote
+    // via the "Create ›" link in the Offers card header.
+    ctas: function(){ return ''
+      + '<div class="px-4 py-3">'
+      +   '<button onclick="s07Primary(true)" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[14px] rounded-[24px] py-3 flex items-center justify-center gap-2 active:scale-[0.96] transition-transform">'
+      +     '<span id="off-quote-primary-label">Send for signature</span>'
+      +   '</button>'
+      + '</div>';
+    }
+  },
+  pending_approval: {
+    chipText: 'Pending approval',
+    chipFg: '#9c4a00',
+    chipBg: '#FFE9CC',
+    ctas: function(){ return ''
+      + '<div class="px-4 py-3 border-b border-[#756b571a]">'
+      +   '<div class="w-full bg-[#f6f5f3] text-[#16140e8c] font-medium text-[14px] rounded-[24px] py-3 flex items-center justify-center gap-2">'
+      +     '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#9c4a00" stroke-width="1.3"/><path d="M7 4v3l2 1.5" stroke="#9c4a00" stroke-width="1.3" stroke-linecap="round"/></svg>'
+      +     'Awaiting pricing-team review'
+      +   '</div>'
+      + '</div>'
+      + '<div class="px-4 py-3"><button onclick="markAsApproved()" class="w-full text-[12px] text-[#16140e8c] underline agent-only">[demo] Mark as approved</button></div>';
+    }
+  },
+  awaiting_sig: {
+    chipText: 'Sent · awaiting sig',
+    chipFg: '#1E40AF',
+    chipBg: '#DBEAFE',
+    ctas: function(){ return ''
+      + '<div class="px-4 py-3 border-b border-[#756b571a]">'
+      +   '<div class="w-full bg-[#f6f5f3] text-[#16140e8c] font-medium text-[14px] rounded-[24px] py-3 flex items-center justify-center gap-2">'
+      +     '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3l5 4 5-4M2 3v8h10V3" stroke="#1E40AF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      +     'Awaiting Marco Rossi’s signature'
+      +   '</div>'
+      + '</div>'
+      + '<div class="px-4 py-3"><button onclick="markAsSigned()" class="w-full text-[12px] text-[#16140e8c] underline agent-only">[demo] Mark as signed</button></div>';
+    }
+  },
+  signed: {
+    chipText: 'Deal',
+    chipFg: '#497d00',
+    chipBg: '#7ccf001a',
+    ctas: function(){ return ''
+      + '<div class="px-4 py-3 border-b border-[#756b571a]">'
+      +   '<button onclick="go(\'08\');startOnboarding()" class="w-full bg-[#0b0b0a] text-white font-semibold text-[14px] rounded-[24px] py-3 flex items-center justify-center gap-2 active:scale-[0.96] transition-transform">'
+      +     '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 100 8A4 4 0 008 2zM2 14c0-2 2.7-3.5 6-3.5s6 1.5 6 3.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><path d="M13 9l2 2-2 2" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      +     'Onboard merchant'
+      +   '</button>'
+      + '</div>'
+      + '<div class="px-4 py-3"><button onclick="go(\'05\')" class="w-full bg-[#f6f5f3] border border-[#756b571a] text-[#090806ec] font-medium text-[14px] rounded-[24px] py-3 flex items-center justify-center gap-2 active:scale-[0.96] transition-transform">'
+      +   '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg>'
+      +   'Create new offer'
+      + '</button></div>';
+    }
+  }
+};
+
+function setOfferStatus(s){
+  window._offerStatus = s;
+  renderOfferCardOnS04();
+}
+
+function renderOfferCardOnS04(){
+  const cfg = OFFER_STATUS_CONFIG[window._offerStatus];
+  if (!cfg) return;
+  const chip = document.getElementById('off-status-chip');
+  if (chip) {
+    chip.textContent = cfg.chipText;
+    chip.style.color = cfg.chipFg;
+    chip.style.background = cfg.chipBg;
+  }
+  const host = document.getElementById('off-card-ctas');
+  if (host) host.innerHTML = cfg.ctas();
+  // The 'quote' card's primary CTA label mirrors s-07 (depends on aboveFloor)
+  if (window._offerStatus === 'quote') {
+    const lbl = document.getElementById('off-quote-primary-label');
+    if (lbl) lbl.textContent = (window._aboveFloor === false) ? 'Send for approval' : 'Send for signature';
+  }
+}
+
+// ─── s-07 CTA handlers ───────────────────────────────────────────────────────
+function s07Primary(fromOfferCard){
+  if (window._aboveFloor === false) {
+    setOfferStatus('pending_approval');
+    if (!fromOfferCard) showConf('sent_for_approval');
+  } else {
+    setOfferStatus('awaiting_sig');
+    if (!fromOfferCard) showConf('sent_for_sig');
+  }
+}
+function s07SaveQuote(){
+  setOfferStatus('quote');
+  showConf('quote_saved');
+}
+function markAsApproved(){ setOfferStatus('awaiting_sig'); }
+function markAsSigned(){
+  setOfferStatus('signed');
+  // Once signed, advance the deal-stage pill to "Signed"
+  const s04el = document.getElementById('s-04');
+  if (s04el) {
+    s04el.querySelectorAll('span').forEach(sp => {
+      const t = sp.textContent.trim();
+      if (t === '1. Uncontacted' || t === '2. Contacted' || t === '3. Engaged' || t === '4. Offer sent') sp.textContent = '5. Signed';
+    });
+  }
+}
+
+// ─── Confirmation overlay (parameterised by intent) ──────────────────────────
+const CONF_INTENT = {
+  quote_saved: {
+    iconBg: '#FFF7E0',
+    iconColor: '#8a6800',
+    iconSvg: '<path d="M9 8h18M9 14h18M9 20h12" stroke="#8a6800" stroke-width="2.5" stroke-linecap="round"/><rect x="5" y="4" width="26" height="28" rx="3" stroke="#8a6800" stroke-width="2" fill="none"/>',
+    title: 'Quote saved',
+    body1: 'Quote v1 has been saved for Mario’s Deli.',
+    body2: 'You can edit it or send it later from the Offers tab.'
+  },
+  sent_for_sig: {
+    iconBg: '#DBEAFE',
+    iconColor: '#1E40AF',
+    iconSvg: '<path d="M5 10l13 9 13-9M5 10v16h26V10M5 10l13-5 13 5" stroke="#1E40AF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+    title: 'Sent for signature',
+    body1: 'Quote v1 has been sent to Marco Rossi.',
+    body2: 'You’ll be notified when the contract is signed.'
+  },
+  sent_for_approval: {
+    iconBg: '#FFE9CC',
+    iconColor: '#9c4a00',
+    iconSvg: '<circle cx="18" cy="18" r="13" stroke="#9c4a00" stroke-width="2.5" fill="none"/><path d="M18 11v8l5 3" stroke="#9c4a00" stroke-width="2.5" stroke-linecap="round"/>',
+    title: 'Sent for approval',
+    body1: 'Quote v1 has been routed to the pricing team.',
+    body2: 'The merchant will only see this offer once it’s approved.'
+  }
+};
+
+function showConf(intent){
+  intent = intent || 'sent_for_sig';
+  const cfg = CONF_INTENT[intent];
+  if (cfg) {
+    const ic = document.getElementById('conf-icon');
+    const svg = document.getElementById('conf-icon-svg');
+    const title = document.getElementById('conf-title');
+    const b1 = document.getElementById('conf-body1');
+    const b2 = document.getElementById('conf-body2');
+    if (ic) ic.style.background = cfg.iconBg;
+    if (svg) svg.innerHTML = cfg.iconSvg;
+    if (title) title.textContent = cfg.title;
+    if (b1) b1.textContent = cfg.body1;
+    if (b2) b2.textContent = cfg.body2;
+  }
+  document.getElementById('conf-ov').style.display = 'flex';
+}
+
 function goToOffers(){
-  document.getElementById('conf-ov').style.display='none';
+  document.getElementById('conf-ov').style.display = 'none';
   go('04');
-  setTimeout(()=>{
+  setTimeout(() => {
     dt('offr');
-    const empty=document.getElementById('off-empty');
-    const created=document.getElementById('off-created');
-    if(empty)empty.classList.add('hidden');
-    if(created)created.classList.remove('hidden');
-    // Update deal stage pill
-    const s04el=document.getElementById('s-04');
-    if(s04el){
-      s04el.querySelectorAll('span').forEach(s=>{
-        const t=s.textContent.trim();
-        if(t==='1. Uncontacted'||t==='2. Contacted'||t==='3. Engaged')s.textContent='4. Offer sent';
+    const empty = document.getElementById('off-empty');
+    const created = document.getElementById('off-created');
+    if (empty) empty.classList.add('hidden');
+    if (created) created.classList.remove('hidden');
+    renderOfferCardOnS04();
+    // Update deal stage pill — once an offer exists, the deal has advanced past Engaged
+    const s04el = document.getElementById('s-04');
+    if (s04el) {
+      s04el.querySelectorAll('span').forEach(s => {
+        const t = s.textContent.trim();
+        if (t === '1. Uncontacted' || t === '2. Contacted' || t === '3. Engaged') s.textContent = '4. Offer sent';
       });
-      // Mark Create offer row complete
-      s04el.querySelectorAll('.dr').forEach(row=>{
-        const ps=row.querySelectorAll('p');
-        let hasCreateOffer=false;
-        ps.forEach(p=>{if(p.textContent.trim()==='Create offer')hasCreateOffer=true;});
-        if(hasCreateOffer)ps.forEach(p=>{if(p.textContent.trim()==='Pending')p.textContent='Complete ✓';});
+      // Mark "Create offer" row complete on the Progress tab
+      s04el.querySelectorAll('.dr').forEach(row => {
+        const ps = row.querySelectorAll('p');
+        let hasCreateOffer = false;
+        ps.forEach(p => { if (p.textContent.trim() === 'Create offer') hasCreateOffer = true; });
+        if (hasCreateOffer) ps.forEach(p => { if (p.textContent.trim() === 'Pending') p.textContent = 'Complete ✓'; });
       });
     }
-  },370);
+  }, 370);
+}
+
+// ─── s-07 footer CTA refresh (label + helper line depend on aboveFloor) ─────
+function refreshS07Cta(){
+  const cta = document.getElementById('s07-primary-cta');
+  const hint = document.getElementById('s07-approval-hint');
+  if (cta) {
+    if (window._aboveFloor === false) {
+      cta.textContent = 'Send for approval →';
+      cta.style.background = '#0b0b0a';
+      cta.style.color = '#ffffff';
+      if (hint) hint.style.display = '';
+    } else {
+      cta.textContent = 'Send for signature →';
+      cta.style.background = '#e1e51a';
+      cta.style.color = '#29320c';
+      if (hint) hint.style.display = 'none';
+    }
+  }
+  // Mirror onto the s-04 offer-card Quote v1 primary CTA label if it's currently rendered
+  const lbl = document.getElementById('off-quote-primary-label');
+  if (lbl) lbl.textContent = (window._aboveFloor === false) ? 'Send for approval' : 'Send for signature';
 }
 
 
@@ -8690,6 +9732,33 @@ const termState = {
   epos: { price:2900, plan:'monthly', stores:{ rs:0, gs:0 } }
 };
 
+// Resolve the deal's store list. Prefers the canonical s-02 stores (ndStores);
+// falls back to the default RS+GS pair when direct-navigating to s-05 in the demo.
+// Returns an array of { id, name } — id is a stable per-position key used by termState.
+function _getDealStores() {
+  if (typeof ndStores !== 'undefined' && Array.isArray(ndStores) && ndStores.length) {
+    return ndStores.map(function(s, i) {
+      return { id: 'st' + i, name: (s && s.name) || ('Store ' + (i + 1)) };
+    });
+  }
+  return [
+    { id: 'rs', name: 'Regent St' },
+    { id: 'gs', name: 'George St' }
+  ];
+}
+
+// Re-key termState[type].stores to match the current deal store list. Preserves any
+// existing qty values for store IDs that are still present; drops orphans.
+function _syncTermStateStores() {
+  var dealStores = _getDealStores();
+  ['go','ess','pro','epos'].forEach(function(type) {
+    var old = (termState[type] && termState[type].stores) || {};
+    var next = {};
+    dealStores.forEach(function(s) { next[s.id] = old[s.id] || 0; });
+    termState[type].stores = next;
+  });
+}
+
 // Terminal monthly revenue expressed as bps of AGG_TPV — fed into the take-rate
 // health bar so it reacts to terminal selection & pricing.
 function computeTerminalTakeRateBps() {
@@ -8702,7 +9771,7 @@ function computeTerminalTakeRateBps() {
     // Only monthly plans (or monthlyOnly terminals) feed monthly take rate.
     const isMonthly = cfg.monthlyOnly || t.plan === 'monthly';
     if (!isMonthly) return;
-    const totalQty = (t.stores.rs || 0) + (t.stores.gs || 0);
+    const totalQty = Object.values(t.stores || {}).reduce((a,b) => a + (b||0), 0);
     if (totalQty === 0) return;
     const freeUnits = Math.min(totalQty, cfg.freeUnits || 0);
     const paidQty = totalQty - freeUnits;
@@ -8797,52 +9866,306 @@ function updateTermDisplay(type) {
   }
 }
 
-function updateTermSummary() {
-  const mount = document.getElementById('term-order-summary');
-  const totalEl = document.getElementById('term-total');
-  if (!mount) return;
-  let html = '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#16140e8c">Teya Tap \u00b7 all stores</span><span style="color:#497d00;font-weight:600">Free</span></div>';
-  let totalMonthly = 0;
-  let totalUpfront = 0;
-  const storeNames = { rs:'Regent St', gs:'George St' };
-  ['go','ess','pro','epos'].forEach(type => {
-    const t = termState[type];
-    const cfg = TERMINALS[type];
-    let freeRemaining = cfg.freeUnits || 0; // free units to distribute across stores
-    Object.entries(t.stores).forEach(([store, qty]) => {
-      if (qty > 0) {
-        const freeHere = Math.min(qty, freeRemaining);
-        const paidHere = qty - freeHere;
-        freeRemaining -= freeHere;
-        // Show free units
-        if (freeHere > 0) {
-          html += '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#090806ec">' + freeHere + '\u00d7 ' + cfg.name + ' \u00b7 ' + storeNames[store] + '</span><span style="color:#497d00;font-weight:600">Free</span></div>';
-        }
-        // Show paid units
-        if (paidHere > 0) {
-          if (t.plan === 'upfront' && !cfg.monthlyOnly) {
-            const lineCost = paidHere * cfg.upfront;
-            totalUpfront += lineCost;
-            html += '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#090806ec">' + paidHere + '\u00d7 ' + cfg.name + ' \u00b7 ' + storeNames[store] + '</span><span style="color:#090806ec;font-weight:600;font-variant-numeric:tabular-nums">' + fmtPence(lineCost) + '</span></div>';
-          } else {
-            const lineCost = paidHere * t.price;
-            totalMonthly += lineCost;
-            html += '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#090806ec">' + paidHere + '\u00d7 ' + cfg.name + ' \u00b7 ' + storeNames[store] + '</span><span style="color:#090806ec;font-weight:600;font-variant-numeric:tabular-nums">' + fmtPence(lineCost) + '/mo</span></div>';
-          }
-        }
+// ─── Card machines accordion (Phase 4.6) ─────────────────────────────────────
+// Render compact list-row terminals into the bottom sheet on s-05. IDs match
+// the existing handlers (setTermPlan, nudgeTermPrice, setTermQty) so all
+// existing behaviour is preserved. The verbose s-05c source HTML is removed
+// from the DOM to avoid duplicate IDs.
+const _TERMINAL_ROW_DEFS = [
+  { type:'go',   name:'Teya Go',         meta:'Portable · accepts all cards',         img:'2e4b880c56532cb4192b69370bc6805885111ec4.png', imgW:28, imgH:34, suggestedMo:1000, suggestedUp:19900, chipId:'cm-chip-go' },
+  { type:'ess',  name:'Teya Essential',  meta:'Touchscreen · receipt printer',         img:'8f037fe4196f463033734e1d9229431b61d18195.png', imgW:28, imgH:34, suggestedMo:1200, suggestedUp:24900 },
+  { type:'pro',  name:'Teya Pro',        meta:'Full POS · large screen',                img:'45fbb70c016df9b1f72cab2dd588ab3362eef2a7.png', imgW:28, imgH:38, suggestedMo:1500, suggestedUp:29900, chipId:'cm-chip-pro' },
+  { type:'epos', name:'Teya EPOS',       meta:'Full EPOS · inventory · staff mgmt',     img:'teya epos.avif',                                  imgW:32, imgH:32, suggestedMo:2900, monthlyOnly:true, imgRounded:true }
+];
+
+function _cmMinusBtn(handler) {
+  return '<button onclick="' + handler + '" style="width:22px;height:22px;border-radius:50%;background:#f6f5f3;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit"><svg width="8" height="2" viewBox="0 0 8 2"><path d="M1 1h6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button>';
+}
+function _cmPlusBtn(handler) {
+  return '<button onclick="' + handler + '" style="width:22px;height:22px;border-radius:50%;background:#f6f5f3;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 1v6M1 4h6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button>';
+}
+
+function _cmQtyControl(type, store, label) {
+  return '<div style="display:flex;align-items:center;gap:5px">' +
+    '<span style="font-size:11px;color:#16140e8c">' + label + '</span>' +
+    _cmMinusBtn("setTermQty('" + type + "','" + store + "',-1)") +
+    '<span id="tq-' + type + '-' + store + '" style="font-size:13px;font-weight:600;color:#16140e8c;width:14px;text-align:center;font-variant-numeric:tabular-nums">0</span>' +
+    _cmPlusBtn("setTermQty('" + type + "','" + store + "',1)") +
+    '</div>';
+}
+
+function _cmBuildRow(t) {
+  // Image hero: 64×64 yellow-tinted frame draws the eye and echoes the brand palette.
+  // Photo-style images (imgRounded, e.g. EPOS) fill the frame; transparent product
+  // renders sit centered inside with object-fit:contain.
+  const imgMarkup = t.imgRounded
+    ? '<div style="width:64px;height:64px;background:#e1e51a1a;border-radius:14px;overflow:hidden;flex-shrink:0"><img src="' + t.img + '" alt="' + t.name + '" style="width:100%;height:100%;object-fit:cover"></div>'
+    : '<div style="width:64px;height:64px;background:#e1e51a1a;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><img src="' + t.img + '" alt="' + t.name + '" style="max-width:48px;max-height:56px;object-fit:contain"></div>';
+
+  const chipMarkup = t.chipId
+    ? '<span id="' + t.chipId + '" style="display:none;font-size:9px;font-weight:500;color:#46520f;background:#e1e51a33;padding:1px 6px;border-radius:8px;flex-shrink:0"></span>'
+    : '';
+
+  // Plan toggle pills (or "Monthly only" badge for EPOS)
+  const planToggle = t.monthlyOnly
+    ? '<span style="font-size:10px;font-weight:500;color:#16140e8c;background:#f6f5f3;border:1px solid #8f867633;padding:3px 8px;border-radius:8px;white-space:nowrap">Monthly only</span>'
+    : '<div style="display:flex;gap:2px">' +
+        '<button id="tp-' + t.type + '-mo" onclick="setTermPlan(\'' + t.type + '\',\'monthly\')" style="font-size:10px;font-weight:500;font-family:inherit;border-radius:8px;border:1.5px solid #090806ec;background:white;color:#090806ec;padding:3px 8px;cursor:pointer">Monthly</button>' +
+        '<button id="tp-' + t.type + '-up" onclick="setTermPlan(\'' + t.type + '\',\'upfront\')" style="font-size:10px;font-weight:500;font-family:inherit;border-radius:8px;border:1.5px solid #756b571a;background:#f6f5f3;color:#16140e8c;padding:3px 8px;cursor:pointer">Pay once</button>' +
+      '</div>';
+
+  // Price nudge — the OUTER div is the one setTermPlan toggles (display:'' => block).
+  // The INNER div carries the flex row, so buttons stay horizontal regardless of outer display.
+  const monthlyPriceBlock =
+    '<div class="agent-only" id="term-' + t.type + '-monthly">' +
+      '<div style="display:inline-flex;align-items:center;gap:4px">' +
+        _cmMinusBtn("nudgeTermPrice('" + t.type + "',-50)") +
+        '<span id="term-' + t.type + '-price" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums;min-width:78px;text-align:center">£' + (t.suggestedMo/100).toFixed(2) + '/mo</span>' +
+        _cmPlusBtn("nudgeTermPrice('" + t.type + "',50)") +
+      '</div>' +
+    '</div>';
+
+  const upfrontPriceBlock = t.monthlyOnly ? '' :
+    '<div class="agent-only" id="term-' + t.type + '-upfront" style="display:none">' +
+      '<div style="display:inline-flex;align-items:center;gap:4px">' +
+        _cmMinusBtn("nudgeTermUpfront('" + t.type + "',-500)") +
+        '<span id="term-' + t.type + '-upfront-price" style="font-size:14px;font-weight:600;color:#090806ec;font-variant-numeric:tabular-nums;min-width:78px;text-align:center">£' + (t.suggestedUp/100).toFixed(2) + '</span>' +
+        _cmPlusBtn("nudgeTermUpfront('" + t.type + "',500)") +
+      '</div>' +
+    '</div>';
+
+  const clientPrice = '<span class="client-only" id="term-' + t.type + '-price-client" style="font-size:14px;font-weight:600;color:#090806ec">£' + (t.suggestedMo/100).toFixed(2) + '/mo</span>';
+
+  // Hidden suggested labels (updateTermDisplay reads them to toggle reset-to-suggested behaviour)
+  const suggestedLabels =
+    '<p id="term-' + t.type + '-suggested" class="agent-only" style="font-size:9.5px;color:#497d00;margin:3px 0 0;text-align:center;cursor:default">Suggested £' + (t.suggestedMo/100).toFixed(2) + '/mo</p>' +
+    (t.monthlyOnly ? '' : '<p id="term-' + t.type + '-upfront-suggested" class="agent-only" style="display:none;font-size:9.5px;color:#497d00;margin:3px 0 0;text-align:center;cursor:default">Suggested £' + (t.suggestedUp/100).toFixed(2) + '</p>');
+
+  // List-row layout: 3 stacked sections, no horizontal cramming.
+  return '<div style="background:white;border-radius:12px;padding:10px 12px;margin-bottom:6px;box-shadow:0 0 0 1px rgba(0,0,0,0.06)">' +
+    // Section 1 — identity (img + name/meta on left, plan toggle on right)
+    '<div style="display:flex;align-items:center;gap:12px">' +
+      imgMarkup +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="display:flex;align-items:center;gap:5px;line-height:1.2;flex-wrap:wrap">' +
+          '<span style="font-size:14px;font-weight:600;color:#090806ec">' + t.name + '</span>' +
+          chipMarkup +
+        '</div>' +
+        '<p style="font-size:10.5px;color:#16140e8c;margin:1px 0 0;line-height:1.3">' + t.meta + '</p>' +
+      '</div>' +
+      '<div style="flex-shrink:0">' + planToggle + '</div>' +
+    '</div>' +
+    // Section 2 — price (centered)
+    '<div style="text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid #756b571a">' +
+      monthlyPriceBlock + upfrontPriceBlock + clientPrice + suggestedLabels +
+    '</div>' +
+    // Section 3 — per-store qty (one row per store, scales to N stores).
+    '<div style="margin-top:8px;padding-top:6px;border-top:1px solid #756b571a">' +
+      _getDealStores().map(function(s, idx, arr) {
+        var notLast = idx < arr.length - 1;
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0' + (notLast ? ';border-bottom:1px solid #f2efe7' : '') + '">' +
+          '<span style="font-size:12px;color:#090806ec;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">' + s.name + '</span>' +
+          '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
+            _cmMinusBtn("setTermQty('" + t.type + "','" + s.id + "',-1)") +
+            '<span id="tq-' + t.type + '-' + s.id + '" style="font-size:13px;font-weight:600;color:#16140e8c;min-width:14px;text-align:center;font-variant-numeric:tabular-nums">0</span>' +
+            _cmPlusBtn("setTermQty('" + t.type + "','" + s.id + "',1)") +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>' +
+  '</div>';
+}
+
+function _cmBuildTapRow() {
+  return '<div style="background:#f6f5f3;border-radius:12px;padding:10px 12px;margin-bottom:6px;border:1px solid #8f867633">' +
+    '<div style="display:flex;align-items:center;gap:8px">' +
+      '<img src="teya%20tap.png" alt="Teya Tap" style="width:36px;height:30px;object-fit:contain;flex-shrink:0">' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="display:flex;align-items:center;gap:5px">' +
+          '<span style="font-size:13px;font-weight:600;color:#090806ec">Teya Tap</span>' +
+          '<span style="font-size:9px;font-weight:500;color:#16140e8c;background:#ffffff;border:1px solid #8f867633;padding:1px 6px;border-radius:8px">Included</span>' +
+        '</div>' +
+        '<p style="font-size:10.5px;color:#16140e8c;margin:1px 0 0">All stores · Free</p>' +
+      '</div>' +
+      '<span style="font-size:12px;font-weight:600;color:#497d00;flex-shrink:0">Free</span>' +
+    '</div>' +
+  '</div>';
+}
+
+function _mountCardMachinesAccordion() {
+  const dst = document.getElementById('cm-sheet-body');
+  if (!dst) return;
+  // Re-key termState[type].stores to the current deal store list (supports N stores).
+  _syncTermStateStores();
+  // Remove the verbose s-05c source markup so its IDs don't shadow the new compact ones.
+  const oldCards = document.querySelector('#s-05c .ss > .px-4.pt-4.pb-6');
+  if (oldCards) oldCards.remove();
+  // Render fresh compact rows.
+  dst.innerHTML = _TERMINAL_ROW_DEFS.map(_cmBuildRow).join('') + _cmBuildTapRow();
+  // Sync visual state from termState (plan toggles, prices, qty, totals).
+  if (typeof setTermPlan === 'function') {
+    _TERMINAL_ROW_DEFS.forEach(t => setTermPlan(t.type, termState[t.type].plan));
+  }
+  if (typeof updateTermDisplay === 'function') {
+    _TERMINAL_ROW_DEFS.forEach(t => updateTermDisplay(t.type));
+  }
+  // Qty controls were rendered with '0' baseline; sync from termState for each deal store.
+  const dealStores = _getDealStores();
+  _TERMINAL_ROW_DEFS.forEach(t => {
+    dealStores.forEach(s => {
+      const el = document.getElementById('tq-' + t.type + '-' + s.id);
+      const qty = (termState[t.type] && termState[t.type].stores[s.id]) || 0;
+      if (el) {
+        el.textContent = qty;
+        el.style.color = qty > 0 ? '#090806ec' : '#16140e8c';
       }
     });
   });
+  if (typeof updateTermSummary === 'function') updateTermSummary();
+  if (typeof updateCardMachinePromos === 'function') updateCardMachinePromos();
+}
+function _initCardMachinesAccordion() {
+  _mountCardMachinesAccordion();
+  if (typeof renderCmSummaryCard === 'function') renderCmSummaryCard();
+  if (typeof updateCardMachinesPreview === 'function') updateCardMachinesPreview();
+}
+if (document.readyState !== 'loading') {
+  _initCardMachinesAccordion();
+} else {
+  document.addEventListener('DOMContentLoaded', _initCardMachinesAccordion);
+}
+
+function openCmSheet() {
+  // Re-mount so the sheet reflects the current deal store list (handles 2 → 3+ stores
+  // added on s-02 after initial DOMContentLoaded ran with the fallback list).
+  if (typeof _mountCardMachinesAccordion === 'function') _mountCardMachinesAccordion();
+  const overlay = document.getElementById('cm-sheet-overlay');
+  const sheet = document.getElementById('cm-sheet');
+  if (overlay) {
+    overlay.style.display = 'block';
+    setTimeout(() => { if (sheet) sheet.style.transform = 'translateY(0)'; }, 10);
+  }
+}
+function closeCmSheet() {
+  const overlay = document.getElementById('cm-sheet-overlay');
+  const sheet = document.getElementById('cm-sheet');
+  if (sheet) sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 300);
+}
+
+// Compute totals + per-terminal breakdown — shared by accordion preview and summary card.
+function _computeCmTotals() {
+  const lines = [];
+  let totalQty = 0, totalMonthly = 0, totalUpfront = 0;
+  if (typeof termState === 'undefined') return { totalQty, totalMonthly, totalUpfront, lines };
+  const NAMES = { go:'Teya Go', ess:'Teya Essential', pro:'Teya Pro', epos:'Teya EPOS' };
+  ['go','ess','pro','epos'].forEach(type => {
+    const t = termState[type];
+    const cfg = TERMINALS[type];
+    if (!t || !cfg) return;
+    const qty = Object.values(t.stores || {}).reduce((a,b) => a + (b||0), 0);
+    if (qty === 0) return;
+    totalQty += qty;
+    const freeUnits = Math.min(qty, cfg.freeUnits || 0);
+    const paidQty = qty - freeUnits;
+    let lineCost = 0;
+    let costLabel = '';
+    if (paidQty > 0) {
+      if (t.plan === 'upfront' && !cfg.monthlyOnly) {
+        lineCost = paidQty * cfg.upfront;
+        totalUpfront += lineCost;
+        costLabel = '£' + (lineCost/100).toFixed(0);
+      } else {
+        lineCost = paidQty * t.price;
+        totalMonthly += lineCost;
+        costLabel = '£' + (lineCost/100).toFixed(0) + '/mo';
+      }
+    } else {
+      costLabel = 'Free';
+    }
+    lines.push({ type, name: NAMES[type], qty, paidQty, freeQty: freeUnits, costLabel });
+  });
+  return { totalQty, totalMonthly, totalUpfront, lines };
+}
+
+// Update the Card machines accordion preview ("3 terminals · £30/mo" when configured; swap to empty-state promo card when no paid terminals).
+function updateCardMachinesPreview() {
+  const valEl = document.getElementById('cm-preview-val');
+  const modEl = document.getElementById('cm-preview-mod');
+  const cmCard = document.getElementById('cm-card');
+  if (!valEl) return;
+  const { totalQty, totalMonthly, totalUpfront } = _computeCmTotals();
+  if (totalQty === 0) {
+    if (cmCard) {
+      cmCard.dataset.empty = 'true';
+      // Force-close if the accordion was open (header is hidden in empty state).
+      if (cmCard.dataset.open === 'true') {
+        cmCard.dataset.open = 'false';
+        const hdr = cmCard.querySelector('.accordion-header');
+        if (hdr) hdr.setAttribute('aria-expanded', 'false');
+      }
+    }
+  } else {
+    if (cmCard) cmCard.dataset.empty = 'false';
+    const noun = totalQty === 1 ? 'terminal' : 'terminals';
+    valEl.textContent = totalQty + ' ' + noun;
+    valEl.classList.remove('muted');
+    // Collapsed preview shows just the count — the £ totals live inside the expanded sheet.
+    if (modEl) {
+      modEl.textContent = '';
+      modEl.className = 'accordion-preview-mod';
+    }
+  }
+  renderCmSummaryCard();
+}
+
+// Render the agent-mode summary card — list of selected terminals + total.
+function renderCmSummaryCard() {
+  const mount = document.getElementById('cm-summary-card');
+  if (!mount) return;
+  const { totalQty, totalMonthly, totalUpfront, lines } = _computeCmTotals();
+  if (totalQty === 0) {
+    mount.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between">' +
+        '<div>' +
+          '<p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">Teya Tap only</p>' +
+          '<p style="font-size:11px;color:#16140e8c;margin:2px 0 0">Included free on every store</p>' +
+        '</div>' +
+        '<span style="font-size:12px;font-weight:600;color:#16140e8c">Free</span>' +
+      '</div>';
+    return;
+  }
+  let totalLabel = '';
+  if (totalMonthly > 0) totalLabel = '£' + (totalMonthly/100).toFixed(0) + '/mo';
+  if (totalUpfront > 0) totalLabel += (totalLabel ? ' + ' : '') + '£' + (totalUpfront/100).toFixed(0);
+  const noun = totalQty === 1 ? 'terminal' : 'terminals';
+  let html =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+      '<p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">' + totalQty + ' ' + noun + '</p>' +
+      '<span style="font-size:13px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums">' + totalLabel + '</span>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:3px">';
+  lines.forEach(l => {
+    const qtyLabel = l.qty + '× ' + l.name;
+    const subLabel = l.freeQty > 0 && l.paidQty === 0
+      ? '<span style="color:#497d00;font-weight:500">Free</span>'
+      : (l.freeQty > 0 ? '<span style="color:#16140e8c">' + l.paidQty + ' paid · ' + l.freeQty + ' free</span>' : '<span style="color:#16140e8c">' + l.costLabel + '</span>');
+    html += '<div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#090806ec">' + qtyLabel + '</span>' + subLabel + '</div>';
+  });
+  html += '<div style="display:flex;justify-content:space-between;font-size:11px;padding-top:3px;border-top:1px solid #8f867633;margin-top:4px"><span style="color:#16140e8c">Teya Tap · all stores</span><span style="color:#497d00;font-weight:500">Free</span></div>';
+  html += '</div>';
   mount.innerHTML = html;
-  let totalText = '';
-  if (totalMonthly > 0) totalText += fmtPence(totalMonthly) + '/mo';
-  if (totalUpfront > 0) totalText += (totalText ? ' + ' : '') + fmtPence(totalUpfront) + ' upfront';
-  if (!totalText) totalText = 'Free';
-  if (totalEl) totalEl.textContent = totalText;
+}
+
+function updateTermSummary() {
+  // Order-summary block was removed from the CM sheet \u2014 this function now only
+  // fans out the downstream recalcs that terminal-state changes trigger
+  // (health bar + accordion preview).
   // Terminal selection & pricing feeds the take-rate health bar — recompute on s-05
   // and push the fresh values into the s-05c header bar.
   if (typeof recalcAll === 'function') recalcAll();
   if (typeof syncHealthBar05c === 'function') syncHealthBar05c();
+  if (typeof updateCardMachinesPreview === 'function') updateCardMachinesPreview();
 }
 
 // Sync the 05c health bar with s-05's values (called after recalcAll or on screen enter)
@@ -8864,7 +10187,14 @@ function syncHealthBar05c() {
   if (srcWall && dstWall) { dstWall.style.background = srcWall.style.background; dstWall.className = srcWall.className; }
   const srcFloor = document.getElementById('tr-floor-label');
   const dstFloor = document.getElementById('tr-floor-label-05c');
-  if (srcFloor && dstFloor) { dstFloor.style.color = srcFloor.style.color; dstFloor.style.fontWeight = srcFloor.style.fontWeight; }
+  if (srcFloor && dstFloor) {
+    dstFloor.textContent = srcFloor.textContent;
+    dstFloor.style.color = srcFloor.style.color;
+    dstFloor.style.fontWeight = srcFloor.style.fontWeight;
+  }
+  const srcTarget = document.getElementById('tr-target-label');
+  const dstTarget = document.getElementById('tr-target-label-05c');
+  if (srcTarget && dstTarget) dstTarget.textContent = srcTarget.textContent;
   updateCardMachinePromos();
 }
 
@@ -8883,6 +10213,17 @@ function updateCardMachinePromos() {
     if (chipGo) { chipGo.textContent = 'Free terminal'; chipGo.style.display = 'inline-block'; }
   }
   // 'ic' (Dynamic rate): no included terminal — chips stay hidden.
+  // Sync the empty-state promo copy to the offer's discount.
+  const cmCopy = document.getElementById('cm-empty-copy');
+  if (cmCopy) {
+    if (ps === 'bl') {
+      cmCopy.innerHTML = '<span style="font-weight:600;color:#46520f">3 months free on Teya Pro</span> with this offer.';
+    } else if (ps === 'mr') {
+      cmCopy.innerHTML = '<span style="font-weight:600;color:#46520f">Free Teya Go terminal</span> with this offer.';
+    } else {
+      cmCopy.innerHTML = 'Add terminals to power in-store card payments.';
+    }
+  }
 }
 
 // Legacy compat — old functions no longer used but may be referenced
@@ -11601,6 +12942,7 @@ function resetInnerNav() {
     chipSelect('ct', 0);  // Flexible
     chipSelect('sa', 0);  // Teya BA (−20 bps, recommended default)
     chipSelect('sf', 1);  // Everyday
+    if (ADDON_CONFIG.dcc) chipSelect('dcc', 0); // No DCC share
     if (typeof clearMca === 'function') clearMca();
     if (typeof cancelMcaInterest === 'function') cancelMcaInterest();
     // Hide the reset link (nothing to reset now)
@@ -11609,7 +12951,8 @@ function resetInnerNav() {
 
   // Show "Reset" link when any add-on deviates from default
   function checkAddonsModified() {
-    const modified = ADDON_CONFIG.ct.idx !== 0 || ADDON_CONFIG.sa.idx !== 0 || ADDON_CONFIG.sf.idx !== 1 || curBaTier !== 'silver' || (typeof mcaConfirmed !== 'undefined' && mcaConfirmed) || mcaTier > 0;
+    const dccModified = (typeof dccTierIdx !== 'undefined') && dccTierIdx !== 0;
+    const modified = ADDON_CONFIG.ct.idx !== 0 || ADDON_CONFIG.sa.idx !== 0 || ADDON_CONFIG.sf.idx !== 1 || curBaTier !== 'silver' || (typeof mcaConfirmed !== 'undefined' && mcaConfirmed) || mcaTier > 0 || dccModified;
     const btn = $('addons-reset');
     if (btn) btn.style.display = modified ? '' : 'none';
   }
@@ -11646,6 +12989,19 @@ function resetInnerNav() {
       ],
       idx: 1,
       apply: function(opt) { settleMod = opt.mod; curSettle = opt.key; }
+    },
+    // DCC revenue share — separate revenue stream, no bps modifier on rate.
+    // Apply is a no-op; chipSelect dispatch updates dccTierIdx + re-renders.
+    dcc: {
+      options: [
+        { key:'dcc0',     label:'No share',  shortLabel:'No share',  mod:0, share:0    },
+        { key:'dcc10',    label:'10% share', shortLabel:'10% share', mod:0, share:0.10 },
+        { key:'dcc20',    label:'20% share', shortLabel:'20% share', mod:0, share:0.20 },
+        { key:'dcc30',    label:'30% share', shortLabel:'30% share', mod:0, share:0.30 },
+        { key:'dccCust',  label:'Custom',    shortLabel:'Custom',    mod:0, share:0.15 }
+      ],
+      idx: 0,
+      apply: function(opt) { dccTierIdx = (typeof DCC_TIERS !== 'undefined') ? DCC_TIERS.findIndex(t => t.share === opt.share) : 0; }
     }
   };
 
@@ -11703,6 +13059,31 @@ function resetInnerNav() {
     // Settlement frequency
     const sfOpt = ADDON_CONFIG.sf.options[ADDON_CONFIG.sf.idx];
     setAccordionPreview('sf', sfOpt.shortLabel || sfOpt.label, 0);
+
+    // DCC revenue share — when share > 0% show normal accordion preview; when 0%, swap to empty-state promo card (data-empty="true").
+    if (ADDON_CONFIG.dcc) {
+      const dccTier = (typeof DCC_TIERS !== 'undefined') ? DCC_TIERS[dccTierIdx] : null;
+      const dccCard = $('dcc-card');
+      const dccEmptyAmt = $('dcc-empty-amount');
+      if (dccTier && dccTier.share > 0) {
+        if (dccCard) dccCard.dataset.empty = 'false';
+        // Custom tier carries no inherent % in its label — inject the live share.
+        const previewLabel = dccTier.isCustom ? ('Custom ' + Math.round(dccTier.share * 100) + '%') : dccTier.label;
+        // Collapsed preview shows just the % — the £/mo amount lives inside the expanded sheet.
+        setAccordionPreview('dcc', previewLabel, 0, null);
+      } else {
+        if (dccCard) {
+          dccCard.dataset.empty = 'true';
+          // If the accordion was open, force-close it (the header is hidden in empty state).
+          if (dccCard.dataset.open === 'true') {
+            dccCard.dataset.open = 'false';
+            const hdr = dccCard.querySelector('.accordion-header');
+            if (hdr) hdr.setAttribute('aria-expanded', 'false');
+          }
+        }
+        if (dccEmptyAmt) dccEmptyAmt.textContent = getDccGrossMonthly();
+      }
+    }
 
     // Teya MCA — value only, no bps in preview
     if (mcaConfirmed) {
@@ -11852,6 +13233,10 @@ function resetInnerNav() {
         c.classList.toggle('active', cIdx === idx);
       });
     }
+    // Refresh the agent-only "selected option" card for contract/settlement
+    if (id === 'ct' && typeof renderContractCurrentCard === 'function') renderContractCurrentCard();
+    if (id === 'sf' && typeof renderSettleCurrentCard === 'function') renderSettleCurrentCard();
+    if (id === 'dcc' && typeof renderDccCurrentCard === 'function') renderDccCurrentCard();
     // Update BA features if bank account
     if (id === 'ba') {
       const list = $('ba-features-list');
@@ -11869,9 +13254,11 @@ function resetInnerNav() {
     recalcAll();
   }
 
-  // ─── Navigation between offer and card-machines screens ───
+  // ─── Navigation between offer and downstream screens ───
+  // Card machines is now an inline accordion on s-05; primary CTA skips s-05c
+  // and goes straight to Product usage.
   function s05Continue() {
-    go('05c');
+    go('06');
   }
   function s05cBack() {
     go('05');
@@ -11993,6 +13380,315 @@ function resetInnerNav() {
   function confirmBaSelection() {
     setBankAccount(baTempIdx);
     closeBaSheet();
+  }
+
+  // ─── Contract Length Bottom Sheet (agent-only) ──────────────────────────────
+  let contractTempIdx = 0;
+
+  function openContractSheet() {
+    const activeChip = document.querySelector('#ct-chips .chip.active');
+    contractTempIdx = activeChip ? parseInt(activeChip.dataset.idx) : 0;
+    updateContractRadios(contractTempIdx);
+    const overlay = $('contract-sheet-overlay');
+    const sheet = $('contract-sheet');
+    if (overlay) { overlay.style.display = 'block'; setTimeout(() => { if (sheet) sheet.style.transform = 'translateY(0)'; }, 10); }
+  }
+
+  function closeContractSheet() {
+    const overlay = $('contract-sheet-overlay');
+    const sheet = $('contract-sheet');
+    if (sheet) sheet.style.transform = 'translateY(100%)';
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 300);
+  }
+
+  function selectContractOpt(idx) {
+    contractTempIdx = idx;
+    updateContractRadios(idx);
+    [0,1,2].forEach(i => {
+      const opt = $('ct-opt-'+i);
+      if (opt) opt.style.borderColor = i === idx ? '#090806ec' : '#756b571a';
+    });
+  }
+
+  function updateContractRadios(activeIdx) {
+    [0,1,2].forEach(i => {
+      const radio = $('ct-radio-'+i);
+      if (radio) {
+        if (i === activeIdx) {
+          radio.style.borderColor = '#090806ec';
+          radio.innerHTML = '<div style="width:10px;height:10px;border-radius:50%;background:#090806ec"></div>';
+        } else {
+          radio.style.borderColor = '#756b571a';
+          radio.innerHTML = '';
+        }
+      }
+    });
+  }
+
+  function confirmContractSelection() {
+    if (typeof chipSelect === 'function') chipSelect('ct', contractTempIdx);
+    closeContractSheet();
+  }
+
+  // ─── Settlement Frequency Bottom Sheet (agent-only) ──────────────────────────
+  let settleTempIdx = 1;
+
+  function openSettleSheet() {
+    const activeChip = document.querySelector('#sf-chips .chip.active');
+    settleTempIdx = activeChip ? parseInt(activeChip.dataset.idx) : 1;
+    updateSettleRadios(settleTempIdx);
+    const overlay = $('settle-sheet-overlay');
+    const sheet = $('settle-sheet');
+    if (overlay) { overlay.style.display = 'block'; setTimeout(() => { if (sheet) sheet.style.transform = 'translateY(0)'; }, 10); }
+  }
+
+  function closeSettleSheet() {
+    const overlay = $('settle-sheet-overlay');
+    const sheet = $('settle-sheet');
+    if (sheet) sheet.style.transform = 'translateY(100%)';
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 300);
+  }
+
+  function selectSettleOpt(idx) {
+    settleTempIdx = idx;
+    updateSettleRadios(idx);
+    [0,1,2,3,4].forEach(i => {
+      const opt = $('sf-opt-'+i);
+      if (opt) opt.style.borderColor = i === idx ? '#090806ec' : '#756b571a';
+    });
+  }
+
+  function updateSettleRadios(activeIdx) {
+    [0,1,2,3,4].forEach(i => {
+      const radio = $('sf-radio-'+i);
+      if (radio) {
+        if (i === activeIdx) {
+          radio.style.borderColor = '#090806ec';
+          radio.innerHTML = '<div style="width:10px;height:10px;border-radius:50%;background:#090806ec"></div>';
+        } else {
+          radio.style.borderColor = '#756b571a';
+          radio.innerHTML = '';
+        }
+      }
+    });
+  }
+
+  function confirmSettleSelection() {
+    if (typeof chipSelect === 'function') chipSelect('sf', settleTempIdx);
+    closeSettleSheet();
+  }
+
+  // ─── DCC Revenue Share (Phase 4.5) ────────────────────────────────────────────
+  // Separate revenue stream — agent picks % of net DCC margin to share with the
+  // customer. Bps unchanged. Tier badges show £/mo to customer + Teya's net £NSR.
+  // Volume assumptions hardcoded; in production these'd be MCC × geography driven.
+  const DCC_FOREIGN_TPV_RATIO = 0.20;   // 20% of TPV from foreign cards (London F&B-plausible)
+  const DCC_OPTIN_RATE = 0.30;          // 30% of foreign-card txns take DCC at terminal
+  const DCC_GROSS_SPREAD = 0.04;        // 4% gross margin on DCC-converted txn
+  const DCC_TOURIST_HINT_THRESHOLD = 50; // £/mo gross; below this, suppress the hint banner
+
+  function getDccGrossMonthly() {
+    const tpv = (typeof AGG_TPV !== 'undefined') ? AGG_TPV : 0;
+    return Math.round(tpv * DCC_FOREIGN_TPV_RATIO * DCC_OPTIN_RATE * DCC_GROSS_SPREAD);
+  }
+
+  // DCC_TIERS[4] is the 'Custom' slot — its share is mutable via setDccCustom().
+  const DCC_TIERS = [
+    { share: 0.00, label: 'No share',  desc: 'Teya keeps all DCC revenue · default' },
+    { share: 0.10, label: '10% share', desc: 'Modest kickback · low Teya impact' },
+    { share: 0.20, label: '20% share', desc: 'Standard for tourism-led merchants' },
+    { share: 0.30, label: '30% share', desc: 'Aggressive · use to win competitive deals' },
+    { share: 0.15, label: 'Custom',    desc: 'Custom share percentage',          isCustom: true }
+  ];
+  let dccTierIdx = 0;
+  let dccTempIdx = 0;
+
+  function openDccSheet() {
+    dccTempIdx = dccTierIdx;
+    updateDccRadios(dccTempIdx);
+    [0,1,2,3,4].forEach(i => {
+      const opt = $('dcc-opt-'+i);
+      if (opt) opt.style.borderColor = i === dccTempIdx ? '#090806ec' : '#756b571a';
+    });
+    const overlay = $('dcc-sheet-overlay');
+    const sheet = $('dcc-sheet');
+    if (overlay) { overlay.style.display = 'block'; setTimeout(() => { if (sheet) sheet.style.transform = 'translateY(0)'; }, 10); }
+  }
+
+  function closeDccSheet() {
+    const overlay = $('dcc-sheet-overlay');
+    const sheet = $('dcc-sheet');
+    if (sheet) sheet.style.transform = 'translateY(100%)';
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 300);
+  }
+
+  function selectDccOpt(idx) {
+    dccTempIdx = idx;
+    updateDccRadios(idx);
+    [0,1,2,3,4].forEach(i => {
+      const opt = $('dcc-opt-'+i);
+      if (opt) opt.style.borderColor = i === idx ? '#090806ec' : '#756b571a';
+    });
+  }
+
+  function updateDccRadios(activeIdx) {
+    [0,1,2,3,4].forEach(i => {
+      const radio = $('dcc-radio-'+i);
+      if (radio) {
+        if (i === activeIdx) {
+          radio.style.borderColor = '#090806ec';
+          radio.innerHTML = '<div style="width:10px;height:10px;border-radius:50%;background:#090806ec"></div>';
+        } else {
+          radio.style.borderColor = '#756b571a';
+          radio.innerHTML = '';
+        }
+      }
+    });
+  }
+
+  function confirmDccSelection() {
+    if (typeof chipSelect === 'function') chipSelect('dcc', dccTempIdx);
+    closeDccSheet();
+  }
+
+  // Refresh the assumption panel + per-tier £ values inside the sheet using current TPV.
+  function renderDccSheet() {
+    const gross = getDccGrossMonthly();
+    const grossEl = $('dcc-gross-amt');
+    if (grossEl) grossEl.textContent = '£' + gross.toLocaleString();
+    // Per-tier customer / Teya-net pairs
+    DCC_TIERS.forEach((tier, i) => {
+      const cust = Math.round(gross * tier.share);
+      const net = gross - cust;
+      const custEl = $('dcc-cust-' + i);
+      const netEl = $('dcc-net-' + i);
+      if (custEl) custEl.textContent = (i === 0) ? '£0 to customer' : ('+£' + cust + ' to customer');
+      if (netEl) netEl.textContent = 'Teya keeps £' + net;
+    });
+    // Mirror Custom row's % + amount onto the merchant-mode chip
+    const chipPct = $('dcc-chip4-pct');
+    const chipMod = $('dcc-chip4-mod');
+    const customShare = DCC_TIERS[4].share;
+    if (chipPct) chipPct.textContent = Math.round(customShare * 100) + '%';
+    if (chipMod) chipMod.textContent = '+£' + Math.round(gross * customShare);
+  }
+
+  // Custom DCC share — parse input, update DCC_TIERS[4].share + ADDON_CONFIG to match,
+  // auto-select the Custom row, re-render the sheet so per-row values stay correct.
+  function setDccCustom(val) {
+    var pct = parseFloat(String(val||'').replace(/[^0-9.]/g, ''));
+    if (isNaN(pct)) return;
+    pct = Math.max(0, Math.min(100, pct));
+    var share = pct / 100;
+    if (DCC_TIERS && DCC_TIERS[4]) { DCC_TIERS[4].share = share; }
+    if (typeof ADDON_CONFIG !== 'undefined' && ADDON_CONFIG.dcc && ADDON_CONFIG.dcc.options[4]) {
+      ADDON_CONFIG.dcc.options[4].share = share;
+    }
+    // Auto-select the Custom row when value changes.
+    if (typeof selectDccOpt === 'function') selectDccOpt(4);
+    if (typeof renderDccSheet === 'function') renderDccSheet();
+  }
+
+  // Render the agent-mode selected-tier card + tourist hint banner
+  function renderDccCurrentCard() {
+    const tier = DCC_TIERS[dccTierIdx] || DCC_TIERS[0];
+    const gross = getDccGrossMonthly();
+    const cust = Math.round(gross * tier.share);
+    const net = gross - cust;
+    const name = $('dcc-current-name');
+    const desc = $('dcc-current-desc');
+    const badge = $('dcc-current-badge');
+    // For the Custom tier, append the actual % so the agent sees the value they set.
+    if (name) name.textContent = tier.isCustom ? ('Custom · ' + Math.round(tier.share * 100) + '%') : tier.label;
+    if (desc) desc.textContent = tier.desc;
+    if (badge) {
+      if (dccTierIdx === 0) {
+        badge.innerHTML = '<span style="font-size:10px;font-weight:600;color:#16140e8c;background:#ffffff;border:1px solid #756b571a;padding:2px 8px;border-radius:10px;letter-spacing:0.1px">no share</span>';
+      } else {
+        badge.innerHTML =
+          '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">' +
+            '<span style="font-size:12px;font-weight:600;color:#497d00">+£' + cust + ' to customer</span>' +
+            '<span class="agent-only" style="font-size:10px;color:#5e564a;font-weight:500">Teya keeps £' + net + '</span>' +
+          '</div>';
+      }
+    }
+    // Tourist hint banner — visible only when share = 0% AND gross is non-trivial
+    const hint = $('dcc-tourist-hint');
+    const hintAmt = $('dcc-hint-amount');
+    if (hint) {
+      const showHint = dccTierIdx === 0 && gross >= DCC_TOURIST_HINT_THRESHOLD;
+      hint.style.display = showHint ? 'block' : 'none';
+    }
+    if (hintAmt) hintAmt.textContent = '£' + gross;
+  }
+
+  // Initial render once the DOM is ready (mirrors Contract/Settle pattern)
+  if (document.readyState !== 'loading') {
+    renderDccSheet();
+    renderDccCurrentCard();
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){
+      renderDccSheet();
+      renderDccCurrentCard();
+    });
+  }
+
+  // ─── Selected-tier card renderers (Contract + Settlement) ────────────────────
+  // Mirror BA's pattern: agent sees a "selected option" card with name + description
+  // + bps/NSR badge. Updated on every chipSelect call.
+  const CT_CARD_DATA = [
+    { name:'Flexible', desc:'No commitment · end anytime' },
+    { name:'12-month', desc:'1-year commitment', bps:'−5 bps', bpsColor:'#497d00', nsr:'+£20 NSR' },
+    { name:'24-month', desc:'2-year commitment', bps:'−10 bps', bpsColor:'#497d00', nsr:'+£40 NSR' }
+  ];
+  const SF_CARD_DATA = {
+    0: { name:'Weekday',  desc:'Funds settle next weekday', bps:'−5 bps',  bpsColor:'#497d00', nsr:'+£15 NSR' },
+    1: { name:'Everyday', desc:'Funds settle every day · default' },
+    2: { name:'Instant',  desc:'Funds settle instantly · 24/7', bps:'+20 bps', bpsColor:'#bb4d00', nsr:'+£50 NSR' },
+    3: { name:'3-day',    desc:'Funds settle on day 3',  bps:'−10 bps', bpsColor:'#497d00', nsr:'+£25 NSR' },
+    4: { name:'15-day',   desc:'Funds settle on day 15', bps:'−15 bps', bpsColor:'#497d00', nsr:'+£40 NSR' }
+  };
+
+  function renderCurrentTierCard(prefix, data) {
+    const name = $(prefix + '-current-name');
+    const desc = $(prefix + '-current-desc');
+    const badge = $(prefix + '-current-badge');
+    if (name) name.textContent = data.name;
+    if (desc) desc.textContent = data.desc;
+    if (badge) {
+      if (!data.bps) {
+        // Default / included case — single "included" pill
+        badge.innerHTML = '<span style="font-size:10px;font-weight:600;color:#497d00;background:#7ccf0026;padding:2px 8px;border-radius:10px;letter-spacing:0.1px">included</span>';
+      } else {
+        // Stacked bps + £ NSR
+        badge.innerHTML =
+          '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">' +
+            '<span style="font-size:12px;font-weight:600;color:' + data.bpsColor + '">' + data.bps + '</span>' +
+            '<span style="font-size:10px;color:#5e564a;font-weight:500">' + data.nsr + '</span>' +
+          '</div>';
+      }
+    }
+  }
+
+  function renderContractCurrentCard() {
+    const idx = (typeof ADDON_CONFIG !== 'undefined' && ADDON_CONFIG.ct) ? ADDON_CONFIG.ct.idx : 0;
+    renderCurrentTierCard('ct', CT_CARD_DATA[idx] || CT_CARD_DATA[0]);
+  }
+
+  function renderSettleCurrentCard() {
+    const idx = (typeof ADDON_CONFIG !== 'undefined' && ADDON_CONFIG.sf) ? ADDON_CONFIG.sf.idx : 1;
+    renderCurrentTierCard('sf', SF_CARD_DATA[idx] || SF_CARD_DATA[1]);
+  }
+
+  // Initial render once the DOM is ready
+  if (document.readyState !== 'loading') {
+    renderContractCurrentCard();
+    renderSettleCurrentCard();
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){
+      renderContractCurrentCard();
+      renderSettleCurrentCard();
+    });
   }
 
   // ─── MCA (discount shown separately, NOT applied to effective rate) ────────
@@ -12126,6 +13822,19 @@ function resetInnerNav() {
         const val = $('ck-mca-val');
         if (val) { val.textContent = '\u2212' + Math.abs(mcaMod) + ' bps'; val.style.color = '#497d00'; }
       } else { ckMca.style.display = 'none'; }
+    }
+
+    // DCC revenue share (visible only when share > 0% \u2014 separate revenue stream, no bps)
+    const ckDcc = $('ck-dcc');
+    if (ckDcc) {
+      const dccTier = (typeof DCC_TIERS !== 'undefined') ? DCC_TIERS[dccTierIdx] : null;
+      if (dccTier && dccTier.share > 0) {
+        const cust = Math.round(getDccGrossMonthly() * dccTier.share);
+        ckDcc.style.display = 'flex';
+        const lbl = $('ck-dcc-label'); if (lbl) lbl.textContent = 'DCC share (' + Math.round(dccTier.share*100) + '% to customer)';
+        const val = $('ck-dcc-val');
+        if (val) { val.textContent = '+\u00a3' + cust + '/mo'; val.style.color = '#497d00'; }
+      } else { ckDcc.style.display = 'none'; }
     }
 
   }
@@ -12342,13 +14051,20 @@ function resetInnerNav() {
     const commission = Math.round(takeRate / 100 / 100 * AGG_TPV);
     const aboveFloor = takeRate >= TAKE_RATE_FLOOR;
 
-    const trRate = $('tr-rate'); if (trRate) trRate.textContent = bps2pct(takeRate);
-    const trComm = $('tr-commission'); if (trComm) trComm.textContent = '\u00a3' + commission.toLocaleString() + '/mo';
+    const trRate = $('tr-rate'); if (trRate) trRate.textContent = '\u00a3' + commission.toLocaleString() + '/mo';
+    const trComm = $('tr-commission'); if (trComm) trComm.textContent = '\u00a3' + commission.toLocaleString();
+
+    // Floor/target \u00a3/mo derived from bps thresholds \u00d7 reference TPV
+    const floorMo  = Math.round(TAKE_RATE_FLOOR  / 10000 * AGG_TPV);
+    const targetMo = Math.round(TAKE_RATE_TARGET / 10000 * AGG_TPV);
 
     const trBar = $('tr-bar');
     const trLabel = $('tr-label');
     const trWall = $('tr-wall');
     const trFloorLabel = $('tr-floor-label');
+    const trTargetLabel = $('tr-target-label');
+    if (trFloorLabel)  trFloorLabel.textContent  = 'Floor \u00a3' + floorMo.toLocaleString();
+    if (trTargetLabel) trTargetLabel.textContent = 'Target \u00a3' + targetMo.toLocaleString();
     if (trBar && trLabel) {
       const maxTR = TAKE_RATE_TARGET * 2;
       const pct = Math.max(0, Math.min(100, (takeRate / maxTR) * 100));
@@ -12373,10 +14089,11 @@ function resetInnerNav() {
     }
 
     // Footer CTA: above floor → "Card machines →"; below floor → "Request approval →".
+    // (Card machines is now an inline accordion on s-05, so the next step is Product usage.)
     const footerCta = $('s05-primary-cta');
     if (footerCta) {
       if (aboveFloor) {
-        footerCta.textContent = 'Card machines \u2192';
+        footerCta.textContent = 'Product usage \u2192';
         footerCta.style.background = '#e1e51a';
         footerCta.style.color = '#29320c';
       } else {
@@ -12386,8 +14103,30 @@ function resetInnerNav() {
       }
     }
 
+    // Phase 5 — expose floor state + refresh s-07 dual CTA / helper line / offer-card label
+    window._aboveFloor = aboveFloor;
+    if (typeof refreshS07Cta === 'function') refreshS07Cta();
+
     // ── MCA confirmed card — update the simulated rate live as other levers change ──
     renderMcaConfirmed();
+
+    // ── DCC current-tier card + tourist hint banner (recompute when TPV/share changes) ──
+    if (typeof renderDccCurrentCard === 'function') renderDccCurrentCard();
+    if (typeof renderDccSheet === 'function') renderDccSheet();
+
+    // ── s-07 Review summary: DCC row visibility + label ──
+    const rvDccRow = $('rv-dcc-row');
+    const rvDccVal = $('rv-dcc-val');
+    if (rvDccRow && rvDccVal && typeof DCC_TIERS !== 'undefined') {
+      const dccTier = DCC_TIERS[dccTierIdx];
+      if (dccTier && dccTier.share > 0) {
+        const cust = Math.round(getDccGrossMonthly() * dccTier.share);
+        rvDccRow.style.display = 'flex';
+        rvDccVal.textContent = Math.round(dccTier.share*100) + '% · +£' + cust + '/mo to customer';
+      } else {
+        rvDccRow.style.display = 'none';
+      }
+    }
 
     // ── Dynamic included features ──
     updateIncludedFeatures();
