@@ -360,8 +360,209 @@
 </div>
 </div>
 
+<!-- ═══ SCREEN 01: DEALS LIST ═══ -->
+<div id="s-01" class="sp active" style="display:flex;flex-direction:column">
+<div class="ss">
+<div class="flex items-center justify-between px-6 pt-4 bg-[#f6f5f3]" style="height:50px"><span class="text-[15px] font-semibold text-[#090806ec]">9:41</span><div class="flex items-center gap-1.5"><svg width="17" height="12" viewBox="0 0 17 12" fill="#090806ec"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#090806ec" stroke-opacity="0.35"/><rect x="1.5" y="1.5" width="16" height="9" rx="2.5" fill="#090806ec"/><path d="M23 4v4a2 2 0 000-4z" fill="#090806ec" fill-opacity="0.4"/></svg></div></div>
+<div class="sticky top-0 z-10 bg-[#f6f5f3] border-b border-[#756b571a]">
+  <div class="flex items-center justify-between px-4" style="height:56px">
+    <div class="flex items-center gap-2"><button onclick="openMenu('deals')" class="size-9 flex items-center justify-center -ml-1 active:opacity-60"><svg width="20" height="14" viewBox="0 0 20 14" fill="none"><path d="M1 1h18M1 7h18M1 13h18" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round"/></svg></button><span class="text-[20px] font-semibold text-[#090806ec]">Deals</span></div>
+    <button onclick="go('02')" class="size-10 bg-[#e1e51a] rounded-[14px] flex items-center justify-center active:scale-[0.96] transition-transform shadow-sm"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M3 9h12" stroke="#29320c" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+  </div>
+</div>
+<div class="px-4 pt-3 pb-2"><div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border border-[#756b571a]"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg><span class="text-[15px] text-[#16140e8c]">Search deals...</span></div></div>
+<div class="px-4 pb-2"><button class="flex items-center gap-1.5 bg-white border border-[#756b571a] rounded-full px-3 h-8 text-[13px] font-medium text-[#090806ec]">Filters <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#090806ec" stroke-width="1.3" stroke-linecap="round"/></svg></button></div>
+<div class="px-4 pb-2"><p class="text-[13px] text-[#090806ec]"><span class="font-semibold">324 deals</span> · <span class="font-semibold">£220,213.00</span> CTO/mo</p><p class="text-[12px] text-[#16140e8c] mt-0.5">Sorted by most recent stage update</p></div>
+<div class="px-4 pb-6">
+<div class="bg-white rounded-3xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_2px_4px_0px_rgba(0,0,0,0.04)]">
+  <div class="dr flex items-center gap-3 px-4 py-3 border-b border-[#756b571a] cursor-pointer" onclick="_companyBackDest='01';var lbl=document.getElementById('company-back-label');if(lbl)lbl.textContent='Deals';go('04')">
+    <div class="size-10 rounded-xl bg-[#e1e51a33] flex items-center justify-center shrink-0 text-[13px] font-semibold text-[#6d770d]">MD</div>
+    <div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-0.5"><p class="text-[15px] font-medium text-[#090806ec]">Mario's Deli</p><span class="text-[10px] font-semibold text-[#497d00] bg-[#7ccf001a] px-1.5 py-0.5 rounded-full">New</span></div><div class="flex items-center gap-1.5"><span class="text-[11px] font-medium bg-[#f6f5f3] px-2 py-0.5 rounded-full border border-[#756b571a] text-[#090806ec]">1. Uncontacted</span><span class="text-[11px] text-[#16140e8c]">Just now</span></div></div>
+    <span class="text-[14px] font-semibold text-[#090806ec] tabular-nums">£12,000</span>
+  </div>
+  <div class="dr flex items-center gap-3 px-4 py-3 border-b border-[#756b571a] cursor-pointer">
+    <div class="size-10 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 text-[13px] font-semibold text-[#16140e8c]">GB</div>
+    <div class="flex-1 min-w-0"><div class="flex items-center gap-1.5 mb-0.5"><p class="text-[15px] font-medium text-[#090806ec]">Gerry's Boutique</p><span class="text-[14px]">🔥</span></div><div class="flex items-center gap-1.5"><span class="text-[11px] font-medium bg-[#f6f5f3] px-2 py-0.5 rounded-full border border-[#756b571a] text-[#090806ec]">1. Uncontacted</span><span class="text-[11px] text-[#16140e8c]">2h ago</span></div></div>
+    <span class="text-[14px] font-semibold text-[#090806ec] tabular-nums">£12,000</span>
+  </div>
+  <div class="dr flex items-center gap-3 px-4 py-3 border-b border-[#756b571a] cursor-pointer">
+    <div class="size-10 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 text-[13px] font-semibold text-[#16140e8c]">BA</div>
+    <div class="flex-1 min-w-0"><p class="text-[15px] font-medium text-[#090806ec] mb-0.5">Brewed Awakening</p><div class="flex items-center gap-1.5"><span class="text-[11px] font-medium bg-[#f6f5f3] px-2 py-0.5 rounded-full border border-[#756b571a] text-[#090806ec]">5. Registration</span><span class="text-[11px] text-[#16140e8c]">2h ago</span></div></div>
+    <span class="text-[14px] font-semibold text-[#090806ec] tabular-nums">£12,000</span>
+  </div>
+  <div class="dr flex items-center gap-3 px-4 py-3 border-b border-[#756b571a] cursor-pointer">
+    <div class="size-10 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 text-[13px] font-semibold text-[#16140e8c]">FC</div>
+    <div class="flex-1 min-w-0"><p class="text-[15px] font-medium text-[#090806ec] mb-0.5">Ferro &amp; Co.</p><div class="flex items-center gap-1.5"><span class="text-[11px] font-medium bg-[#f6f5f3] px-2 py-0.5 rounded-full border border-[#756b571a] text-[#090806ec]">6. Under review</span><span class="text-[11px] text-[#16140e8c]">2h ago</span></div></div>
+    <span class="text-[14px] font-semibold text-[#090806ec] tabular-nums">£12,000</span>
+  </div>
+  <div class="dr flex items-center gap-3 px-4 py-3 border-b border-[#756b571a] cursor-pointer">
+    <div class="size-10 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 text-[13px] font-semibold text-[#16140e8c]">GG</div>
+    <div class="flex-1 min-w-0"><p class="text-[15px] font-medium text-[#090806ec] mb-0.5">GreenLeaf Grocers</p><div class="flex items-center gap-1.5"><span class="text-[11px] font-medium bg-[#f6f5f3] px-2 py-0.5 rounded-full border border-[#756b571a] text-[#090806ec]">3. Engaged</span><span class="text-[11px] text-[#16140e8c]">2h ago</span></div></div>
+    <span class="text-[14px] font-semibold text-[#090806ec] tabular-nums">£12,000</span>
+  </div>
+  <div class="dr flex items-center gap-3 px-4 py-3 border-b border-[#756b571a] cursor-pointer">
+    <div class="size-10 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 text-[13px] font-semibold text-[#16140e8c]">NC</div>
+    <div class="flex-1 min-w-0"><p class="text-[15px] font-medium text-[#090806ec] mb-0.5">Nightcap</p><div class="flex items-center gap-1.5"><span class="text-[11px] font-medium bg-[#f6f5f3] px-2 py-0.5 rounded-full border border-[#756b571a] text-[#090806ec]">3. Engaged</span><span class="text-[11px] text-[#16140e8c]">2h ago</span></div></div>
+    <span class="text-[14px] font-semibold text-[#090806ec] tabular-nums">£12,000</span>
+  </div>
+  <div class="dr flex items-center gap-3 px-4 py-3 border-b border-[#756b571a] cursor-pointer">
+    <div class="size-10 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 text-[13px] font-semibold text-[#16140e8c]">PC</div>
+    <div class="flex-1 min-w-0"><p class="text-[15px] font-medium text-[#090806ec] mb-0.5">Paws &amp; Claws</p><div class="flex items-center gap-1.5"><span class="text-[11px] font-medium bg-[#f6f5f3] px-2 py-0.5 rounded-full border border-[#756b571a] text-[#090806ec]">4. Negotiating</span><span class="text-[11px] text-[#16140e8c]">2h ago</span></div></div>
+    <span class="text-[14px] font-semibold text-[#090806ec] tabular-nums">£12,000</span>
+  </div>
+  <div class="dr flex items-center gap-3 px-4 py-3 cursor-pointer">
+    <div class="size-10 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 text-[13px] font-semibold text-[#16140e8c]">IG</div>
+    <div class="flex-1 min-w-0"><div class="flex items-center gap-1.5 mb-0.5"><p class="text-[15px] font-medium text-[#090806ec]">Ironworks Gym</p><span class="text-[14px]">🔥</span></div><div class="flex items-center gap-1.5"><span class="text-[11px] font-medium bg-[#f6f5f3] px-2 py-0.5 rounded-full border border-[#756b571a] text-[#090806ec]">1. Uncontacted</span><span class="text-[11px] text-[#16140e8c]">2h ago</span></div></div>
+    <span class="text-[14px] font-semibold text-[#090806ec] tabular-nums">£12,000</span>
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- ═══ SCREEN 02: NEW DEAL (consolidated) ═══ -->
+<div id="s-02" class="sp sr" style="display:flex;flex-direction:column">
+<div class="ss">
+<div class="flex items-center justify-between px-6 pt-4 bg-[#f6f5f3]" style="height:50px"><span class="text-[15px] font-semibold text-[#090806ec]">9:41</span><div class="flex items-center gap-1.5"><svg width="17" height="12" viewBox="0 0 17 12" fill="#090806ec"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#090806ec" stroke-opacity="0.35"/><rect x="1.5" y="1.5" width="16" height="9" rx="2.5" fill="#090806ec"/><path d="M23 4v4a2 2 0 000-4z" fill="#090806ec" fill-opacity="0.4"/></svg></div></div>
+<div class="sticky top-0 z-10 bg-[#f6f5f3] border-b border-[#756b571a]">
+  <div class="relative flex items-center justify-center px-4" style="height:56px">
+    <button onclick="go('01')" class="absolute left-4 flex items-center gap-1 text-[#090806ec] active:opacity-60"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M7 1L1 7l6 6" stroke="#090806ec" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-[16px] font-medium">Back</span></button>
+    <span class="text-[16px] font-semibold text-[#090806ec]">New deal</span>
+  </div>
+</div>
+<!-- ── DATA CONFIDENCE bar (Phase 2) — sticky header, mirrors s-05 NSR bar pattern.
+     Stays visible while the stores list scrolls. Hidden until first input lands. ── -->
+<div id="nd-confidence" class="agent-only" style="position:sticky;top:56px;z-index:9;background:#f6f5f3;padding:8px 16px 10px;border-bottom:1px solid #756b571a;display:none">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:5px">
+    <div style="display:flex;align-items:baseline;gap:8px;min-width:0;flex:1">
+      <span style="font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#16140e8c;flex-shrink:0">Data confidence</span>
+      <span id="nd-conf-level" style="font-size:13px;font-weight:600;color:#5a7a26">Medium</span>
+    </div>
+    <span id="nd-conf-pct" style="font-size:13px;font-weight:700;color:#090806ec;font-variant-numeric:tabular-nums;flex-shrink:0">60%</span>
+  </div>
+  <div id="nd-conf-track" class="conf-bar-track">
+    <div id="nd-conf-bar" class="conf-bar-fill" style="width:60%;background:#a3c947"></div>
+  </div>
+  <p id="nd-conf-hint" style="font-size:11px;color:#497d00;margin-top:6px;line-height:1.3">&uarr; Upload Camden's statement to reduce pricing risk</p>
+</div>
+
+<!-- ── STORES IN THIS DEAL section (unified: statement upload + store list + manual add) ── -->
+<div class="ai pt-4 px-4 mb-4" style="animation-delay:0ms">
+  <p class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-2 px-1">Stores in this deal</p>
+
+  <!-- Statements area — iOS grouped-list pattern: action card on top, files card
+       below, both white with small gap between. Files card collapses when empty. -->
+  <div id="nd-stmt-upload" onclick="ndUploadStatement()" class="bg-white rounded-2xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] px-4 py-3 flex items-center gap-3 cursor-pointer active:bg-[#5f4f300d] transition-colors">
+    <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13V4M10 4L7 7M10 4l3 3" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+    <div class="flex-1"><p id="nd-stmt-upload-label" class="text-[14px] font-medium text-[#090806ec]">Upload statement</p><p class="text-[12px] text-[#16140e8c]">We&rsquo;ll detect stores and attach automatically</p></div>
+  </div>
+  <!-- Processed statements list — separate white card below the action. Hidden when empty (no content = no card). -->
+  <div id="nd-stmt-banners" class="bg-white rounded-2xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] mt-2 empty:hidden divide-y divide-[#756b571a] overflow-hidden"></div>
+
+  <!-- Stores list (cards rendered by JS) — 20pt gap above to read as new section per iOS grouped-list pattern. `empty:hidden` collapses when no stores so the gap doesn't apply. -->
+  <div id="nd-stores-container" class="space-y-2 mt-4 empty:hidden empty:mt-0"></div>
+
+  <!-- Add store manually — always visible, secondary to the statement upload above -->
+  <div id="nd-add-store-row" onclick="ndOpenStoreSearch()" class="mt-3 flex items-center justify-center gap-1.5 cursor-pointer active:opacity-60 transition-opacity py-2">
+    <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#16140e8c" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <span class="text-[13px] font-medium text-[#16140e8c]">Add store via Google search</span>
+  </div>
+</div>
+<!-- end scroll -->
+</div>
+<!-- ── STICKY FOOTER ── -->
+<div class="cta space-y-2">
+  <button onclick="go('03')" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Continue</button>
+  <button onclick="go('01')" class="w-full bg-transparent text-[#090806ec] font-medium text-[15px] rounded-[32px] py-3">Cancel</button>
+</div>
+
+<!-- ── BOTTOM SHEET: Statement Results ── -->
+<div id="nd-stmt-overlay" class="popup-overlay" onclick="ndCloseStmtSheet()">
+  <div class="popup-sheet" onclick="event.stopPropagation()" style="max-height:75%;overflow-y:auto">
+    <div class="popup-handle"></div>
+    <div id="nd-stmt-sheet-header" style="padding:0 20px 4px">
+      <!-- Rendered dynamically -->
+    </div>
+    <div id="nd-stmt-stores-list" style="padding:0 16px 4px">
+      <!-- Rendered dynamically -->
+    </div>
+    <div style="padding:0 16px 20px">
+      <button onclick="ndConfirmStmtStores()" style="width:100%;padding:14px;border-radius:32px;font-size:15px;font-weight:600;cursor:pointer;text-align:center;background:#090806ec;color:white;border:none;font-family:'Figtree',sans-serif;transition:transform 120ms" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''" onmouseleave="this.style.transform=''">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BOTTOM SHEET: Store Search ── -->
+<div id="nd-search-overlay" class="popup-overlay" onclick="ndCloseStoreSearch()">
+  <div class="popup-sheet" onclick="event.stopPropagation()" style="max-height:80%;overflow-y:auto">
+    <div class="popup-handle"></div>
+    <div style="padding:0 20px 12px">
+      <p style="font-size:17px;font-weight:600;color:#090806ec;margin:0 0 4px">Add a store</p>
+      <p id="nd-search-subtitle" style="font-size:13px;color:#16140e8c;margin:0">Search by trading name or address</p>
+    </div>
+    <!-- Segmented toggle — Physical / E-commerce -->
+    <div style="margin:0 16px 14px;background:#f0eee9;border-radius:9999px;padding:3px;display:flex;gap:3px">
+      <button id="nd-tab-physical" onclick="ndSetSearchType('physical')" style="flex:1;padding:8px 12px;border-radius:9999px;background:white;color:#090806ec;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;box-shadow:0 1px 2px rgba(0,0,0,0.08);transition:all 150ms">Physical store</button>
+      <button id="nd-tab-ecom" onclick="ndSetSearchType('online')" style="flex:1;padding:8px 12px;border-radius:9999px;background:transparent;color:#16140e8c;font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:inherit;transition:all 150ms">E-commerce store</button>
+    </div>
+    <!-- Physical store content (default flow) -->
+    <div id="nd-search-physical">
+      <div style="padding:0 16px 12px">
+        <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border-2 border-[#090806ec] shadow-[0_0_0_3px_rgba(117,107,87,0.1)]">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="#16140e8c" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <input type="text" value="Mario's Deli" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="Search address or business name"/>
+        </div>
+      </div>
+      <div style="padding:0 16px 4px">
+        <div class="bg-white rounded-2xl overflow-hidden shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]">
+          <div onclick="ndAddStore('Waterloo','56 Waterloo Rd, London SE1 8SS',['Café/Restaurant','Takeaway/Fast Food'],'£22.50')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
+            <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Waterloo</p><p class="text-[12px] text-[#16140e8c]">56 Waterloo Rd, London SE1 8SS</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £22.50</p></div>
+            <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div onclick="ndAddStore('Camden','42-48 Camden High St, London NW1 0JH',['Café/Restaurant','Bar/Pub','Takeaway/Fast Food'],'£18.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-[#756b571a] active:bg-[#5f4f300d]">
+            <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Camden</p><p class="text-[12px] text-[#16140e8c]">42-48 Camden High St, London NW1 0JH</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £18.00</p></div>
+            <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div onclick="ndAddStore('Canary Wharf','One Canada Square, London E14 5AB',['Café/Restaurant','Retail — Grocery'],'£26.00')" class="search-result flex items-start gap-3 px-4 py-3 cursor-pointer active:bg-[#5f4f300d]">
+            <div class="size-9 rounded-xl bg-[#f6f5f3] flex items-center justify-center shrink-0 mt-0.5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6.5h12M2 6.5v7a1 1 0 001 1h10a1 1 0 001-1v-7M2 6.5L4 2h8l2 4.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-1"><p class="text-[14px] font-medium text-[#090806ec]">Mario's Deli — Canary Wharf</p><p class="text-[12px] text-[#16140e8c]">One Canada Square, London E14 5AB</p><p class="text-[11px] text-[#16140e8c] mt-0.5">Café/Restaurant · Avg. £26.00</p></div>
+            <svg class="shrink-0 mt-1" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#16140e8c" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="mt-3 text-center"><button class="text-[13px] text-[#090806ec] underline underline-offset-2">Enter address manually</button></div>
+      </div>
+      <div style="padding:0 16px 16px"></div>
+    </div>
+
+    <!-- Online store content -->
+    <div id="nd-search-online" style="display:none">
+      <div style="padding:0 16px 10px">
+        <label style="font-size:11px;color:#16140e8c;font-weight:500;display:block;margin-bottom:6px">Store name</label>
+        <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border border-[#8f867633]">
+          <input type="text" id="nd-online-name" value="Mario's Deli — Online" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="e.g. Mario's Deli — Online"/>
+        </div>
+      </div>
+      <div style="padding:0 16px 10px">
+        <label style="font-size:11px;color:#16140e8c;font-weight:500;display:block;margin-bottom:6px">Store URL</label>
+        <div class="flex items-center gap-2 bg-white rounded-full px-4 h-11 border-2 border-[#090806ec] shadow-[0_0_0_3px_rgba(117,107,87,0.1)]">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#16140e8c" stroke-width="1.3"/><path d="M1.5 8h13M8 1.5c2 1.7 3 4 3 6.5s-1 4.8-3 6.5M8 1.5c-2 1.7-3 4-3 6.5s1 4.8 3 6.5" stroke="#16140e8c" stroke-width="1.1"/></svg>
+          <input type="text" id="nd-online-url" value="mariosdeli.co.uk" class="flex-1 bg-transparent text-[15px] text-[#090806ec] outline-none" placeholder="e.g. mystore.co.uk"/>
+        </div>
+      </div>
+      <div style="padding:0 16px 16px">
+        <button onclick="ndAddOnlineStore()" class="w-full bg-[#0b0b0a] text-white font-semibold text-[15px] rounded-[24px] py-3.5 active:scale-[0.96] transition-transform">Add ecommerce store</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end s-02 -->
+
 <!-- ═══ SCREEN 04: DEAL OVERVIEW ═══ -->
-<div id="s-04" class="sp active" style="display:flex;flex-direction:column">
+<div id="s-04" class="sp sr" style="display:flex;flex-direction:column">
 <div class="ss">
 <div class="flex items-center justify-between px-6 pt-4 bg-[#f6f5f3]" style="height:50px"><span class="text-[15px] font-semibold text-[#090806ec]">9:41</span><div class="flex items-center gap-1.5"><svg width="17" height="12" viewBox="0 0 17 12" fill="#090806ec"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#090806ec" stroke-opacity="0.35"/><rect x="1.5" y="1.5" width="16" height="9" rx="2.5" fill="#090806ec"/><path d="M23 4v4a2 2 0 000-4z" fill="#090806ec" fill-opacity="0.4"/></svg></div></div>
 <div class="sticky top-0 z-10 bg-[#f6f5f3] border-b border-[#756b571a]">
@@ -475,7 +676,9 @@
 <div id="dt-note" class="px-4 pt-3 pb-6 hidden"><div class="bg-white rounded-3xl p-4 shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)]"><textarea class="w-full bg-transparent text-[14px] text-[#090806ec] outline-none resize-none" rows="5" placeholder="Add your private notes here..."></textarea></div></div>
 </div>
 </div>
-<!-- ═══ SCREEN 05: CREATE OFFER ═══ -->
+
+<!-- ═══ SCREEN 04i: INFO TAB (full) ═══ -->
+
 <style>
   #s-05.client-mode .agent-only { display:none !important; }
   #s-05 .client-only, #s-05c .client-only { display:none !important; }
@@ -1660,6 +1863,8 @@
 </div>
 
 <!-- ═══ SCREEN 05c: CARD MACHINES (redesigned — terminal-first, stores as assignment rows) ═══ -->
+
+<!-- ═══ SCREEN 05c: CARD MACHINES (redesigned — terminal-first, stores as assignment rows) ═══ -->
 <div id="s-05c" class="sp sr" style="display:flex;flex-direction:column">
 <!-- Pinned header: status bar + nav + health bar (outside scroll) -->
 <div style="flex-shrink:0">
@@ -1955,6 +2160,9 @@
 </div>
 <div class="cta"><button onclick="go('06')" class="w-full bg-[#e1e51a] text-[#29320c] font-semibold text-[16px] rounded-[32px] py-4 active:scale-[0.96] transition-transform">Product usage</button></div>
 </div>
+
+<!-- ═══ SCREEN 06: PRODUCT USAGE ═══ -->
+
 <script>
   // ── Screen 06 (Product Usage) — tabbed per-store pattern ──
   // Per the e-commerce PM review (see: meeting 2026-05): each store is either physical
@@ -2248,9 +2456,6 @@
   })();
 </script>
 
-      
-</div>
-</div>
 </div><!-- /phone screen -->
 </div><!-- /bezel -->
 </div><!-- /frame -->
@@ -2267,6 +2472,16 @@
 <!-- Camera Control (right) -->
 <div style="position:absolute;right:-2px;top:320px;width:3px;height:40px;background:linear-gradient(to left,#0a0a0a 0%,#2c2c2e 50%,#1a1a1c 100%);border-radius:0 1.5px 1.5px 0;box-shadow:inset -1px 0 1px rgba(255,255,255,0.05),1px 0 2px rgba(0,0,0,0.35)"></div>
 </div><!-- /relative -->
+
+<!-- jump nav -->
+<div class="flex flex-wrap items-center justify-center gap-2 max-w-2xl">
+  <button onclick="go('01')" class="text-[11px] font-medium px-3 py-1 rounded-full bg-white/70 hover:bg-white text-[#090806ec]/60 hover:text-[#090806ec] transition-all shadow-sm">Deals (s-01)</button>
+  <button onclick="go('02')" class="text-[11px] font-medium px-3 py-1 rounded-full bg-white/70 hover:bg-white text-[#090806ec]/60 hover:text-[#090806ec] transition-all shadow-sm">New deal (s-02)</button>
+  <button onclick="go('04')" class="text-[11px] font-medium px-3 py-1 rounded-full bg-white/70 hover:bg-white text-[#090806ec]/60 hover:text-[#090806ec] transition-all shadow-sm">Offers (s-04)</button>
+  <button onclick="go('05')" class="text-[11px] font-medium px-3 py-1 rounded-full bg-white/70 hover:bg-white text-[#090806ec]/60 hover:text-[#090806ec] transition-all shadow-sm">Negotiation (s-05)</button>
+  <button onclick="go('05c')" class="text-[11px] font-medium px-3 py-1 rounded-full bg-white/70 hover:bg-white text-[#090806ec]/60 hover:text-[#090806ec] transition-all shadow-sm">Card machines (s-05c)</button>
+</div>
+
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
 const ORDER=['01','members','02','03','04','04i','05','05c','06','07','08','09'];
