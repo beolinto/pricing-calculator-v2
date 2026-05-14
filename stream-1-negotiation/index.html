@@ -451,6 +451,18 @@
 <div class="ai pt-4 px-4 mb-4" style="animation-delay:0ms">
   <p class="text-[11px] font-semibold uppercase tracking-[1.5px] text-[#16140e8c] mb-2 px-1">Stores in this deal</p>
 
+  <!-- ── MOTO eligibility hint — preventive note so agents upload enough statement
+       coverage upfront. MOTO requires ≥6 months of acquirer history per store; without
+       it the agent gets blocked when enabling MOTO downstream and has to come back. ── -->
+  <div class="agent-only flex items-start gap-2 mb-3 px-1">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:2px">
+      <circle cx="8" cy="8" r="6.5" stroke="#16140e8c" stroke-width="1.2"/>
+      <path d="M8 5v3.5" stroke="#16140e8c" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="8" cy="11" r=".7" fill="#16140e8c"/>
+    </svg>
+    <p class="text-[12px] text-[#16140e8c] leading-[1.4]">Planning to enable MOTO on any store? Upload at least 6 months of statements per store so the offer reflects the data needed for that surcharge.</p>
+  </div>
+
   <!-- Statements area — iOS grouped-list pattern: action card on top, files card
        below, both white with small gap between. Files card collapses when empty. -->
   <div id="nd-stmt-upload" onclick="ndUploadStatement()" class="bg-white rounded-2xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] px-4 py-3 flex items-center gap-3 cursor-pointer active:bg-[#5f4f300d] transition-colors">
@@ -927,13 +939,12 @@
             <div style="border-top:1px solid #756b571a;padding-top:12px;margin-bottom:14px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;min-height:20px">
                 <p style="font-size:11px;color:#16140e8c;margin:0">Terminals</p>
-                <span style="font-size:10px;font-weight:600;background:#e1e51a33;color:#46520f;padding:2px 8px;border-radius:20px">3 months free</span>
               </div>
               <div style="display:flex;align-items:flex-start;gap:8px">
                 <img src="45fbb70c016df9b1f72cab2dd588ab3362eef2a7.png" alt="Teya Pro" style="width:28px;height:36px;object-fit:contain;flex-shrink:0">
                 <div>
                   <p style="font-size:13px;color:#090806ec;font-weight:500;margin:0;line-height:1.2">1&times; Teya Pro</p>
-                  <p style="font-size:11px;line-height:1.4;color:#16140e8c;margin:4px 0 0">Free for 3 months, then &pound;15/mo</p>
+                  <p style="font-size:11px;line-height:1.4;color:#16140e8c;margin:4px 0 0">&pound;15/mo</p>
                 </div>
               </div>
             </div>
@@ -993,7 +1004,6 @@
             <div style="border-top:1px solid #756b571a;padding-top:12px;margin-bottom:14px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;min-height:20px">
                 <p style="font-size:11px;color:#16140e8c;margin:0">Terminals</p>
-                <span style="font-size:10px;font-weight:600;background:#7ccf001a;color:#497d00;padding:2px 8px;border-radius:20px">Free terminal</span>
               </div>
               <div style="display:flex;align-items:flex-start;gap:8px">
                 <img src="2e4b880c56532cb4192b69370bc6805885111ec4.png" alt="Teya Go" style="width:28px;height:36px;object-fit:contain;flex-shrink:0">
@@ -1128,7 +1138,6 @@
                 <div class="client-only chip-row" id="ct-chips">
                   <button class="chip active" data-idx="0" onclick="chipSelect('ct',0)">Flexible</button>
                   <button class="chip" data-idx="1" onclick="chipSelect('ct',1)">12-month <span class="chip-mod green">−5</span></button>
-                  <button class="chip" data-idx="2" onclick="chipSelect('ct',2)">24-month <span class="chip-mod green">−10</span></button>
                 </div>
               </div>
             </div>
@@ -1250,7 +1259,7 @@
             <div class="addon-empty" id="cm-empty" style="padding:14px 16px;align-items:center;gap:12px">
               <div style="flex:1;min-width:0">
                 <p class="addon-label" style="margin:0">Card machines</p>
-                <p id="cm-empty-copy" style="font-size:11px;color:#16140e8c;margin:3px 0 0;line-height:1.4"><span style="font-weight:600;color:#46520f">3 months free on Teya Pro</span> with this offer.</p>
+                <p id="cm-empty-copy" style="font-size:11px;color:#16140e8c;margin:3px 0 0;line-height:1.4">Add terminals to power in-store card payments.</p>
               </div>
               <button onclick="openCmSheet()" style="background:white;color:#090806ec;border:1.5px solid #756b571a;border-radius:10px;padding:6px 14px 6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;transition:transform 120ms,background 150ms" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''" onmouseleave="this.style.transform=''" onmouseenter="this.style.background='#f6f5f3'" onmouseout="this.style.background='white'">
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="#090806ec" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -1613,23 +1622,6 @@
                 <span style="font-size:10px;color:#5e564a;font-weight:500">+£20 NSR</span>
               </div>
               <div id="ct-radio-1" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 24-month -->
-        <div id="ct-opt-2" onclick="selectContractOpt(2)" style="background:white;border-radius:16px;padding:14px;margin-bottom:16px;border:1.5px solid #756b571a;cursor:pointer;transition:border-color 150ms">
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <p style="font-size:14px;font-weight:600;color:#090806ec;margin:0">24-month</p>
-              <p style="font-size:11px;color:#16140e8c;margin:2px 0 0">2-year commitment</p>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px">
-              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.15">
-                <span style="font-size:12px;font-weight:600;color:#497d00">−10 bps</span>
-                <span style="font-size:10px;color:#5e564a;font-weight:500">+£40 NSR</span>
-              </div>
-              <div id="ct-radio-2" style="width:18px;height:18px;border-radius:50%;border:2px solid #756b571a;display:flex;align-items:center;justify-content:center;transition:all 150ms"></div>
             </div>
           </div>
         </div>
@@ -2588,7 +2580,7 @@ const COMPANY_VARIANTS = {
     ],
     pricing:    { base: '1.45% blended', contract: 'Flexible', quoteVer: 'v1 · 27 Mar 2025' },
     // Existing Setup state used by the add-store offer screen (iscreen-03-offer-selection)
-    // Mario is on Flexible → can upgrade to 12m / 24m (demonstrates upgrade path)
+    // Mario is on Flexible → can upgrade to 12m (demonstrates upgrade path)
     existingSetup: { contract: 'flex', bundle: 'silver' },
     // Pricing structure the company is currently on + their current company base fee (bps)
     // Drives the "Current" badge placement and the savings-comparison sheet on the offer screen.
@@ -4978,32 +4970,15 @@ function syncHealthBar05c() {
   updateCardMachinePromos();
 }
 
-// Reflect the selected offer's terminal promo on the Card Machines screen:
-// show a matching chip on the terminal included with the selected offer.
-// Reads the global curPS set by the offer carousel.
+// Card-machine promo chips have been removed from MVP scope — keep the
+// chips hidden and use neutral empty-state copy regardless of pricing structure.
 function updateCardMachinePromos() {
-  const ps = (typeof curPS !== 'undefined') ? curPS : 'bl';
   const chipPro = document.getElementById('cm-chip-pro');
   const chipGo  = document.getElementById('cm-chip-go');
-  if (chipPro) { chipPro.style.display = 'none'; chipPro.textContent = ''; }
-  if (chipGo)  { chipGo.style.display  = 'none'; chipGo.textContent  = ''; }
-  if (ps === 'bl') {
-    if (chipPro) { chipPro.textContent = '3 months free'; chipPro.style.display = 'inline-block'; }
-  } else if (ps === 'mr') {
-    if (chipGo) { chipGo.textContent = 'Free terminal'; chipGo.style.display = 'inline-block'; }
-  }
-  // 'ic' (Dynamic rate): no included terminal — chips stay hidden.
-  // Sync the empty-state promo copy to the offer's discount.
+  if (chipPro) chipPro.style.display = 'none';
+  if (chipGo)  chipGo.style.display  = 'none';
   const cmCopy = document.getElementById('cm-empty-copy');
-  if (cmCopy) {
-    if (ps === 'bl') {
-      cmCopy.innerHTML = '<span style="font-weight:600;color:#46520f">3 months free on Teya Pro</span> with this offer.';
-    } else if (ps === 'mr') {
-      cmCopy.innerHTML = '<span style="font-weight:600;color:#46520f">Free Teya Go terminal</span> with this offer.';
-    } else {
-      cmCopy.innerHTML = 'Add terminals to power in-store card payments.';
-    }
-  }
+  if (cmCopy) cmCopy.innerHTML = 'Add terminals to power in-store card payments.';
 }
 
 // Legacy compat — old functions no longer used but may be referenced
@@ -7743,8 +7718,7 @@ function resetInnerNav() {
     ct: {
       options: [
         { key:'flex', label:'Flexible', shortLabel:'Flexible', mod:0 },
-        { key:'12m', label:'12-month fixed', shortLabel:'12-month', mod:-5 },
-        { key:'24m', label:'24-month fixed', shortLabel:'24-month', mod:-10 }
+        { key:'12m', label:'12-month fixed', shortLabel:'12-month', mod:-5 }
       ],
       idx: 0,
       apply: function(opt) { contractMod = opt.mod; curContract = opt.key; }
@@ -8418,8 +8392,7 @@ function resetInnerNav() {
   // + bps/NSR badge. Updated on every chipSelect call.
   const CT_CARD_DATA = [
     { name:'Flexible', desc:'No commitment · end anytime' },
-    { name:'12-month', desc:'1-year commitment', bps:'−5 bps', bpsColor:'#497d00', nsr:'+£20 NSR' },
-    { name:'24-month', desc:'2-year commitment', bps:'−10 bps', bpsColor:'#497d00', nsr:'+£40 NSR' }
+    { name:'12-month', desc:'1-year commitment', bps:'−5 bps', bpsColor:'#497d00', nsr:'+£20 NSR' }
   ];
   const SF_CARD_DATA = {
     0: { name:'Weekday',  desc:'Funds settle next weekday', bps:'−5 bps',  bpsColor:'#497d00', nsr:'+£15 NSR' },
@@ -8683,7 +8656,7 @@ function resetInnerNav() {
     return Math.round(AGG_TPV * BUSINESS_EXPENSE_RATIO);
   }
   const SETTLE_LABEL_MAP = { wd:'Weekday settlement', ed:'Everyday settlement', 'in':'Instant settlement' };
-  const CONTRACT_LABEL_MAP = { flex:'Flexible contract', '12m':'12-month fixed contract', '24m':'24-month fixed contract' };
+  const CONTRACT_LABEL_MAP = { flex:'Flexible contract', '12m':'12-month fixed contract' };
 
   function getIncludedFeatures() {
     const feats = [];
